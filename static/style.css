@@ -1,0 +1,104 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #bd8408;
+}
+body main {
+  width: 100vw;
+  display: grid;
+  grid-template-areas: "transcript-area options-area" "pagination-area pagination-area";
+  grid-template-columns: 80% 1fr;
+  grid-gap: 1rem;
+}
+body main .table-of-content .row {
+  display: grid;
+  grid-template-columns: 40% 30% 20% 10%;
+  margin: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+body main .table-of-content .row * {
+  margin: 0 0.2rem;
+  text-align: center;
+}
+body main .table-of-content .row:not(:first-child) {
+  min-height: 100px;
+}
+body main .table-of-content .row .category-span select {
+  padding: 0.2rem;
+}
+body main .table-of-content .row .details-span {
+  text-align: center;
+  position: relative;
+}
+body main .table-of-content .row .details-span span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  will-change: filter;
+  transition: filter 0.5s;
+  transform: translate(-50%, -50%) rotate(90deg);
+  padding: 1.3rem;
+  font: 1.3rem Verdana;
+  font-weight: bold;
+  background-color: #ebb60899;
+  user-select: none;
+  cursor: pointer;
+}
+body main .table-of-content .row .details-span span:hover {
+  filter: contrast(1.5);
+}
+body main .table-of-content .row .details-span span.active {
+  filter: contrast(2);
+}
+body main .table-of-content .row .transcript-span {
+  height: 80%;
+}
+body main .table-of-content .row .transcript-span textarea {
+  width: 100%;
+  height: 100%;
+  font: 1.2rem Verdana;
+  padding: 0.4rem;
+}
+body #options {
+  grid-area: options-area;
+}
+body #transcript {
+  grid-area: transcript-area;
+}
+body #pagination {
+  grid-area: pagination-area;
+  display: flex;
+  flex-flow: row nowrap;
+  overflow-x: scroll;
+}
+body #pagination .page_offset {
+  cursor: pointer;
+  will-change: filter;
+  transition: filter 0.5s;
+  position: relative;
+  padding: 1.5rem;
+  margin: 0 0.2rem;
+  border: 1px solid black;
+  background: #dfa300;
+}
+body #pagination .page_offset:hover {
+  filter: contrast(1.5);
+}
+body #pagination .page_offset.active {
+  filter: contrast(2);
+}
+body #pagination .page_offset span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  user-select: none;
+}
+
+/*# sourceMappingURL=style.css.map */
