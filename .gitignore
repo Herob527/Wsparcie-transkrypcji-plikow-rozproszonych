@@ -25,5 +25,6 @@ yarn-error.log*
 /static
 /source
 
-#logs
+# Untracked files:
 api_logs.log
+.prettierrc

@@ -67,7 +67,12 @@ export default function App() {
 
 	return (
 		<QueryClientProvider key="query_provider" client={queryClient}>
-			{transcriptLines}
+			<div id='transcript_bar'>
+				{transcriptLines}
+			</div>
+			<div id='options_bar'>
+				<CategoryAddForm key='new_category_submit'  />
+			</div>
 		</QueryClientProvider>
 	);
 }
@@ -127,7 +132,7 @@ function Category(props: any) {
 			</select>
 		);
 
-	const onCategoryChange = async (ev: any) => {
+	const handleChange = async (ev: any) => {
 		setCategory(ev.target.value);
 		const bindingId = ev.currentTarget.parentElement.getAttribute('data-id');
 		const res =
@@ -156,10 +161,24 @@ function Category(props: any) {
 	return (
 		<select
 			title="Kategorie głosów"
-			onChange={onCategoryChange}
+			onChange={handleChange}
 			value={category}
 		>
 			{categories}
 		</select>
 	);
+}
+function CategoryAddForm() {
+	const handleSubmit = (ev: any) => {
+		ev.preventDefault();
+		console.dir(ev);
+		const dataFromForm = new FormData(ev.target.parent);
+		console.dir(dataFromForm);
+	};
+	return (
+		<form onSubmit={handleSubmit} method="post">
+			<input type="text" name="category_name" autoComplete="off" />
+			<input type="submit" />
+		</form>
+	)
 }
