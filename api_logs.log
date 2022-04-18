@@ -3081,3 +3081,16 @@ INFO:werkzeug: * Restarting with stat
 WARNING:werkzeug: * Debugger is active!
 INFO:werkzeug: * Debugger PIN: 134-421-469
 INFO:werkzeug: * Running on http://127.0.0.1:5002/ (Press CTRL+C to quit)
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:46:22] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:46:22] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:46:22] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:46:22] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:46:31] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:46:33] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:46:33] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:47:31] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:47:42] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:47:43] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:48:47] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:48:48] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/Apr/2022 22:48:56] "GET /categories HTTP/1.1" 200 -
