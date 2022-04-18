@@ -70,10 +70,6 @@ class bindings(Resource):
             res: List[engine.Row] = conn.execute(query).mappings().all()
             return [dict(row) for row in res]
 
-    def post(self):
-        pass
-
-
 class texts(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -88,9 +84,16 @@ class texts(Resource):
             res: List[engine.Row] = conn.execute(query).mappings().all()
             return [dict(row) for row in res]
 
-    def post(self):
-        pass
-
+    def patch(self):
+        data = request.get_json()
+        with _engine.connect() as conn:
+            query = c_texts.update().where(c_texts.c.id==data['bindings_id']).values(transcript=data['text'])
+            try:
+                conn.execute(query)
+            except Exception as e:
+                print(e.args)
+                return jsonify({"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"})
+        return jsonify({"Success": "Kategoria pomyślnie zaktualizowana"})
 
 class categories(Resource):
     def get(self):
@@ -100,7 +103,24 @@ class categories(Resource):
             return [dict(row) for row in res]
 
     def post(self):
-        pass
+        data = request.get_json()
+        print(data)
+        with _engine.connect() as conn:
+            query = c_categories.insert(category_name=data['category_name'])
+            # conn.execute(query)
+            print(query)
+        return jsonify({"Hejo": "Hej"})
+
+    def patch(self):
+        data = request.get_json()
+        with _engine.connect() as conn:
+            query = c_bindings.update().where(c_bindings.c.id==data['bindings_id']).values(category_id=data['category_id'])
+            try:
+                conn.execute(query)
+            except Exception as e:
+                print(e.args)
+                return jsonify({"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"})
+        return jsonify({"Success": "Kategoria pomyślnie zaktualizowana"})
 
 class audios(Resource):
     def get(self):
@@ -115,7 +135,7 @@ class audios(Resource):
             res: List[engine.Row] = conn.execute(query).mappings().all()
             return [dict(row) for row in res]
 
-    def post(self):
+    def patch(self):
         pass
 
 @app.route('/get_size', methods=['GET'])
