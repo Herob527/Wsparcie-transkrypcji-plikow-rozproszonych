@@ -28,3 +28,4 @@ yarn-error.log*
 # Untracked files:
 api_logs.log
 .prettierrc
+file_category.db

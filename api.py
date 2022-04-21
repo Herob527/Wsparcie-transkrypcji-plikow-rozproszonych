@@ -104,12 +104,15 @@ class categories(Resource):
 
     def post(self):
         data = request.get_json()
-        print(data)
         with _engine.connect() as conn:
-            query = c_categories.insert(category_name=data['category_name'])
-            # conn.execute(query)
-            print(query)
-        return jsonify({"Hejo": "Hej"})
+            query = c_categories.insert().values(name=data['category_name'])
+            try:
+                conn.execute(query)
+            except sqlalchemy.exc.IntegrityError:
+                return jsonify({"Error": f"Kategoria {data['category_name']} już istnieje"})
+            except Exception as e:
+                return jsonify({"Error": f"Nieznany błąd: {e.args[0]}"})
+        return jsonify({"Success": f"Kategoria {data['category_name']} została pomyślnie dodana"})
 
     def patch(self):
         data = request.get_json()

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { SetStateAction, useEffect, useState } from "react";
+import { QueryClient, QueryClientProvider, useQuery  } from "react-query";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +57,7 @@ export default function App() {
 				id={line["id"]}
 				index={index}
 			/>
+
 			<Category
 				key={`category_${line["audio_name"]}_${line["id"]}`}
 				currentCategory={line["category_id"]}
@@ -77,9 +78,9 @@ export default function App() {
 	);
 }
 
-function Transcript( props: any) {
+function Transcript(props: any) {
 	const [text, setText] = useState(props["transcript"]);
-
+	
 	const handleChange = async (ev: any) => {
 		setText(ev.target.value);
 		const bindingId = ev.currentTarget.parentElement.getAttribute('data-id');
@@ -95,7 +96,7 @@ function Transcript( props: any) {
 				})
 			})
 			.then(res => res.json())
-			.catch(err => console.error(err));
+			.catch(err => err);
 		console.log('Transkrypt: ',res);
 	};
 	return (
@@ -111,7 +112,7 @@ function Transcript( props: any) {
 
 function Category(props: any) {
 	const [category, setCategory] = useState(0);
-	const { isLoading, error, data } = useQuery("repoData", async () => {
+	const { isLoading, error, data, refetch } = useQuery("repoData", async () => {
 		const res = await fetch(`${API_ADDRESS}/categories`);
 		return await res.json();
 	});
@@ -150,10 +151,13 @@ function Category(props: any) {
 			.catch(err => console.error(err));
 		console.log('Dane: ',res);
 	};
-
+	const handleClick = () => refetch();
+	
 	const categories = data.map((category: any, index: number) => {
 		return (
-			<option key={`option_${category["id"]}_${index}`} value={category["id"]}>
+			<option 
+				key={`option_${category["id"]}_${index}`} 
+				value={category["id"]}>
 				{category["name"].trim()}
 			</option>
 		);
@@ -162,6 +166,7 @@ function Category(props: any) {
 		<select
 			title="Kategorie głosów"
 			onChange={handleChange}
+			onClick={handleClick}
 			value={category}
 		>
 			{categories}
@@ -169,16 +174,34 @@ function Category(props: any) {
 	);
 }
 function CategoryAddForm() {
-	const handleSubmit = (ev: any) => {
+	const [categoryName, setCategoryName] = useState("");
+	const handleChange = (ev: { target: { value: SetStateAction<string>; }; }) => {
+		setCategoryName(ev.target.value);
+	}
+
+	const handleSubmit = async (ev: any) => {
 		ev.preventDefault();
-		console.dir(ev);
-		const dataFromForm = new FormData(ev.target.parent);
-		console.dir(dataFromForm);
+		const dataFromForm = new FormData(ev.target);
+		const res =
+			await fetch(`${API_ADDRESS}/categories`, {
+				"method": "POST",
+				"headers": {
+					"Content-Type": "application/json"
+				},
+				"body": JSON.stringify(Object.fromEntries(dataFromForm.entries()))
+			})
+			.then(res => res.json())
+			.catch(err => err);
+		console.log('Nowa kategoria: ',res);
+		setCategoryName("");
 	};
 	return (
-		<form onSubmit={handleSubmit} method="post">
-			<input type="text" name="category_name" autoComplete="off" />
-			<input type="submit" />
+		<form  onSubmit={handleSubmit} method="post">
+			<input type="text" value={categoryName} onChange={handleChange} name="category_name" autoComplete="off" required />
+			<input type="submit" name='submit_name' value='Prześlij' />
 		</form>
 	)
+}
+const Pagination = (props: any) => {
+
 }
