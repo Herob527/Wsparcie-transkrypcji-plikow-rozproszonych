@@ -1,5 +1,6 @@
-import { SetStateAction, useEffect, useState } from "react";
-import { QueryClient, QueryClientProvider, useQuery  } from "react-query";
+import { SetStateAction, useEffect, useState, useRef } from "react";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import './styles/css/App.css';
 
 const queryClient = new QueryClient();
 
@@ -15,10 +16,11 @@ const fetchLines = async (offset: number = 0, limit: number = 30) => {
 		fetchedData[endpoint] = res;
 	}
 	let data = [];
-	for (let index = 0; index < limit; index++) {
+	const fetchedAmount = fetchedData["bindings"].length;
+	for (let index = 0; index < fetchedAmount; index++) {
 		const currentBinding = fetchedData["bindings"][index],
-          currentAudio = fetchedData["audios"][index],
-          currentText = fetchedData["texts"][index];
+			currentAudio = fetchedData["audios"][index],
+			currentText = fetchedData["texts"][index];
 
 		const currentData = {
 			id: currentBinding["id"],
@@ -33,15 +35,40 @@ const fetchLines = async (offset: number = 0, limit: number = 30) => {
 
 export default function App() {
 	const [lines, setLines] = useState(Array());
-
+	const [page, setPage] = useState(0);
+	const totalData = useRef(0);
+	const elementsPerPage = 30;
 	useEffect(() => {
-		fetchLines().then(async (el) => setLines(el));
-	}, []);
+		fetchLines(elementsPerPage * page, elementsPerPage)
+			.then(async (el) => setLines(el));
+		(async () => {
+			const res = await fetch(`${API_ADDRESS}/get_size`)
+				.then(async (el) => await el.json());
+			totalData.current = res['count_1'];
+		})()
+	}, [page, elementsPerPage]);
 
-	if (!lines) {
-		return <p key="loading"> Loading... </p>;
+	if (totalData.current === 0) {
+		return (<p> Loading </p>);
 	}
-
+	const amountOfPages = Math.ceil(totalData.current / elementsPerPage);
+	const paginationLines = [];
+	const handlePaginationClick = (ev: any) => {
+		const newPage: number = ev.target.getAttribute('data-page');
+		setPage(newPage);
+	}
+	for (let i = 0; i < amountOfPages; i++) {
+		const paginationElement =
+			<span
+				className='paginationElement'
+				onClick={handlePaginationClick} data-page={i}
+			>
+				<span>
+				{i + 1}
+				</span>
+			</span>
+		paginationLines.push(paginationElement);
+	}
 	const transcriptLines = lines.map((line, index) => (
 		<div data-id={line["id"]}>
 			<span key={`name_${line["audio_name"]}`}>{line["audio_name"]}</span>
@@ -68,11 +95,18 @@ export default function App() {
 
 	return (
 		<QueryClientProvider key="query_provider" client={queryClient}>
-			<div id='transcript_bar'>
-				{transcriptLines}
+			<div id='transcript' key='transcript'>
+				<div id='lines'>
+					{transcriptLines}
+				</div>
+				<div id='pagination'>
+					{paginationLines}
+				</div>
 			</div>
-			<div id='options_bar'>
-				<CategoryAddForm key='new_category_submit'  />
+			<div id='sidebar'>
+				<div id='category' key='category'>
+					<CategoryAddForm key='new_category_submit' />
+				</div>
 			</div>
 		</QueryClientProvider>
 	);
@@ -80,7 +114,7 @@ export default function App() {
 
 function Transcript(props: any) {
 	const [text, setText] = useState(props["transcript"]);
-	
+
 	const handleChange = async (ev: any) => {
 		setText(ev.target.value);
 		const bindingId = ev.currentTarget.parentElement.getAttribute('data-id');
@@ -95,9 +129,9 @@ function Transcript(props: any) {
 					"bindings_id": bindingId
 				})
 			})
-			.then(res => res.json())
-			.catch(err => err);
-		console.log('Transkrypt: ',res);
+				.then(res => res.json())
+				.catch(err => err);
+		console.log('Transkrypt: ', res);
 	};
 	return (
 		<textarea
@@ -147,16 +181,16 @@ function Category(props: any) {
 					"bindings_id": bindingId
 				})
 			})
-			.then(res => res.json())
-			.catch(err => console.error(err));
-		console.log('Dane: ',res);
+				.then(res => res.json())
+				.catch(err => console.error(err));
+		console.log('Dane: ', res);
 	};
 	const handleClick = () => refetch();
-	
+
 	const categories = data.map((category: any, index: number) => {
 		return (
-			<option 
-				key={`option_${category["id"]}_${index}`} 
+			<option
+				key={`option_${category["id"]}_${index}`}
 				value={category["id"]}>
 				{category["name"].trim()}
 			</option>
@@ -175,7 +209,7 @@ function Category(props: any) {
 }
 function CategoryAddForm() {
 	const [categoryName, setCategoryName] = useState("");
-	const handleChange = (ev: { target: { value: SetStateAction<string>; }; }) => {
+	const handleChange = (ev: any) => {
 		setCategoryName(ev.target.value);
 	}
 
@@ -190,18 +224,15 @@ function CategoryAddForm() {
 				},
 				"body": JSON.stringify(Object.fromEntries(dataFromForm.entries()))
 			})
-			.then(res => res.json())
-			.catch(err => err);
-		console.log('Nowa kategoria: ',res);
+				.then(res => res.json())
+				.catch(err => err);
+		console.log('Nowa kategoria: ', res);
 		setCategoryName("");
 	};
 	return (
-		<form  onSubmit={handleSubmit} method="post">
+		<form onSubmit={handleSubmit} method="post">
 			<input type="text" value={categoryName} onChange={handleChange} name="category_name" autoComplete="off" required />
 			<input type="submit" name='submit_name' value='Prześlij' />
 		</form>
 	)
-}
-const Pagination = (props: any) => {
-
 }
