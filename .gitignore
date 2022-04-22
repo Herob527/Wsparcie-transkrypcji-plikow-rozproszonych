@@ -29,3 +29,4 @@ yarn-error.log*
 api_logs.log
 .prettierrc
 file_category.db
+config.json

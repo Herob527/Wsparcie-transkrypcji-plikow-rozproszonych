@@ -1,0 +1,29 @@
+#pagination {
+  width: 100%;
+  overflow-x: scroll;
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 1rem 0;
+}
+#pagination .paginationElement {
+  padding: 1.4rem;
+  margin: 0 0.2rem;
+  position: relative;
+  background-color: #0569ff;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+}
+#pagination .paginationElement:hover {
+  filter: brightness(1.5);
+}
+#pagination .paginationElement span {
+  position: absolute;
+  font: 1.2rem Verdana;
+}
+
+/*# sourceMappingURL=App.css.map */

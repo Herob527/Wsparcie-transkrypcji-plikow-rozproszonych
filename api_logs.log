@@ -3993,3 +3993,213 @@ INFO:werkzeug: * Detected change in 'C:\\Users\\szymo\\Desktop\\Pliki\\katalogow
 INFO:werkzeug: * Restarting with stat
 WARNING:werkzeug: * Debugger is active!
 INFO:werkzeug: * Debugger PIN: 134-421-469
+INFO:werkzeug: * Running on http://127.0.0.1:5002/ (Press CTRL+C to quit)
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:31:14] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:31:16] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:31:17] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:31:17] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:31:17] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:31:20] "OPTIONS /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:31:21] "PATCH /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:31:23] "PATCH /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:29] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:29] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:29] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:29] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:29] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:30] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:31] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:33] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:37] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:40] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:47] "OPTIONS /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:48] "POST /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:51] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:53:52] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:55:21] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:55:22] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:55:24] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:55:28] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:55:34] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:56:23] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:56:25] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:56:50] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:56:54] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:56:55] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:56:57] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:18] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:18] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:18] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:18] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:21] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:21] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:21] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:21] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:28] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:28] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:28] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:57:28] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:58:16] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:58:16] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:58:16] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 20:58:16] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:00:03] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:00:03] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:00:03] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:00:03] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:00:07] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:00:07] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:00:07] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:00:07] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:27:02] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:27:10] "OPTIONS /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:27:10] "POST /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 21:27:12] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:03:44] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:03:44] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:03:44] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:03:44] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:09:10] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:09:10] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:09:10] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:09:10] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:22:23] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:22:23] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:22:23] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:22:23] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:23:04] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:23:05] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:23:07] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:23:08] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:23:10] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:23:43] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:24:47] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:24:49] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:24:53] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:28:47] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:32:28] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:32:36] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [21/Apr/2022 22:32:37] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 134-421-469
+INFO:werkzeug: * Running on http://127.0.0.1:5002/ (Press CTRL+C to quit)
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:19:27] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:19:28] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:19:28] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:19:28] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:20:20] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:36] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:36] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:36] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:36] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:40] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:43] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:43] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:44] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:21:44] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:21] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:21] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:22] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:22] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:22] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:24] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:25] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:25] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:42] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:42] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:43] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:43] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:43] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:44] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:54] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:54] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:54] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:22:54] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:23:46] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:23:46] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:23:46] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:23:46] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:23:49] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:23:50] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:24:35] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:24:35] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:24:35] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:24:35] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:28] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:28] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:28] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:28] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:29] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:29] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:30] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:30] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:31] "OPTIONS /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:32] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:33] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:40] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:41] "OPTIONS /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:41] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:41] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:41] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:41] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:41] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:42] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:44] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:44] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:45] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:46] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:46] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:46] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:46] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:51] "OPTIONS /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:25:51] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in 'C:\\Users\\szymo\\Desktop\\Pliki\\katalogowanie-dzwiekow-react\\api.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 134-421-469
+INFO:werkzeug: * Running on http://127.0.0.1:5002/ (Press CTRL+C to quit)
+INFO:werkzeug: * Detected change in 'C:\\Users\\szymo\\Desktop\\Pliki\\katalogowanie-dzwiekow-react\\api.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 134-421-469
+INFO:werkzeug: * Running on http://127.0.0.1:5002/ (Press CTRL+C to quit)
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:14] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:15] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:15] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:15] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:18] "OPTIONS /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:18] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:19] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:20] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:20] "GET /bindings?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:21] "GET /audios?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:21] "GET /texts?offset=0&limit=30 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:21] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:26] "OPTIONS /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:26:26] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:27:28] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:27:53] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:27:55] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:27:56] "OPTIONS /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:27:56] "PATCH /texts HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Apr/2022 09:32:33] "GET /categories HTTP/1.1" 200 -
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 134-421-469
+INFO:werkzeug: * Running on http://127.0.0.1:5002/ (Press CTRL+C to quit)

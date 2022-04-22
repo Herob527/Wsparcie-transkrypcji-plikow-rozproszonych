@@ -93,7 +93,7 @@ class texts(Resource):
             except Exception as e:
                 print(e.args)
                 return jsonify({"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"})
-        return jsonify({"Success": "Kategoria pomyślnie zaktualizowana"})
+        return jsonify({"Success": "Tekst zaktualizowany pomyślnie"})
 
 class categories(Resource):
     def get(self):
