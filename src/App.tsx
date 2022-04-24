@@ -1,6 +1,7 @@
-import { SetStateAction, useEffect, useState, useRef } from "react";
+import { SetStateAction, useEffect, useState, useRef, useCallback } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import './styles/css/App.css';
+import WaveSurfer from "wavesurfer.js";
 
 const queryClient = new QueryClient();
 
@@ -34,10 +35,12 @@ const fetchLines = async (offset: number = 0, limit: number = 30) => {
 };
 
 export default function App() {
+
 	const [lines, setLines] = useState(Array());
 	const [page, setPage] = useState(0);
 	const totalData = useRef(0);
-	const elementsPerPage = 30;
+	const [elementsPerPage, setElementsPerPage] = useState(30);
+
 	useEffect(() => {
 		fetchLines(elementsPerPage * page, elementsPerPage)
 			.then(async (el) => setLines(el));
@@ -48,36 +51,41 @@ export default function App() {
 		})()
 	}, [page, elementsPerPage]);
 
+
 	if (totalData.current === 0) {
 		return (<p> Loading </p>);
 	}
 	const amountOfPages = Math.ceil(totalData.current / elementsPerPage);
 	const paginationLines = [];
+
 	const handlePaginationClick = (ev: any) => {
+		console.dir(ev);
 		const newPage: number = ev.target.getAttribute('data-page');
+		if (newPage === page) return;
 		setPage(newPage);
 	}
+
 	for (let i = 0; i < amountOfPages; i++) {
 		const paginationElement =
 			<span
 				className='paginationElement'
 				onClick={handlePaginationClick} data-page={i}
 			>
-				<span>
-				{i + 1}
+				<span data-page={i}>
+					{i + 1}
 				</span>
 			</span>
 		paginationLines.push(paginationElement);
 	}
+
 	const transcriptLines = lines.map((line, index) => (
-		<div data-id={line["id"]}>
+		<div data-id={line["id"]} className='line'>
 			<span key={`name_${line["audio_name"]}`}>{line["audio_name"]}</span>
-			<audio key={`audio_${line["audio_name"]}`} controls>
-				<source
-					key={`source_${line["audio_name"]}`}
-					src={require(`./../source/${line["audio_name"]}`)}
-				/>
-			</audio>
+			<WaveAudio 
+				index={index} 
+				audio_name={line['audio_name']}
+				key={`audio_${line['id']}`} 
+			/>
 			<Transcript
 				key={`transcript_${line["audio_name"]}_${line["id"]}`}
 				transcript={line["transcript"]}
@@ -97,6 +105,12 @@ export default function App() {
 		<QueryClientProvider key="query_provider" client={queryClient}>
 			<div id='transcript' key='transcript'>
 				<div id='lines'>
+					<div className="heading">
+						<span> Nazwa </span>
+						<span> Plik audio </span>
+						<span className='transcript'> Transkrypt </span>
+						<span className='category'> Kategoria </span>
+					</div>
 					{transcriptLines}
 				</div>
 				<div id='pagination'>
@@ -104,9 +118,7 @@ export default function App() {
 				</div>
 			</div>
 			<div id='sidebar'>
-				<div id='category' key='category'>
-					<CategoryAddForm key='new_category_submit' />
-				</div>
+				<CategoryAddForm key='new_category_submit' />
 			</div>
 		</QueryClientProvider>
 	);
@@ -207,12 +219,13 @@ function Category(props: any) {
 		</select>
 	);
 }
+
+
 function CategoryAddForm() {
 	const [categoryName, setCategoryName] = useState("");
 	const handleChange = (ev: any) => {
 		setCategoryName(ev.target.value);
 	}
-
 	const handleSubmit = async (ev: any) => {
 		ev.preventDefault();
 		const dataFromForm = new FormData(ev.target);
@@ -230,9 +243,43 @@ function CategoryAddForm() {
 		setCategoryName("");
 	};
 	return (
+
 		<form onSubmit={handleSubmit} method="post">
+			<h4> Dodawanie nowej kategorii </h4>
 			<input type="text" value={categoryName} onChange={handleChange} name="category_name" autoComplete="off" required />
 			<input type="submit" name='submit_name' value='Prześlij' />
 		</form>
+
 	)
+}
+
+function WaveAudio(props: any) {
+	const waveAudioRef = useRef({} as WaveSurfer);
+	
+	const handleClick = (ev: any) => {
+		if (!waveAudioRef.current.isPlaying()) {
+			waveAudioRef.current.play();
+			return;
+		}
+		waveAudioRef.current.pause();
+		
+	}
+	
+	useEffect(() => {
+		const audioElement = document.querySelector(`#waveform_${props['index']}`) as HTMLElement;
+		const waveform = WaveSurfer.create({
+			container: audioElement,
+			waveColor: '#0569ff',
+			progressColor: '#0353cc'
+
+		});
+		const pathToFile = `./source/${props['audio_name']}`;
+		waveform.load(pathToFile);
+		waveAudioRef.current = waveform;
+		return () => waveform.destroy()
+	})
+
+	return (<div id={`waveform_${props['index']}`} onClick={handleClick}>
+
+	</div>)
 }

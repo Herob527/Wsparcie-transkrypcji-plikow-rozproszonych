@@ -1,5 +1,15 @@
+*
+    box-sizing: border-box
+body
+    margin: 0
+    padding: 0 
 #root 
     display: flex
     flex-flow: row nowrap
+    grid-gap: 0.2rem
     #transcript
-    #category
+        width: 80%
+    #sidebar
+        width: 20%
+    & > *
+        padding: 0.4rem

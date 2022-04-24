@@ -1,13 +1,40 @@
+#transcript #lines {
+  display: grid;
+  position: relative;
+  grid-gap: 0.2rem;
+}
+#transcript #lines > div {
+  display: grid;
+  grid-template-columns: 15% 30% 45% 10%;
+  text-align: center;
+  grid-gap: 0 0.2rem;
+  align-items: center;
+}
+#transcript #lines > div.heading {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  font: 1.2rem Verdana;
+  margin-bottom: 0.2rem;
+  background: white;
+}
+
 #pagination {
-  width: 100%;
+  z-index: 10;
+  width: calc(100% + 0.6rem);
   overflow-x: scroll;
   display: flex;
   flex-flow: row nowrap;
-  margin: 1rem 0;
+  margin: 0.2rem 0 0;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  background-color: #0353cc;
+  padding: 0.2rem;
 }
 #pagination .paginationElement {
-  padding: 1.4rem;
-  margin: 0 0.2rem;
+  padding: 1.5rem;
   position: relative;
   background-color: #0569ff;
   color: white;
@@ -17,6 +44,9 @@
   flex-flow: column nowrap;
   align-items: center;
   justify-content: center;
+}
+#pagination .paginationElement:nth-of-type(n + 1):not(:last-of-type) {
+  margin: 0 0.2rem 0 0;
 }
 #pagination .paginationElement:hover {
   filter: brightness(1.5);

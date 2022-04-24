@@ -30,4 +30,3 @@ yarn-error.log*
 file_category.db
 config.json
 api_logs.log
-file_category*

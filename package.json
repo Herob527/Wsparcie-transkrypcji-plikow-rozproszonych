@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@re_point/wavesurfer": "^5.3.4",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
@@ -15,13 +16,16 @@
     "react-query": "^3.34.16",
     "react-scripts": "5.0.0",
     "typescript": "^4.6.2",
+    "wavesurfer.js": "^6.1.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "start_api": "python api.py",
+    "start_sass": "sass src/styles/sass:src/styles/css --watch"
   },
   "eslintConfig": {
     "extends": [
@@ -40,5 +44,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/wavesurfer.js": "^6.0.3"
   }
+  
 }
