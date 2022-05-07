@@ -48,5 +48,4 @@
   "devDependencies": {
     "@types/wavesurfer.js": "^6.0.3"
   }
-  
 }

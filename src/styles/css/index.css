@@ -10,16 +10,12 @@ body {
 #root {
   display: flex;
   flex-flow: row nowrap;
-  grid-gap: 0.2rem;
 }
 #root #transcript {
   width: 80%;
 }
 #root #sidebar {
   width: 20%;
-}
-#root > * {
-  padding: 0.4rem;
 }
 
 /*# sourceMappingURL=index.css.map */

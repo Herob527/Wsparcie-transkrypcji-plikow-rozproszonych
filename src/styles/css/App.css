@@ -1,28 +1,54 @@
+.heading_name {
+  font: 1.5rem Arial !important;
+  margin: 0;
+  padding: 0 0 0.4rem 0 !important;
+}
+
 #transcript #lines {
   display: grid;
   position: relative;
-  grid-gap: 0.2rem;
 }
 #transcript #lines > div {
   display: grid;
-  grid-template-columns: 15% 30% 45% 10%;
+  grid-template-columns: 15% 30% 43% 12%;
   text-align: center;
-  grid-gap: 0 0.2rem;
   align-items: center;
+}
+#transcript #lines > div span {
+  word-break: break-word;
+  font: 1rem Arial;
+}
+#transcript #lines > div.heading > * {
+  font-family: Arial;
+  border-right: 2px solid #0569ff;
+  margin: 0;
+}
+#transcript #lines > div:not(#transcript #lines > div.heading) > * {
+  padding: 0.2rem;
+  margin: 0.2rem;
+}
+#transcript #lines > div > .transcript {
+  font: 1.2rem Arial;
+  min-height: 90%;
+  max-width: calc(100% - 0.2rem);
+  padding: 0.4rem !important;
+  resize: none;
+}
+#transcript #lines > div > .category {
+  font: 1.2rem Arial;
 }
 #transcript #lines > div.heading {
   position: sticky;
   top: 0;
   left: 0;
   z-index: 10;
-  font: 1.2rem Verdana;
+  border-bottom: 2px solid #0569ff;
   margin-bottom: 0.2rem;
   background: white;
 }
 
 #pagination {
   z-index: 10;
-  width: calc(100% + 0.6rem);
   overflow-x: scroll;
   display: flex;
   flex-flow: row nowrap;
@@ -30,20 +56,26 @@
   position: sticky;
   bottom: 0;
   left: 0;
-  background-color: #0353cc;
-  padding: 0.2rem;
+  background-color: white;
 }
 #pagination .paginationElement {
+  will-change: filter;
+  transition: filter 0.2s;
   padding: 1.5rem;
   position: relative;
-  background-color: #0569ff;
-  color: white;
+  background-color: white;
   cursor: pointer;
   text-align: center;
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
   justify-content: center;
+  border: 2px solid #0569ff;
+}
+#pagination .paginationElement.active {
+  background: #0569ff;
+  color: white;
+  border: 2px solid #0445a7;
 }
 #pagination .paginationElement:nth-of-type(n + 1):not(:last-of-type) {
   margin: 0 0.2rem 0 0;
@@ -51,9 +83,31 @@
 #pagination .paginationElement:hover {
   filter: brightness(1.5);
 }
+#pagination .paginationElement:hover span {
+  transform: scale(1.1);
+}
 #pagination .paginationElement span {
   position: absolute;
   font: 1.2rem Verdana;
+}
+
+#sidebar {
+  align-items: center;
+  position: sticky;
+  top: 0;
+  right: 0;
+  height: fit-content;
+  font: 1rem Arial;
+  text-align: center;
+}
+#sidebar input {
+  font: 1rem Arial;
+  padding: 0.2rem;
+  margin: 0.2rem 0;
+}
+#sidebar > * {
+  padding: 0.2rem;
+  border-bottom: 2px solid #0569ff;
 }
 
 /*# sourceMappingURL=App.css.map */

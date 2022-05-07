@@ -1,0 +1,31 @@
+{
+    "elementsPerPage": 20, 
+    "shortcuts": {
+        "forward": {
+            "keyCombination": ["Alt","R"],
+            "title": "Przesuń odtwarzanie audio naprzód. Domyślnie o .5 sekund",
+            "value": 0.5
+        },
+        "back": {
+            "keyCombination": ["Alt","Q"],
+            "title": "Cofnij odtwarzanie audio. Domyślnie o .5 sekund",
+            "value": 0.5
+        },
+        "pause": {
+            "keyCombination": ["Alt","T"],
+            "title": "Zatrzymaj odtwarzanie", 
+            "value": null
+        },
+        "continue": {
+            "keyCombination": ["Alt","D"],
+            "title": "Kontynuuj odtwarzanie",
+            "value": null
+        },
+        "stop": {
+            "keyCombination": ["Alt", "Y"],
+            "title": "Zakończ odtwarzanie (zeruje wskaźnik)",
+            "value": null
+        }
+
+    }
+}

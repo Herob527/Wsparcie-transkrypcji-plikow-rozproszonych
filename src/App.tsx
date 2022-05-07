@@ -1,11 +1,45 @@
-import { SetStateAction, useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef,  MouseEvent} from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import './styles/css/App.css';
 import WaveSurfer from "wavesurfer.js";
+import config from './config.json'
 
 const queryClient = new QueryClient();
 
 const API_ADDRESS = "http://localhost:5002";
+
+let selectedLine = 0;
+let audioElements: Array<WaveSurfer> = [];
+
+const areSetsTheSame = (leftSet: Set<string>, rightSet: Set<string>) : boolean => {
+	if (leftSet.size != rightSet.size) {
+		return false;
+	}
+	for (let val in leftSet.values()) {
+		if (!rightSet.has(val)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+const keyBinding = (keyCombination: Set<string> ,onKeyDownCallback: () => void, onKeyUpCallback: () => void) => {
+	const pressedKeys: Set<string> = new Set();
+	let isPressed = false;
+	document.addEventListener("keydown", (event) => {
+		pressedKeys.add(event.key)
+		// console.log(pressedKeys, keyCombination, areSetsTheSame(pressedKeys, keyCombination));
+		if (!isPressed && areSetsTheSame(pressedKeys, keyCombination)) {
+			onKeyDownCallback.call(globalThis)
+			isPressed = true;
+		};
+	})
+	document.addEventListener("keyup", (event) => {
+		pressedKeys.delete(event.key);
+		onKeyUpCallback.call(globalThis);
+		isPressed = false;
+	});
+}
 
 const fetchLines = async (offset: number = 0, limit: number = 30) => {
 	const apiEndpoints = ["bindings", "audios", "texts"];
@@ -24,22 +58,33 @@ const fetchLines = async (offset: number = 0, limit: number = 30) => {
 			currentText = fetchedData["texts"][index];
 
 		const currentData = {
-			id: currentBinding["id"],
-			category_id: currentBinding["category_id"],
-			audio_name: currentAudio["name"],
-			transcript: currentText["transcript"],
+			id: currentBinding["id"] as number,
+			category_id: currentBinding["category_id"] as number, 
+			audio_name: currentAudio["name"] as string,
+			transcript: currentText["transcript"] as string,
 		};
 		data.push(currentData);
 	}
+	data.sort((prev,cur) => {
+		const sortingKey = 'audio_name'
+		const audioNameLength = prev[sortingKey].length;
+		for (let i = 0; i < audioNameLength; i++) {
+			if (prev[sortingKey][i] > cur[sortingKey][i]) return 1;
+			if (prev[sortingKey][i] < cur[sortingKey][i]) return -1;
+		}
+		return 0;
+	});
 	return data;
 };
 
 export default function App() {
-
+	const minElementsPerPage = 10;
+	const initialElementsPerPage: number = config['elementsPerPage'];
+	const maxElementsPerPage = 50;
 	const [lines, setLines] = useState(Array());
 	const [page, setPage] = useState(0);
-	const totalData = useRef(0);
-	const [elementsPerPage, setElementsPerPage] = useState(30);
+	const [elementsPerPage, setElementsPerPage] = useState(initialElementsPerPage);
+	const totalData = useRef(0)
 
 	useEffect(() => {
 		fetchLines(elementsPerPage * page, elementsPerPage)
@@ -59,16 +104,16 @@ export default function App() {
 	const paginationLines = [];
 
 	const handlePaginationClick = (ev: any) => {
-		console.dir(ev);
 		const newPage: number = ev.target.getAttribute('data-page');
 		if (newPage === page) return;
 		setPage(newPage);
 	}
 
 	for (let i = 0; i < amountOfPages; i++) {
+		const classes = `paginationElement ${i == page ? 'active' : ''}`;
 		const paginationElement =
 			<span
-				className='paginationElement'
+				className={classes}
 				onClick={handlePaginationClick} data-page={i}
 			>
 				<span data-page={i}>
@@ -77,39 +122,59 @@ export default function App() {
 			</span>
 		paginationLines.push(paginationElement);
 	}
-
+	const handleLineClick = (event: MouseEvent<HTMLDivElement>) => {
+		const currentIndex = event.currentTarget;
+		selectedLine = Number(currentIndex.getAttribute('data-line-order'));
+	}
+	document.onkeyup = (event: KeyboardEvent) => {
+		if (event.key === 'F2') {
+			const currentAudio = audioElements[selectedLine];
+			if (currentAudio.isPlaying()) {
+				currentAudio.pause();
+				return
+			}
+			currentAudio.play();
+		}
+	}
 	const transcriptLines = lines.map((line, index) => (
-		<div data-id={line["id"]} className='line'>
+		<div data-id={line["id"]} data-line-order={index} className='line' onClick={handleLineClick}>
 			<span key={`name_${line["audio_name"]}`}>{line["audio_name"]}</span>
-			<WaveAudio 
-				index={index} 
+			<WaveAudio
+				index={index}
 				audio_name={line['audio_name']}
-				key={`audio_${line['id']}`} 
+				key={`audio_${line['id']}`}
 			/>
 			<Transcript
 				key={`transcript_${line["audio_name"]}_${line["id"]}`}
 				transcript={line["transcript"]}
 				id={line["id"]}
 				index={index}
-			/>
 
+			/>
 			<Category
 				key={`category_${line["audio_name"]}_${line["id"]}`}
 				currentCategory={line["category_id"]}
 				id={line["id"]}
 			/>
+			
 		</div>
 	));
-
+	const handleInput = (ev: any) => {
+		const newVal = ev.target.value;
+		if (Number(newVal) < minElementsPerPage) setElementsPerPage(minElementsPerPage);
+		setElementsPerPage(newVal)
+	}
+	document.title = `Katerskrypcja: Strona ${(Number(page) + Number(1))}`;
 	return (
 		<QueryClientProvider key="query_provider" client={queryClient}>
+			
 			<div id='transcript' key='transcript'>
 				<div id='lines'>
 					<div className="heading">
-						<span> Nazwa </span>
-						<span> Plik audio </span>
-						<span className='transcript'> Transkrypt </span>
-						<span className='category'> Kategoria </span>
+						<span className='heading_name'> Nazwa </span>
+						<span className='heading_name'> Plik audio </span>
+						<span className='heading_name'> Transkrypt </span>
+						<span className='heading_name'> Kategoria </span>
 					</div>
 					{transcriptLines}
 				</div>
@@ -118,8 +183,15 @@ export default function App() {
 				</div>
 			</div>
 			<div id='sidebar'>
+				<p className='heading_name'> Prosty panel konfiguracji </p>
 				<CategoryAddForm key='new_category_submit' />
+				<div id='number_of_entries'>
+					<h4> Zmień liczbę wpisów na stronę</h4>
+					<input type='number' min={minElementsPerPage} max={maxElementsPerPage} required value={elementsPerPage} onInput={handleInput} />
+				</div>
+				<Finalise key='categorise' />
 			</div>
+			
 		</QueryClientProvider>
 	);
 }
@@ -128,6 +200,9 @@ function Transcript(props: any) {
 	const [text, setText] = useState(props["transcript"]);
 
 	const handleChange = async (ev: any) => {
+		setText(ev.target.value);
+	};
+	const handleBlur = async (ev: any) => {
 		setText(ev.target.value);
 		const bindingId = ev.currentTarget.parentElement.getAttribute('data-id');
 		const res =
@@ -144,14 +219,21 @@ function Transcript(props: any) {
 				.then(res => res.json())
 				.catch(err => err);
 		console.log('Transkrypt: ', res);
-	};
+	}
+	const handleFocus = (ev: any) => {
+		const lineOrder = ev.currentTarget.parentElement.getAttribute('data-line-order');
+		selectedLine = Number(lineOrder)
+	}
 	return (
 		<textarea
 			title="Transkrpcja"
 			value={text}
 			onChange={handleChange}
-			onBlur={handleChange}
+			onBlur={handleBlur}
+			onFocus={handleFocus}
 			tabIndex={props['index'] + 1}
+			className='transcript'
+
 		></textarea>
 	);
 }
@@ -198,7 +280,6 @@ function Category(props: any) {
 		console.log('Dane: ', res);
 	};
 	const handleClick = () => refetch();
-
 	const categories = data.map((category: any, index: number) => {
 		return (
 			<option
@@ -214,6 +295,7 @@ function Category(props: any) {
 			onChange={handleChange}
 			onClick={handleClick}
 			value={category}
+			className="category"
 		>
 			{categories}
 		</select>
@@ -244,39 +326,74 @@ function CategoryAddForm() {
 	};
 	return (
 
-		<form onSubmit={handleSubmit} method="post">
+		<form id='new_category_form' onSubmit={handleSubmit} method="post">
 			<h4> Dodawanie nowej kategorii </h4>
 			<input type="text" value={categoryName} onChange={handleChange} name="category_name" autoComplete="off" required />
-			<input type="submit" name='submit_name' value='Prześlij' />
+			<br />
+			<input type="submit" name='add_category' value='Prześlij' />
 		</form>
 
 	)
 }
 
-function WaveAudio(props: any) {
+function Finalise() {
+	const [categoriseLevel, setCategoriseLevel] = useState(1);
+
+	const handleSubmit = async (event: any) => {
+		event.preventDefault();
+		const data = new FormData(event.currentTarget);
+		const finalise = await fetch(`${API_ADDRESS}/finalise`, {
+			"method": "POST",
+			"headers": {
+				"Content-Type": "application/json"
+			},
+			"body": JSON.stringify(Object.fromEntries(data.entries()))
+		}).then(el => el.json())
+		console.log(finalise);
+	}
+	const handleChange = (event: any) => {
+		setCategoriseLevel(event.target.value);
+	}
+	const levelTitles = [
+		'Kategoryzacja + Podział na listy',
+		'Kategoryzacja + Format plików + Podział na listy',
+		'Kategoryzacja + Format plików + Podział na listy Flowtron'
+	]
+	return (<form method='POST' id='categorise' onSubmit={handleSubmit}>
+		<h4> Finalizacja  </h4>
+		<p> {levelTitles[categoriseLevel]} </p>
+		<input type='range' min={0} max={2} step={1} value={categoriseLevel} onChange={handleChange} name='categoriseLevel' title={levelTitles[categoriseLevel]}/>
+		<br />
+		<input type='submit' name='categorise' value='Finalizuj'  />
+	</form>)
+}
+
+function WaveAudio(props: { "index": number, "audio_name": string}) {
 	const waveAudioRef = useRef({} as WaveSurfer);
-	
+	const audioContainerRef = useRef({} as HTMLElement)
 	const handleClick = (ev: any) => {
 		if (!waveAudioRef.current.isPlaying()) {
 			waveAudioRef.current.play();
 			return;
 		}
 		waveAudioRef.current.pause();
-		
 	}
-	
 	useEffect(() => {
 		const audioElement = document.querySelector(`#waveform_${props['index']}`) as HTMLElement;
+		audioContainerRef.current = audioElement;
 		const waveform = WaveSurfer.create({
 			container: audioElement,
 			waveColor: '#0569ff',
 			progressColor: '#0353cc'
-
 		});
 		const pathToFile = `./source/${props['audio_name']}`;
 		waveform.load(pathToFile);
+		audioElements.push(waveform);
 		waveAudioRef.current = waveform;
-		return () => waveform.destroy()
+		return () => { 
+			waveform.destroy()
+			audioElements.splice(0, audioElements.length)
+		}
 	})
 
 	return (<div id={`waveform_${props['index']}`} onClick={handleClick}>
