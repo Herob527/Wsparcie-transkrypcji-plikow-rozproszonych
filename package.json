@@ -1,7 +1,7 @@
 {
   "name": "katalogowanie-dzwiekow-react",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@re_point/wavesurfer": "^5.3.4",
     "@testing-library/jest-dom": "^5.16.2",

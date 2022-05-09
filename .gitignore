@@ -31,5 +31,5 @@ yarn-error.log*
 *.log
 *.db
 ffmpeg.exe
-./api_logs.log
-./remove_all.py
+api_logs.log
+remove_all.py
