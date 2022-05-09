@@ -7,22 +7,22 @@ Do działania wymaga ffmpeg.exe
 F2 - Zatrzymaj / Wznów audio
 
 # To-Do lista
-[] Zaimplementować trzeci poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
-[] Zautomatyzować proces wstępnej konfiguracji bazy
-[] Dodać wsparcie dla innnych wersji językowych
-[] Dodać ciemny styl
-[] Przy konfiguracji dodać rekursywne przeszukiwanie folderów z plikami źródłowymi
-[] Konfiguracja aplikacji z poziomu interfejsu
-[] Zaimplementować skróty klawiszowe
-[] Ogólnie dostosować aplikację do ułatwienia rozproszonego developmentu
+- [ ] Zaimplementować trzeci poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
+- [ ] Zautomatyzować proces wstępnej konfiguracji bazy
+- [ ] Dodać wsparcie dla innnych wersji językowych
+- [ ] Dodać ciemny styl
+- [ ] Przy konfiguracji dodać rekursywne przeszukiwanie folderów z plikami źródłowymi
+- [ ] Konfiguracja aplikacji z poziomu interfejsu
+- [ ] Zaimplementować skróty klawiszowe
+- [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego developmentu
 
-W ogromnym skrócie, uczynić aplikację user friendly
+W ogromnym skrócie, uczynić aplikację user friendly i dev friednly
 
 # Dalekie plany
-[] Przetestować framework Electron
-[] Przetestować chmurowe systemy bazodanowe
-[] Przepisać API na nowo, żeby ułatwić implementację na inne systemy bazodanowe
-[] Zaimplementować wsparcie auto-tranksrypcji
+- [ ] Przetestować framework Electron
+- [ ] Przetestować chmurowe systemy bazodanowe
+- [ ] Przepisać API na nowo, żeby ułatwić implementację na inne systemy bazodanowe
+- [ ] Zaimplementować wsparcie auto-tranksrypcji
 
 # Wstępna konfiguracja bazy
 Obecnie aplikacja wymaga ręcznej konfiguracji bazy
