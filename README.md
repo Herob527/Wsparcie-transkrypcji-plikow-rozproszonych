@@ -33,8 +33,11 @@ Obecnie aplikacja wymaga ręcznej konfiguracji bazy
 1. Należy uruchomić python api.py
 2. Pliki muszą być w folderze source
 3. Należy wykonać żądanie POST dla endpointa /setup_database
-Dla CMD
+
+Dla CMD:
+
 curl http://localhost:5002/setup_database -X POST
+
 I czekać
 
 # Wsparcie techniczne
