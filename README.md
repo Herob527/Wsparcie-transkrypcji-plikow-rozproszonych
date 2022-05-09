@@ -39,9 +39,3 @@ I czekać
 
 # Wsparcie techniczne
 Jako iż to wczesna alfa, to też nie udzielam wsparcia technicznego w problemach jakie mogą nastąpić
-
-# Uruchamianie build
-1. Należy zainstalować pakiet node serve
-npm install serve
-2. Wklepać komendę serve -s build
-3. API musi być włączone
