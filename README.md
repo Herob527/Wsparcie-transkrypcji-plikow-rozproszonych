@@ -20,7 +20,7 @@ F2 - Zatrzymaj / Wznów audio
 - [ ] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego developmentu
 
-W ogromnym skrócie, uczynić aplikację user friendly i dev friednly
+W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 
 # Dalekie plany
 - [ ] Przetestować framework Electron
