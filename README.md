@@ -34,7 +34,7 @@ Obecnie aplikacja wymaga ręcznej konfiguracji bazy
 2. Pliki muszą być w folderze source
 3. Należy wykonać żądanie POST dla endpointa /setup_database
 
-Dla CMD:
+Dla command line Windows:
 
 curl http://localhost:5002/setup_database -X POST
 
