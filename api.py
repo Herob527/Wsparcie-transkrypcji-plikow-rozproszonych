@@ -1,4 +1,4 @@
-from urllib.parse import urldefrag, urlparse
+
 from flask import Flask, jsonify, request, make_response
 from flask_restful import Resource, Api, reqparse
 from pathlib import Path
@@ -6,16 +6,14 @@ from flask_cors import CORS
 import sqlalchemy
 from sqlalchemy import Table, Column, Integer, create_engine, MetaData, String, insert, select, ForeignKey, exc, and_, func, Float, engine
 from pprint import pprint
-from shutil import copyfile, rmtree, copy
-from os import mkdir, stat, getcwd, listdir
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
+from shutil import rmtree, copy
 from pydub import AudioSegment, exceptions
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 import time
 import json
 from typing import List
 import logging
+from functools import partial
 
 logging.basicConfig(filename='api_logs.log', encoding='utf-8')
 
@@ -198,39 +196,51 @@ def setup_database():
     t0 = time.time()
     with _engine.connect():
         x = tuple(enumerate(Path('./source').iterdir()))
-        with Pool(6) as pool:
+        with Pool(cpu_count()) as pool:
             pool.starmap(insert_data, x)
         c_categories.insert({"id": 0, "name":"Nieznane"}).execute()            
     t1 = time.time() - t0
     print(f'Baza ustawiona. Wykorzystany czas: {round(t1,2)} sekund')
     return {"Response": "Baza ustawiona"}
 
+def export_audio_segment(path: Path, should_convert_multi_channel: bool = False):
+    audio = AudioSegment.from_file(path)
+    if not should_convert_multi_channel and audio.channels > 1:
+        multi_channel_path = Path(*path.parts[:-2], 'multi_channel')
+        multi_channel_path.mkdir(exist_ok=True)
+        audio.export(Path(multi_channel_path, path.name))
+        return
+    audio.export(path, format='wav', parameters=['-ac','1','-ar','22050','-y'])
 
 @app.route('/finalise', methods=['POST'])
 def finalise():
     source = Path('./public/source')
     output = Path('./output')
     try:
+        logging.info("Attempted removing output directory")
         rmtree(output)
+        logging.info("Removed output directory successfully")
     except FileNotFoundError:
         pass
     output.mkdir(exist_ok=True)
     data = request.get_json()
     categorise_level = data['categoriseLevel']
+    should_convert_multi_channel = data['shouldConvertMultiChannel']
+
+    category_query = select(c_categories)
+    cat_res = category_query.execute().mappings().all()
     
-    def categorise_divide():
+    def categorise():
         with _engine.connect():
             general_query = select(c_bindings, c_audio, c_categories, c_texts).join(c_audio).join(c_categories).join(c_texts)
             general_res = general_query.execute().mappings().all()
 
-            category_query = select(c_categories)
-            cat_res = category_query.execute().mappings().all()
-            category_dirs = [Path(output, i['name']) for i in cat_res]
-
             # Creating clear lists yet to be filled with transcription
             for i in cat_res:
                 category_path = Path(output, i['name'])
+                wavs_path = Path(category_path , 'wavs')
                 category_path.mkdir(exist_ok=True)
+                wavs_path.mkdir(exist_ok=True)
                 open(f'{category_path}/list.txt', 'w', encoding='utf-8').close()
 
             # Copying files to assigned categories and filling created lists with transcription
@@ -244,41 +254,73 @@ def finalise():
                     file_name = name.replace(f'{category_name.lower()}/','')
                     transcription.write(f"{file_name}|{text}\n")
                 copy(f'{source}/{name}', f'{path}')
+                logging.info(f'Copied {source}/{name} to {path}.')
 
-            for i in category_dirs:
-                path_to_list = Path(i) 
-                with open(f'{path_to_list}/list.txt', 'r', encoding='utf-8') as input, \
-                open(f'{path_to_list}/list_train.txt','w', encoding='utf-8') as train_output, \
-                open(f'{path_to_list}/list_val.txt', 'w' ,encoding='utf-8') as val_output:
-                    all_files = input.readlines()
-                    # Declaration of number proportions 
-                    amount_of_files = len(all_files)
-                    validation_share = 10
-                    val_amount = amount_of_files // validation_share
-                    train_amount = amount_of_files - val_amount
+    def create_transcript():
+        category_dirs = [Path(output, i['name']) for i in cat_res]
 
-                    # Dividing dataset to train and validation sets
-                    train_files = all_files[val_amount: val_amount + train_amount]
-                    val_files = all_files[:val_amount]
-                    for i in train_files:
-                        train_output.write(f'{i}')
+        for i in category_dirs:
+            path_to_list = Path(i) 
+            with open(f'{path_to_list}/list.txt', 'r', encoding='utf-8') as input, \
+            open(f'{path_to_list}/list_train.txt','w', encoding='utf-8') as train_output, \
+            open(f'{path_to_list}/list_val.txt', 'w' ,encoding='utf-8') as val_output:
+                all_files = input.readlines()
+                # Declaration of number proportions 
+                amount_of_files = len(all_files)
+                validation_share = 10
+                val_amount = amount_of_files // validation_share
+                train_amount = amount_of_files - val_amount
 
-                    for i in val_files:
-                        val_output.write(f'{i}')
-        return "0"
+                # Dividing dataset to train and validation sets
+                train_files = all_files[val_amount: val_amount + train_amount]
+                val_files = all_files[:val_amount]
+                for i in train_files:
+                    train_output.write(f'{i}')
 
-    def categorise_format_divide():
+                for i in val_files:
+                    val_output.write(f'{i}')      
+    def format():
+        """
+            Formats audio files, through ffmpeg, to wav files.
+            Audio file props:
+                Frequency: 22 050 Hz
+                Channels: 1
+        """
+        dirs = [Path(output, i['name'], 'wavs') for i in cat_res]   
+        audio_files = []
+        for directory in dirs:
+            audio_files.extend((file, should_convert_multi_channel == '1') for file in directory.iterdir())
+
+        with Pool(cpu_count() * 4) as p:
+            p.starmap(export_audio_segment, audio_files)
+        """
+        for i in cat_res:
+            category_path = Path(output, i['name'])
+            wavs_path = Path(category_path, 'wavs')
+            temp_path = Path(category_path, 'temp_wavs')
+            for i in wavs_path.iterdir():
+                audio = AudioSegment.from_file(i)
+                audio.export(i, format='wav', parameters=["-ac", "1", "-ar", "22050", '-y'])
+        """
         return "1"
     
-    def flowtron():
+    def multispeaker():
         return "2"
-    _bindings = {
-        "0": categorise_divide,
-        "1": categorise_format_divide,
-        "2": flowtron,
-    }
-    choice = _bindings[categorise_level]()
-    return choice
+
+    def categorise_divide():
+        categorise()
+        logging.info("Files categorised")
+        create_transcript()
+        logging.info("Transcription provided")
+
+    levels = [
+        categorise_divide,
+        format,
+        multispeaker,
+    ]
+    for i in levels[:int(categorise_level) + 1]:
+        print(i())
+    return data
 
 
 api.add_resource(bindings, '/bindings')

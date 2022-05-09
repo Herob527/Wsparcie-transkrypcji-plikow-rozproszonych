@@ -1,28 +1,29 @@
 {
-    "elementsPerPage": 20, 
+    "elementsPerPage": 20,
+    "source": "./source",
     "shortcuts": {
         "forward": {
-            "keyCombination": ["Alt","R"],
+            "keyCombination": ["Alt","w"],
             "title": "Przesuń odtwarzanie audio naprzód. Domyślnie o .5 sekund",
             "value": 0.5
         },
         "back": {
-            "keyCombination": ["Alt","Q"],
+            "keyCombination": ["Alt","q"],
             "title": "Cofnij odtwarzanie audio. Domyślnie o .5 sekund",
             "value": 0.5
         },
         "pause": {
-            "keyCombination": ["Alt","T"],
+            "keyCombination": ["Alt","t"],
             "title": "Zatrzymaj odtwarzanie", 
             "value": null
         },
         "continue": {
-            "keyCombination": ["Alt","D"],
+            "keyCombination": ["Alt","d"],
             "title": "Kontynuuj odtwarzanie",
             "value": null
         },
         "stop": {
-            "keyCombination": ["Alt", "Y"],
+            "keyCombination": ["Alt", "y"],
             "title": "Zakończ odtwarzanie (zeruje wskaźnik)",
             "value": null
         }
