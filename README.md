@@ -1,7 +1,11 @@
 # Informacje
 Ta aplikacja ma na celu wesprzeć transkrypt i kategoryzację plików nieuporządkowanych
+
 Obecnie, jest to wczesna alfa i nie wszystko działa jak należy
+
 Do działania wymaga ffmpeg.exe
+
+Ogólnie aplikacja jest uruchamiana w środowisku deweloperskim ReactJS, więc wymaga pakietu react-scripts
 
 # Skróty klawiszowe
 F2 - Zatrzymaj / Wznów audio
