@@ -1,26 +1,43 @@
 # Informacje
 Ta aplikacja ma na celu wesprzeć transkrypt i kategoryzację plików nieuporządkowanych
 Obecnie, jest to wczesna alfa i nie wszystko działa jak należy
+Do działania wymaga ffmpeg.exe
+
+# Skróty klawiszowe
+F2 - Zatrzymaj / Wznów audio
 
 # To-Do lista
-1. Zaimplementować trzeci poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
-2. Zautomatyzować proces wstępnej konfiguracji bazy
-3. Dodać wsparcie dla innnych wersji językowych
-4. Dodać ciemny styl
-5. Przy konfiguracji dodać rekursywne przeszukiwanie folderów z plikami źródłowymi
-6. Konfiguracja aplikacji z poziomu interfejsu
+[] Zaimplementować trzeci poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
+[] Zautomatyzować proces wstępnej konfiguracji bazy
+[] Dodać wsparcie dla innnych wersji językowych
+[] Dodać ciemny styl
+[] Przy konfiguracji dodać rekursywne przeszukiwanie folderów z plikami źródłowymi
+[] Konfiguracja aplikacji z poziomu interfejsu
+[] Zaimplementować skróty klawiszowe
+[] Ogólnie dostosować aplikację do ułatwienia rozproszonego developmentu
+
+W ogromnym skrócie, uczynić aplikację user friendly
 
 # Dalekie plany
-1. Przetestować framework Electron
-2. Przetestować chmurowe systemy bazodanowe
-3. Przepisać API na nowo, żeby ułatwić implementację na inne systemy bazodanowe
-4. Zaimplementować wsparcie auto-tranksrypcji
+[] Przetestować framework Electron
+[] Przetestować chmurowe systemy bazodanowe
+[] Przepisać API na nowo, żeby ułatwić implementację na inne systemy bazodanowe
+[] Zaimplementować wsparcie auto-tranksrypcji
 
-# Konfiguracja bazy
+# Wstępna konfiguracja bazy
 Obecnie aplikacja wymaga ręcznej konfiguracji bazy
 1. Należy uruchomić python api.py
 2. Pliki muszą być w folderze source
 3. Należy wykonać żądanie POST dla endpointa /setup_database
 Dla CMD
 curl http://localhost:5002/setup_database -X POST
+I czekać
 
+# Wsparcie techniczne
+Jako iż to wczesna alfa, to też nie udzielam wsparcia technicznego w problemach jakie mogą nastąpić
+
+# Uruchamianie build
+1. Należy zainstalować pakiet node serve
+npm install serve
+2. Wklepać komendę serve -s build
+3. API musi być włączone

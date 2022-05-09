@@ -28,7 +28,8 @@ yarn-error.log*
 /output
 # Untracked files:
 .prettierrc
-file_category.db
 *.log
 *.db
 ffmpeg.exe
+./api_logs.log
+./remove_all.py
