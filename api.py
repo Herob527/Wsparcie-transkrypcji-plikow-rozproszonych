@@ -1,4 +1,5 @@
 
+from pprint import pprint
 from flask import Flask, jsonify, request, make_response
 from flask_restful import Resource, Api, reqparse
 from pathlib import Path
@@ -259,7 +260,7 @@ def finalise():
         c_categories.c.name != 'Nieznane').where(c_categories.c.name != 'Odpad')
     cat_res = category_query.execute().mappings().all()
     general_query = select(c_bindings, c_audio, c_categories, c_texts).join(c_audio).join(c_categories).join(c_texts) \
-        .where(c_categories.c.name not in ['Nieznane','Odpad']).where(c_texts.c.transcript != '')\
+        .where(c_categories.c.name not in ['Nieznane', 'Odpad']).where(c_texts.c.transcript != '') \
         .group_by(c_texts.c.transcript)
 
     general_res = general_query.order_by(
@@ -349,21 +350,21 @@ def finalise():
         multispeaker_text.mkdir()
         with open(f'{multispeaker_text}/list.txt', 'w', encoding='utf-8') as output:
             for i in general_res:
-                file_name = f"{i['category_id']}_{i['name']}" 
+                file_name = f"{i['category_id']}_{i['name']}"
                 output.write(
                     f"wavs/{file_name}|{i['transcript']}|{i['category_id']}\n")
                 copy(
                     f"{source}/{i['name']}", f"{multispeaker_wavs}/{file_name}")
         with open(f'{multispeaker_text}/list.txt', 'r', encoding='utf-8') as input, \
                 open(f'{multispeaker_text}/list_train.txt', 'w', encoding='utf-8') as train_output, \
-                open(f'{multispeaker_text}/list_val.txt', 'w', encoding='utf-8') as val_output:
+                open(f'{multispeaker_text}/list_val.txt', 'w', encoding='utf-8') as val_output, \
+                open(f'{multispeaker_text}/model_data.json', 'w', encoding='utf-8') as model_data_output:
             all_files = input.readlines()
             # Declaration of number proportions
             amount_of_files = len(all_files)
             validation_share = 10
             val_amount = amount_of_files // validation_share
             train_amount = amount_of_files - val_amount
-
             # Dividing dataset to train and validation sets
             train_files = all_files[val_amount: val_amount + train_amount]
             val_files = all_files[:val_amount]
@@ -372,6 +373,31 @@ def finalise():
 
             for i in val_files:
                 val_output.write(f'{i}')
+            with _engine.connect() as conn:
+                model_data_query = select(c_categories.c.id, c_categories.c.name, 
+                func.round(func.sum(c_audio.c.duration_seconds) / 60,2).label('n_files')).select_from(c_audio) \
+                    .join(c_bindings) \
+                    .join(c_categories) \
+                    .join(c_texts) \
+                    .group_by(c_bindings.c.category_id) \
+                    .where(c_texts.c.transcript != '')
+                model_data_res = model_data_query.execute().mappings().all()
+                actors = []
+                for i in model_data_res:
+                    current_actor = {}
+                    current_actor['id'] = i['id']
+                    current_actor['name'] = i['name']
+                    current_actor['n_files'] = i['n_files']
+                    actors.append(current_actor)
+
+                model_data = {
+                    "name": "",
+                    "train_list":"",
+                    "tacotron":"",
+                    "n_speakers": len(actors),
+                    "actors": actors
+                }
+                json.dump(model_data, model_data_output)
         return "2"
 
     def categorise_divide():
