@@ -26,10 +26,11 @@ yarn-error.log*
 /source
 /public
 /output
+/multispeaker_output
 # Untracked files:
-.prettierrc
+.prettierrc 
 *.log
-*.db
-ffmpeg.exe
-api_logs.log
-remove_all.py
+*.db 
+ffmpeg.exe 
+api_logs.log 
+remove_all.py  

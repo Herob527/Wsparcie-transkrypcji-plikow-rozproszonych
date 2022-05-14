@@ -146,25 +146,25 @@ export default function App() {
   };
   const shortcuts = config["shortcuts"];
   /*
-		keyBinding(shortcuts['forward']['keyCombination'], 
-		() => {
-			const currentAudio = audioElements[selectedLine];
-			console.dir(currentAudio)
-			if (currentAudio) {
-				currentAudio.skip(shortcuts['forward']['value'])
-			}
-		}, 
-		() => 1)
-		keyBinding(shortcuts['back']['keyCombination'], 
-		() => {
-			const currentAudio = audioElements[selectedLine];
-			// console.dir(currentAudio)
-			if (currentAudio) {
-				currentAudio.skip(-shortcuts['forward']['value'])
-			}
-		}, 
-		() => 1)
-	*/
+    keyBinding(shortcuts['forward']['keyCombination'], 
+    () => {
+      const currentAudio = audioElements[selectedLine];
+      console.dir(currentAudio)
+      if (currentAudio) {
+        currentAudio.skip(shortcuts['forward']['value'])
+      }
+    }, 
+    () => 1)
+    keyBinding(shortcuts['back']['keyCombination'], 
+    () => {
+      const currentAudio = audioElements[selectedLine];
+      // console.dir(currentAudio)
+      if (currentAudio) {
+        currentAudio.skip(-shortcuts['forward']['value'])
+      }
+    }, 
+    () => 1)
+  */
   const transcriptLines = lines.map((line, index) => (
     <div
       data-id={line["id"]}
@@ -373,14 +373,16 @@ function CategoryAddForm() {
 }
 
 function Finalise() {
-  const [categoriseLevel, setCategoriseLevel] = useState(1);
+  const [categoriseLevel, setCategoriseLevel] = useState(0);
   const [multiChannel, setMultiChannel] = useState(0);
+  const [format, setFormat] = useState(0);
   const [isWorking, setIsWorking] = useState(false)
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setIsWorking(true)
     const data = new FormData(event.currentTarget);
-	  data.set("shouldConvertMultiChannel",`${multiChannel}`)
+    data.set("shouldConvertMultiChannel", `${multiChannel}`)
+    data.set("shouldFormat", `${format}`)
     console.log([...data]);
     const finalise = await fetch(`${API_ADDRESS}/finalise`, {
       method: "POST",
@@ -388,7 +390,7 @@ function Finalise() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(Object.fromEntries(data.entries())),
-    }).then((el) => el.json()).catch((err) => {console.error(err)});
+    }).then((el) => el.json()).catch((err) => { console.error(err) });
     console.log(finalise);
     setIsWorking(false);
   };
@@ -398,15 +400,22 @@ function Finalise() {
   const handleMultiChannelChange = (event: any) => {
     setMultiChannel(+event.currentTarget.checked);
   };
+
+  const handleFormatChange = (event: any) => {
+    setFormat(+event.currentTarget.checked);
+  }
   const levelTitles = [
     "Kategoryzacja + Podział na listy",
-    "Kategoryzacja + Podział na listy + Format plików",
-    "Kategoryzacja + Podział na listy multispeaker + Format plików",
+    "Kategoryzacja + Podział na listy multispeaker",
   ];
   const multiChannelMessages = [
-    "Pliki wielokanałowe będą w osobnym folderze bez konwersji",
-	"Pliki wielokanałowe zostaną przekonwertowane",
+    "Pliki wielokanałowe zostaną pominięte",
+    "Pliki wielokanałowe zostaną przekonwertowane",
   ];
+  const formatMessages = [
+    "Pliki nie będą formatowane",
+    "Pliki zostaną dodatkowo sformatowane"
+  ]
   return (
     <form method="POST" id="categorise" onSubmit={handleSubmit}>
       <h4> Finalizacja </h4>
@@ -414,7 +423,7 @@ function Finalise() {
       <input
         type="range"
         min={0}
-        max={2}
+        max={1}
         step={1}
         value={categoriseLevel}
         onChange={handleLevelChange}
@@ -422,6 +431,17 @@ function Finalise() {
         title={levelTitles[categoriseLevel]}
       />
       <br />
+
+{/*       <input
+        type="checkbox"
+        id="shouldFormat"
+        name="shouldFormat"
+        onChange={handleFormatChange}
+        value={format}
+        title="Jeżeli zaznaczone, to pliki zostaną sformatowane na odpowiedni format. Jeżeli nie, będą skopiowane oryginały."
+      />
+      <label htmlFor="shouldFormat"> Formatować pliki? </label> 
+      <p>{formatMessages[format]}</p>*/}
       <input
         type="checkbox"
         id="shouldConvertMultiChannel"
@@ -432,11 +452,12 @@ function Finalise() {
       />
       <label htmlFor="shouldConvertMultiChannel">
         {" "}
-        Konwertować pliki wielokanałowe?{" "}
+        Formatować też pliki wielokanałowe?{" "}
       </label>
       <p>{multiChannelMessages[multiChannel]}</p>
       <br />
-      <input type="submit" name="categorise" value="Finalizuj" disabled={isWorking}/>
+
+      <input type="submit" name="categorise" value="Finalizuj" disabled={isWorking} />
     </form>
   );
 }
