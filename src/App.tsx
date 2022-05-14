@@ -441,7 +441,7 @@ function Finalise() {
         title="Jeżeli zaznaczone, to pliki zostaną sformatowane na odpowiedni format. Jeżeli nie, będą skopiowane oryginały."
       />
       <label htmlFor="shouldFormat"> Formatować pliki? </label> 
-      <p>{formatMessages[format]}</p>*/}
+      <p>{formatMessages[format]}</p>*
       <input
         type="checkbox"
         id="shouldConvertMultiChannel"
@@ -455,6 +455,7 @@ function Finalise() {
         Formatować też pliki wielokanałowe?{" "}
       </label>
       <p>{multiChannelMessages[multiChannel]}</p>
+  */}
       <br />
 
       <input type="submit" name="categorise" value="Finalizuj" disabled={isWorking} />

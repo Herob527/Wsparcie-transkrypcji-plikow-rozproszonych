@@ -8,7 +8,7 @@ Do działania wymaga ffmpeg.exe
 Ogólnie aplikacja jest uruchamiana w środowisku deweloperskim ReactJS, więc wymaga pakietu react-scripts
 
 # Skróty klawiszowe
-F3 - Zatrzymaj / Wznów audio
+F2 - Zatrzymaj / Wznów audio
 
 # To-Do lista
 - [x] Zaimplementować trzeci poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
