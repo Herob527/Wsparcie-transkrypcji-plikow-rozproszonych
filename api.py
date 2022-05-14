@@ -356,9 +356,9 @@ def finalise():
                 copy(
                     f"{source}/{i['name']}", f"{multispeaker_wavs}/{file_name}")
         with open(f'{multispeaker_text}/list.txt', 'r', encoding='utf-8') as input, \
-                open(f'{multispeaker_text}/list_train.txt', 'w', encoding='utf-8') as train_output, \
-                open(f'{multispeaker_text}/list_val.txt', 'w', encoding='utf-8') as val_output, \
-                open(f'{multispeaker_text}/model_data.json', 'w', encoding='utf-8') as model_data_output:
+            open(f'{multispeaker_text}/list_train.txt', 'w', encoding='utf-8') as train_output, \
+            open(f'{multispeaker_text}/list_val.txt', 'w', encoding='utf-8') as val_output,\
+            open(f'{multispeaker_text}/model_data.json', 'w', encoding='utf-8') as model_data_output:
             all_files = input.readlines()
             # Declaration of number proportions
             amount_of_files = len(all_files)
@@ -384,10 +384,7 @@ def finalise():
                 model_data_res = model_data_query.execute().mappings().all()
                 actors = []
                 for i in model_data_res:
-                    current_actor = {}
-                    current_actor['id'] = i['id']
-                    current_actor['name'] = i['name']
-                    current_actor['n_files'] = i['n_files']
+                    current_actor = {'id': i['id'], 'name': i['name'], 'n_files': i['n_files']}
                     actors.append(current_actor)
 
                 model_data = {

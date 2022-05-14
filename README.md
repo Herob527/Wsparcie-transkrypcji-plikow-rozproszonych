@@ -12,9 +12,9 @@ F2 - Zatrzymaj / Wznów audio
 
 # To-Do lista
 - [x] Zaimplementować trzeci poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
+- [x] Zautomatyzować proces wstępnej konfiguracji bazy (istnieje on w oparciu o istnienie pliku status.json)
 - [ ] Zaimplementować opcjonalne formatowanie plików przy finalizacji
 - [ ] Zaimplementować opcjonalnie wycinanie ciszy przy finalizacji
-- [ ] Zautomatyzować proces wstępnej konfiguracji bazy
 - [ ] Dodać wsparcie dla innnych wersji językowych
 - [ ] Dodać ciemny styl
 - [ ] Przy konfiguracji dodać rekursywne przeszukiwanie folderów z plikami źródłowymi
