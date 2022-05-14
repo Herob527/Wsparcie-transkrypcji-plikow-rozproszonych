@@ -1,4 +1,5 @@
 
+from math import floor
 from pprint import pprint
 from flask import Flask, jsonify, request, make_response
 from flask_restful import Resource, Api, reqparse
@@ -301,12 +302,20 @@ def finalise():
                 # Declaration of number proportions
                 amount_of_files = len(all_files)
                 validation_share = 10
-                val_amount = amount_of_files // validation_share
+                val_amount = floor(amount_of_files / validation_share)
                 train_amount = amount_of_files - val_amount
 
                 # Dividing dataset to train and validation sets
                 train_files = all_files[val_amount: val_amount + train_amount]
                 val_files = all_files[:val_amount]
+                while val_amount == 0 and validation_share > 1:
+                    validation_share -= 1
+                    val_amount = floor(amount_of_files / validation_share)
+                    print(val_amount)
+                    train_amount = amount_of_files - val_amount
+                    train_files = all_files[val_amount: val_amount + train_amount]
+                    val_files = all_files[:val_amount]
+                    # print(f'amount_of_files: {amount_of_files}, val_amount: {val_amount}', f'train_amount: {train_amount}', f'validation_share: {validation_share}')          
                 for i in train_files:
                     train_output.write(f'{i}')
 
@@ -375,12 +384,13 @@ def finalise():
                 val_output.write(f'{i}')
             with _engine.connect() as conn:
                 model_data_query = select(c_categories.c.id, c_categories.c.name, 
-                func.round(func.sum(c_audio.c.duration_seconds) / 60,2).label('n_files')).select_from(c_audio) \
+                    func.round(func.sum(c_audio.c.duration_seconds) / 60,2).label('n_files')) \
+                    .select_from(c_audio) \
                     .join(c_bindings) \
                     .join(c_categories) \
                     .join(c_texts) \
                     .group_by(c_bindings.c.category_id) \
-                    .where(c_texts.c.transcript != '')
+                    .where(c_texts.c.transcript != '').where(c_categories.c.name not in ['Nieznane', 'Odpad'])
                 model_data_res = model_data_query.execute().mappings().all()
                 actors = []
                 for i in model_data_res:
