@@ -11,7 +11,7 @@ Ogólnie aplikacja jest uruchamiana w środowisku deweloperskim ReactJS, więc w
 F2 - Zatrzymaj / Wznów audio
 
 # To-Do lista
-- [x] Zaimplementować trzeci poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
+- [x] Zaimplementować ~~trzeci~~ drugi poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
 - [x] Zautomatyzować proces wstępnej konfiguracji bazy (obecnie istnieje on w oparciu o istnienie pliku status.json)
 - [ ] Zaimplementować opcjonalne formatowanie plików przy finalizacji
 - [ ] Zaimplementować opcjonalnie wycinanie ciszy przy finalizacji
