@@ -11,7 +11,7 @@ Ogólnie aplikacja jest uruchamiana w środowisku deweloperskim ReactJS, więc w
 F2 - Zatrzymaj / Wznów audio
 
 # To-Do lista
-- [x] Zaimplementować trzeci poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
+- [x] Zaimplementować ~~trzeci~~ drugi poziom eksportu, czyli wsparcie dla treningu modeli multi_speaker tj. Flowtron lub Uberduck Tacotron
 - [x] Zautomatyzować proces wstępnej konfiguracji bazy (obecnie istnieje on w oparciu o istnienie pliku status.json)
 - [ ] Zaimplementować opcjonalne formatowanie plików przy finalizacji
 - [ ] Zaimplementować opcjonalnie wycinanie ciszy przy finalizacji
@@ -29,18 +29,6 @@ W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 - [ ] Przetestować chmurowe systemy bazodanowe
 - [ ] Przepisać API na nowo, żeby ułatwić implementację na inne systemy bazodanowe
 - [ ] Zaimplementować wsparcie auto-tranksrypcji
-
-# Wstępna konfiguracja bazy
-Obecnie aplikacja wymaga ręcznej konfiguracji bazy
-1. Należy uruchomić python api.py
-2. Pliki muszą być w folderze source
-3. Należy wykonać żądanie POST dla endpointa /setup_database
-
-Dla command line Windows:
-
-curl http://localhost:5002/setup_database -X POST
-
-I czekać
 
 # Wsparcie techniczne
 Jako iż to wczesna alfa, to też nie udzielam wsparcia technicznego w problemach jakie mogą nastąpić
