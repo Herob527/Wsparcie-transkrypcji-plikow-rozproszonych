@@ -27,10 +27,12 @@ yarn-error.log*
 /public
 /output
 /multispeaker_output
+/tacotron_output
 # Untracked files:
 .prettierrc 
 *.log
 *.db 
 ffmpeg.exe 
 api_logs.log 
-remove_all.py  
+remove_all.py
+remove_all.py

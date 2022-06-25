@@ -1,4 +1,5 @@
 
+from dataclasses import dataclass
 from math import floor
 from pprint import pprint
 from flask import Flask, jsonify, request, make_response
@@ -7,7 +8,7 @@ from pathlib import Path
 from flask_cors import CORS
 import sqlalchemy
 from sqlalchemy import Table, Column, Integer, create_engine, MetaData, String, insert, select, ForeignKey, exc, and_, func, Float, engine
-
+from random import shuffle
 from shutil import rmtree, copy
 from pydub import AudioSegment, exceptions
 from multiprocessing import Pool, cpu_count
@@ -15,15 +16,15 @@ import time
 import json
 from typing import List
 import logging
+from ffmpeg import FFmpeg
+import asyncio
 
-logging.basicConfig(filename='api_logs.log', encoding='utf-8')
+logging.basicConfig(filename='api_info.log', encoding='utf-8', filemode='a', level=logging.INFO)
+logging.basicConfig(filename='api_errors.log', encoding='utf-8', filemode='a', level=logging.ERROR)
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
-
-AudioSegment.converter = './ffmpeg.exe'
-AudioSegment.ffmpeg = './ffmpeg.exe'
 
 _engine = create_engine('sqlite:///file_category.db',
                         connect_args={'check_same_thread': False},)
@@ -241,185 +242,242 @@ def export_audio_segment(path: Path, should_convert_multi_channel: bool = False)
                  '-ac', '1', '-ar', '22050', '-y'])
 
 
-@app.route('/finalise', methods=['POST'])
-def finalise():
-    source = Path('./source')
-    output = Path('./output')
-    converted_wavs = Path('./converted')
-    try:
-        logging.info("Attempted removing output directory")
-        rmtree(output)
-        logging.info("Removed output directory successfully")
-    except FileNotFoundError:
+class BaseFinalise:
+    """
+    Base class containing methods to perform finalisation of project.
+    That is:
+        1. Export files to given category
+        2. Provide transcription
+        3. Optionally, format exported files.
+    """
+
+    def __init__(self, configuration: dict):
+        """
+        configuration: dict 
+            Contains data prompted by user. In the future, it'll be based purely on config.json
+        """
+        self.general_query = select(c_bindings, c_audio, c_categories, c_texts) \
+            .join(c_audio).join(c_categories).join(c_texts) \
+            .where(c_categories.c.name != 'Nieznane').where(c_categories.c.name != 'Odpad').where(c_texts.c.transcript != '')
+
+        self.general_data: List[dict] = self.general_query.order_by(
+            c_audio.c.name).execute().mappings().all()
+        self.configuration = configuration
+        self.source = Path('./source')
+    def categorise(self):
+        """
+            This method aims to export files to categories basing on the data from database.
+        """
         pass
-    output.mkdir(exist_ok=True)
-    data = request.get_json()
-    categorise_level = data['categoriseLevel']
-    should_convert_multi_channel = data['shouldConvertMultiChannel'] == '1'
 
-    category_query = select(c_categories).where(
-        c_categories.c.name != 'Nieznane').where(c_categories.c.name != 'Odpad')
-    cat_res = category_query.execute().mappings().all()
-    general_query = select(c_bindings, c_audio, c_categories, c_texts).join(c_audio).join(c_categories).join(c_texts) \
-        .where(c_categories.c.name not in ['Nieznane', 'Odpad']).where(c_texts.c.transcript != '') \
-        .group_by(c_texts.c.transcript)
+    def provide_transcription(self):
+        """
+            This method aims to provide transcription for each category and correct small errors like the lack of dot at the end.
+            Run after self.categorise().
+        """
+        pass
 
-    general_res = general_query.order_by(
-        c_audio.c.duration_seconds).execute().mappings().all()
+    def format(self):
+        """
+            This method formats files if it's prompted by user.
+            Run after self.categorise().
+        """
+        pass
 
-    def categorise():
-        # Creating clear lists yet to be filled with transcription
-        for i in cat_res:
-            category_path = Path(output, i['name'])
+
+class TacotronFinalise(BaseFinalise):
+    """
+    This class implements finalisation of the project optimised to train single Tacotron models
+    """
+    def __init__(self, configuration: dict):
+        BaseFinalise.__init__(self, configuration)
+        self.output = Path('./tacotron_output')
+        if self.output.exists():
+            rmtree(self.output)
+
+    def categorise(self):
+        category_query = self.general_query.group_by(c_categories.c.name)
+        category_data = category_query.execute().mappings().all()
+        
+        for i in category_data:
+            category_path = Path(self.output, i['name_1'])
             wavs_path = Path(category_path, 'wavs')
-            category_path.mkdir(exist_ok=True)
-            wavs_path.mkdir(exist_ok=True)
-            open(f'{category_path}/list.txt',
-                 'w', encoding='utf-8').close()
+            audio_channels = i['channels']
+            category_path.mkdir(exist_ok=True, parents = True)
+            wavs_path.mkdir(exist_ok=True, parents = True)
+        for i in self.general_data:
+            name = i['name'].strip()
+            category_name = i['name_1'].strip()
+            audio_length = i['duration_seconds']
+            output_file_path = Path(self.output, category_name, 'wavs')
+            is_invalid_format = audio_length > self.configuration['maximum_length'] or audio_length < self.configuration['minimum_length'] or audio_channels != 1 
+            if not is_invalid_format:
+                path_for_invalid_length = Path(self.output, category_name, 'invalid_length')
+                path_for_invalid_length.mkdir(exist_ok=True)
+                copy(f'{self.source}/{name}', f'{path_for_invalid_length}')    
+                continue
+            copy(f'{self.source}/{name}', f'{output_file_path}')
 
-        # Copying files to assigned categories and filling created lists with transcription
-        for i in general_res:
-            name = i['name']
+    def provide_transcription(self):
+        for i in self.general_data:
+            audio_length = i['duration_seconds']
+            audio_channels = i['channels']
             category_name = i['name_1']
-            text = i['transcript']
-            path = Path(output, category_name, 'wavs')
-            path.mkdir(parents=True, exist_ok=True)
-            with open(f'{output}/{category_name}/list.txt', 'a', encoding='utf-8') as transcription:
-                file_name = name.replace(f'{category_name.lower()}/', '')
-                transcription.write(f"wavs/{file_name}|{text}\n")
-            copy(f'{source}/{name}', f'{path}')
-            logging.info(f'Copied {source}/{name} to {path}.')
+            category_path = Path(self.output, category_name)
+            transcription_path = Path(category_path, 'list.txt')
+            is_invalid_format = audio_length > self.configuration['maximum_length'] or audio_length < self.configuration['minimum_length'] or audio_channels != 1 
+            if is_invalid_format:
+                transcription_path = Path(category_path, 'invalid_list.txt')
+            with open(transcription_path, "a", encoding="utf-8") as output:
+                name = i['name'].strip()
+                if not name.endswith('.wav'):
+                    name += '.wav'
+                line = i['transcript'].strip()
+                if not line.endswith((".","?","!")):
+                    line += line.join(".")
+                output.write(f"{name}|{line}\n")      
 
-    def create_transcript():
-        category_dirs = [Path(output, i['name']) for i in cat_res]
+    def format(self):
+        category_query = self.general_query.group_by(c_categories.c.name)
+        category_data = category_query.execute().mappings().all()
+        for category in category_data:
+            wavs_path = Path(self.output, category['name_1'], 'wavs')
+            temp_folder = Path(wavs_path, 'temp')
+            temp_folder.mkdir()
+            audios = (i for i in wavs_path.iterdir() if i.is_file())
+            for audio in audios:
+                output_name = f'{temp_folder}/{audio.name}' if audio.name.endswith('.wav') else f'{temp_folder}/{audio.name}.wav'
+                current_file = FFmpeg().option('y').input(audio).output(output_name, ar=22050, ac=1)
 
-        for i in category_dirs:
-            path_to_list = Path(i)
-            with open(f'{path_to_list}/list.txt', 'r', encoding='utf-8') as input, \
-                    open(f'{path_to_list}/list_train.txt', 'w', encoding='utf-8') as train_output, \
-                    open(f'{path_to_list}/list_val.txt', 'w', encoding='utf-8') as val_output:
-                all_files = input.readlines()
-                # Declaration of number proportions
-                amount_of_files = len(all_files)
-                validation_share = 10
-                val_amount = floor(amount_of_files / validation_share)
-                train_amount = amount_of_files - val_amount
+                @current_file.on('stderr')
+                def on_stderr(line):
+                    #print('stderr:', line)
+                    pass
 
-                # Dividing dataset to train and validation sets
-                train_files = all_files[val_amount: val_amount + train_amount]
-                val_files = all_files[:val_amount]
-                while val_amount == 0 and validation_share > 1:
-                    validation_share -= 1
-                    val_amount = floor(amount_of_files / validation_share)
-                    print(val_amount)
-                    train_amount = amount_of_files - val_amount
-                    train_files = all_files[val_amount: val_amount + train_amount]
-                    val_files = all_files[:val_amount]
-                    # print(f'amount_of_files: {amount_of_files}, val_amount: {val_amount}', f'train_amount: {train_amount}', f'validation_share: {validation_share}')          
-                for i in train_files:
-                    train_output.write(f'{i}')
+                @current_file.on('error')
+                def on_error(code):
+                    print('Error:', code, f' on file: {audio}')
+                @current_file.on('completed')
+                def on_completed():
+                    audio.unlink()
+                    print(f'Completed formating file: {audio}')
+                asyncio.run(current_file.execute())
+            
+            for audio in temp_folder.iterdir():
+                copy(audio, wavs_path)
+            rmtree(temp_folder)
 
-                for i in val_files:
-                    val_output.write(f'{i}')
 
-    def format():
-        """
-            Formats audio files, through ffmpeg, to wav files.
-            Audio file props:
-                Frequency: 22 050 Hz
-                Channels: 1
-        """
-        dirs = [Path(output, i['name'], 'wavs') for i in cat_res]
-        audio_files = []
-        for directory in dirs:
-            audio_files.extend((file, should_convert_multi_channel == '1')
-                               for file in directory.iterdir())
+class MultiSpeakerFinalise(BaseFinalise):
+    """
+    This class implements finalisation of the project optimised to train multispeaker models like Flowtron or Uberduck Pipeline Tacotron
+    """
+    def __init__(self, configuration: dict):
+        self.output = Path('./multispeaker_output')
+        if self.output.exists():
+            rmtree(self.output) 
+        self.output.mkdir()
+        BaseFinalise.__init__(self, configuration)
+        self.model_info = select(c_categories.c.id, c_categories.c.name,
+                                       func.round(func.sum(c_audio.c.duration_seconds) / 60, 2).label('n_files')) \
+            .select_from(c_audio) \
+            .join(c_bindings).join(c_categories) \
+            .join(c_texts).group_by(c_bindings.c.category_id) \
+            .where(c_texts.c.transcript != '').where(c_categories.c.name not in ['Nieznane', 'Odpad']).execute().mappings().all()
 
-        with Pool(cpu_count() * 4) as p:
-            p.starmap(export_audio_segment, audio_files)
-        """
-        for i in cat_res:
-            category_path = Path(output, i['name'])
-            wavs_path = Path(category_path, 'wavs')
-            temp_path = Path(category_path, 'temp_wavs')
-            for i in wavs_path.iterdir():
-                audio = AudioSegment.from_file(i)
-                audio.export(i, format='wav', parameters=["-ac", "1", "-ar", "22050", '-y'])
-        """
-        return "1"
+    def categorise(self):
+        wavs_path = Path(self.output, 'wavs')
+        invalid_wavs_path = Path(self.output, 'invalid_wavs') 
+        wavs_path.mkdir()
+        invalid_wavs_path.mkdir() 
+        
+        for i in self.general_data:
+            current_folder = wavs_path
+            audio_length = i['duration_seconds']
+            audio_channels = i['channels']
+            is_invalid_format = audio_length > self.configuration['maximum_length'] or audio_length < self.configuration['minimum_length'] or audio_channels != 1
+            if is_invalid_format:
+                current_folder = invalid_wavs_path
+            output_name = f"{i['category_id']}_{i['name']}"
+            source_path = Path('source', i['name'])
+            output_path = Path(current_folder, output_name)
+                
+            copy(source_path, output_path)
+            
 
-    def multispeaker():
-        multispeaker_path = Path('./multispeaker_output')
-        multispeaker_wavs = Path(multispeaker_path, 'wavs')
-        multispeaker_text = Path(multispeaker_path, 'texts')
-        if multispeaker_path.exists():
-            rmtree(multispeaker_path)
+    def provide_transcription(self):
+        data_path = Path(self.output, 'texts')
+        data_path.mkdir()
+        with open(Path(data_path, 'model_info.json'), "w", encoding='utf-8') as model_info_output:
+            actors = [dict(i) for i in self.model_info]
+            output_data = {
+                "name":"", 
+                "n_speakers": len(actors),
+                "tacotron": "",
+                "train_list": "",
+                "actors": actors
+            }
+            json.dump(output_data, model_info_output)
+        existing_data = [i for i in self.general_data if Path(self.output, 'wavs', f"{i['category_id']}_{i['name']}").exists()]
+        validation_data_amount = len(existing_data) // 10
+        validation_data = existing_data[:validation_data_amount:]
+        training_data = existing_data[validation_data_amount:]
+        with open(Path(data_path, 'list_train.txt'),"w", encoding='utf-8') as train_output, \
+             open(Path(data_path, 'list_val.txt'),"w", encoding='utf-8') as val_output:
+            for entry in training_data:
+                name, category_id, transcript = entry['name'], entry['category_id'], entry['transcript']
+                if self.configuration['should_format']:
+                    name += '.wav'
+                train_output.write(f"wavs/{category_id}_{name}|{transcript}|{category_id}\n")
+            for entry in validation_data:
+                name, category_id, transcript = entry['name'], entry['category_id'], entry['transcript']
+                if self.configuration['should_format']:
+                    name += '.wav'
+                val_output.write(f"wavs/{category_id}_{name}|{transcript}|{category_id}\n")
 
-        multispeaker_wavs.mkdir(parents=True)
-        multispeaker_text.mkdir()
-        with open(f'{multispeaker_text}/list.txt', 'w', encoding='utf-8') as output:
-            for i in general_res:
-                file_name = f"{i['category_id']}_{i['name']}"
-                output.write(
-                    f"wavs/{file_name}|{i['transcript']}|{i['category_id']}\n")
-                copy(
-                    f"{source}/{i['name']}", f"{multispeaker_wavs}/{file_name}")
-        with open(f'{multispeaker_text}/list.txt', 'r', encoding='utf-8') as input, \
-            open(f'{multispeaker_text}/list_train.txt', 'w', encoding='utf-8') as train_output, \
-            open(f'{multispeaker_text}/list_val.txt', 'w', encoding='utf-8') as val_output,\
-            open(f'{multispeaker_text}/model_data.json', 'w', encoding='utf-8') as model_data_output:
-            all_files = input.readlines()
-            # Declaration of number proportions
-            amount_of_files = len(all_files)
-            validation_share = 10
-            val_amount = amount_of_files // validation_share
-            train_amount = amount_of_files - val_amount
-            # Dividing dataset to train and validation sets
-            train_files = all_files[val_amount: val_amount + train_amount]
-            val_files = all_files[:val_amount]
-            for i in train_files:
-                train_output.write(f'{i}')
+    def format(self):
+        temp_folder = Path(self.output, 'wavs', 'temp')
+        wavs_path = Path(self.output, 'wavs')
+        temp_folder.mkdir()
+        audios = [i for i in wavs_path.iterdir() if i.is_file()] 
+        for audio in audios:
+            output_name = f'{temp_folder}/{audio.name}' if audio.name.endswith('.wav') else f'{temp_folder}/{audio.name}.wav'
+            current_file = FFmpeg().option('y').input(audio).output(output_name, ar=22050, ac=1)
+ 
+            @current_file.on('stderr')
+            def on_stderr(line):
+                #print('stderr:', line)
+                pass
 
-            for i in val_files:
-                val_output.write(f'{i}')
-            with _engine.connect() as conn:
-                model_data_query = select(c_categories.c.id, c_categories.c.name, 
-                    func.round(func.sum(c_audio.c.duration_seconds) / 60,2).label('n_files')) \
-                    .select_from(c_audio) \
-                    .join(c_bindings) \
-                    .join(c_categories) \
-                    .join(c_texts) \
-                    .group_by(c_bindings.c.category_id) \
-                    .where(c_texts.c.transcript != '').where(c_categories.c.name not in ['Nieznane', 'Odpad'])
-                model_data_res = model_data_query.execute().mappings().all()
-                actors = []
-                for i in model_data_res:
-                    current_actor = {'id': i['id'], 'name': i['name'], 'n_files': i['n_files']}
-                    actors.append(current_actor)
+            @current_file.on('error')
+            def on_error(code):
+                print('Error:', code, f' on file: {audio}')
+            @current_file.on('completed')
+            def on_completed():
+                audio.unlink()
+                print(f'Completed formating file: {audio}')
+            asyncio.run(current_file.execute())
+        
+        for audio in temp_folder.iterdir():
+            copy(audio, wavs_path)
+        rmtree(temp_folder)       
 
-                model_data = {
-                    "name": "",
-                    "train_list":"",
-                    "tacotron":"",
-                    "n_speakers": len(actors),
-                    "actors": actors
-                }
-                json.dump(model_data, model_data_output)
-        return "2"
-
-    def categorise_divide():
-        categorise()
-        logging.info("Files categorised")
-        create_transcript()
-        logging.info("Transcription provided")
-
-    levels = [
-        categorise_divide,
-        multispeaker,
-    ]
-    print(levels[int(categorise_level)]())
-    return data
-
+@app.route('/finalise', methods=['POST'])
+def finalise_2():
+    data = request.get_json()
+    print(data)
+    data['minimum_length'] = int(data['minimum_length'])
+    data['maximum_length'] = int(data["maximum_length"])
+    modes = {
+        "tacotron": TacotronFinalise,
+        "multispeaker": MultiSpeakerFinalise 
+    }
+    x = modes[data["mode"]](data)
+    x.categorise()
+    x.provide_transcription()
+    if data['should_format']:
+        x.format()
+    return {"Message": "Finalizacja: Jest sukces"}
 
 api.add_resource(bindings, '/bindings')
 api.add_resource(texts, '/texts')

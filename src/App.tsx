@@ -135,6 +135,7 @@ export default function App() {
     selectedLine = Number(currentIndex.getAttribute("data-line-order"));
   };
   document.onkeyup = (event: KeyboardEvent) => {
+    event.preventDefault()
     if (event.key === "F2") {
       const currentAudio = audioElements[selectedLine];
       if (currentAudio.isPlaying()) {
@@ -142,6 +143,15 @@ export default function App() {
         return;
       }
       currentAudio.play();
+    }
+    if (event.key === "F8") {
+      const currentAudio = audioElements[selectedLine];
+      if (currentAudio.isPlaying()) {
+        currentAudio.setCurrentTime(0);
+        currentAudio.stop();
+        return;
+      }
+      currentAudio.play();      
     }
   };
   const shortcuts = config["shortcuts"];
@@ -374,15 +384,18 @@ function CategoryAddForm() {
 
 function Finalise() {
   const [categoriseLevel, setCategoriseLevel] = useState(0);
-  const [multiChannel, setMultiChannel] = useState(0);
+
   const [format, setFormat] = useState(0);
   const [isWorking, setIsWorking] = useState(false)
+  const modes = ["tacotron", "multispeaker"]
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setIsWorking(true)
     const data = new FormData(event.currentTarget);
-    data.set("shouldConvertMultiChannel", `${multiChannel}`)
-    data.set("shouldFormat", `${format}`)
+    data.set("should_format", `${format}`)
+    data.set("mode", modes[categoriseLevel])
+    data.set("maximum_length", "10")
+    data.set("minimum_length", "2")
     console.log([...data]);
     const finalise = await fetch(`${API_ADDRESS}/finalise`, {
       method: "POST",
@@ -391,14 +404,10 @@ function Finalise() {
       },
       body: JSON.stringify(Object.fromEntries(data.entries())),
     }).then((el) => el.json()).catch((err) => { console.error(err) });
-    console.log(finalise);
     setIsWorking(false);
   };
   const handleLevelChange = (event: any) => {
     setCategoriseLevel(event.currentTarget.value);
-  };
-  const handleMultiChannelChange = (event: any) => {
-    setMultiChannel(+event.currentTarget.checked);
   };
 
   const handleFormatChange = (event: any) => {
@@ -406,12 +415,9 @@ function Finalise() {
   }
   const levelTitles = [
     "Kategoryzacja + Podział na listy",
-    "Kategoryzacja + Podział na listy multispeaker",
+    "Eksport do multispeaker",
   ];
-  const multiChannelMessages = [
-    "Pliki wielokanałowe zostaną pominięte",
-    "Pliki wielokanałowe zostaną przekonwertowane",
-  ];
+
   const formatMessages = [
     "Pliki nie będą formatowane",
     "Pliki zostaną dodatkowo sformatowane"
@@ -431,8 +437,8 @@ function Finalise() {
         title={levelTitles[categoriseLevel]}
       />
       <br />
-
-{/*       <input
+      <label htmlFor="shouldFormat"> Formatować pliki? </label> 
+{       <input
         type="checkbox"
         id="shouldFormat"
         name="shouldFormat"
@@ -440,6 +446,7 @@ function Finalise() {
         value={format}
         title="Jeżeli zaznaczone, to pliki zostaną sformatowane na odpowiedni format. Jeżeli nie, będą skopiowane oryginały."
       />
+  }{/*
       <label htmlFor="shouldFormat"> Formatować pliki? </label> 
       <p>{formatMessages[format]}</p>*
       <input
