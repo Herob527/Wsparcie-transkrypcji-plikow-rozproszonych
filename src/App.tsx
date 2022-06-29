@@ -26,29 +26,6 @@ const areSetsTheSame = (
   return true;
 };
 
-const keyBinding = (
-  keyCombination: Array<string> | Set<string>,
-  onKeyDownCallback: () => void,
-  onKeyUpCallback: () => void
-) => {
-  const pressedKeys: Set<string> = new Set();
-  const _keyCombination: Set<string> = new Set(keyCombination);
-  let isPressed = false;
-
-  document.addEventListener("keydown", (event) => {
-    pressedKeys.add(event.key);
-    // console.log(pressedKeys, keyCombination, areSetsTheSame(pressedKeys, keyCombination));
-    if (!isPressed && areSetsTheSame(pressedKeys, _keyCombination)) {
-      onKeyDownCallback.call(this);
-      isPressed = true;
-    }
-  });
-  document.addEventListener("keyup", (event) => {
-    pressedKeys.delete(event.key);
-    onKeyUpCallback.call(this);
-    isPressed = false;
-  });
-};
 
 const fetchLines = async (offset: number = 0, limit: number = 30) => {
   const apiEndpoints = ["bindings", "audios", "texts"];
@@ -65,11 +42,13 @@ const fetchLines = async (offset: number = 0, limit: number = 30) => {
     const currentBinding = fetchedData["bindings"][index],
       currentAudio = fetchedData["audios"][index],
       currentText = fetchedData["texts"][index];
+      
 
     const currentData = {
       id: currentBinding["id"] as number,
       category_id: currentBinding["category_id"] as number,
       audio_name: currentAudio["name"] as string,
+      audio_dir: currentAudio['directory'] as string,
       transcript: currentText["transcript"] as string,
     };
     data.push(currentData);
@@ -117,12 +96,15 @@ export default function App() {
 
   const handlePaginationClick = (ev: any) => {
     const newPage: number = ev.target.getAttribute("data-page");
+    const allPaginationsButtons = document.querySelectorAll(".paginationElement");
+    allPaginationsButtons.forEach(el => el.classList.remove('active'));
     if (newPage === page) return;
     setPage(newPage);
+    allPaginationsButtons[newPage].classList.add('active');
   };
 
   for (let i = 0; i < amountOfPages; i++) {
-    const classes = `paginationElement ${i == page ? "active" : ""}`;
+    const classes = `paginationElement ${i === page ? "active" : ""}`;
     const paginationElement = (
       <span className={classes} onClick={handlePaginationClick} data-page={i}>
         <span data-page={i}>{i + 1}</span>
@@ -154,27 +136,6 @@ export default function App() {
       currentAudio.play();      
     }
   };
-  const shortcuts = config["shortcuts"];
-  /*
-    keyBinding(shortcuts['forward']['keyCombination'], 
-    () => {
-      const currentAudio = audioElements[selectedLine];
-      console.dir(currentAudio)
-      if (currentAudio) {
-        currentAudio.skip(shortcuts['forward']['value'])
-      }
-    }, 
-    () => 1)
-    keyBinding(shortcuts['back']['keyCombination'], 
-    () => {
-      const currentAudio = audioElements[selectedLine];
-      // console.dir(currentAudio)
-      if (currentAudio) {
-        currentAudio.skip(-shortcuts['forward']['value'])
-      }
-    }, 
-    () => 1)
-  */
   const transcriptLines = lines.map((line, index) => (
     <div
       data-id={line["id"]}
@@ -185,7 +146,8 @@ export default function App() {
       <span key={`name_${line["audio_name"]}`}>{line["audio_name"]}</span>
       <WaveAudio
         index={index}
-        audio_name={line["audio_name"]}
+        audio_dir = {line["audio_dir"]}
+        audio_name={`${line["audio_name"]}`}
         key={`audio_${line["id"]}`}
       />
       <Transcript
@@ -226,17 +188,6 @@ export default function App() {
       <div id="sidebar">
         <p className="heading_name"> Prosty panel konfiguracji </p>
         <CategoryAddForm key="new_category_submit" />
-        <div id="number_of_entries">
-          <h4> Zmień liczbę wpisów na stronę</h4>
-          <input
-            type="number"
-            min={minElementsPerPage}
-            max={maxElementsPerPage}
-            required
-            value={elementsPerPage}
-            onInput={handleInput}
-          />
-        </div>
         <Finalise key="categorise" />
       </div>
     </QueryClientProvider>
@@ -394,8 +345,8 @@ function Finalise() {
     const data = new FormData(event.currentTarget);
     data.set("should_format", `${format}`)
     data.set("mode", modes[categoriseLevel])
-    data.set("maximum_length", "10")
-    data.set("minimum_length", "2")
+    data.set("maximum_length", String(config['maximumLength']))
+    data.set("minimum_length", String(config['minimumLength']))
     console.log([...data]);
     const finalise = await fetch(`${API_ADDRESS}/finalise`, {
       method: "POST",
@@ -446,23 +397,7 @@ function Finalise() {
         value={format}
         title="Jeżeli zaznaczone, to pliki zostaną sformatowane na odpowiedni format. Jeżeli nie, będą skopiowane oryginały."
       />
-  }{/*
-      <label htmlFor="shouldFormat"> Formatować pliki? </label> 
-      <p>{formatMessages[format]}</p>*
-      <input
-        type="checkbox"
-        id="shouldConvertMultiChannel"
-        name="shouldConvertMultiChannel"
-        onChange={handleMultiChannelChange}
-        value={multiChannel}
-        title="Jeżeli zaznaczone, to przekonwertuje pliki wielokanałowe. Jeżeli nie, to pliki wielokanałowe będą w folderze multichannel."
-      />
-      <label htmlFor="shouldConvertMultiChannel">
-        {" "}
-        Formatować też pliki wielokanałowe?{" "}
-      </label>
-      <p>{multiChannelMessages[multiChannel]}</p>
-  */}
+  }
       <br />
 
       <input type="submit" name="categorise" value="Finalizuj" disabled={isWorking} />
@@ -470,7 +405,7 @@ function Finalise() {
   );
 }
 
-function WaveAudio(props: { index: number; audio_name: string }) {
+function WaveAudio(props: { index: number; audio_name: string; audio_dir: string }) {
   const waveAudioRef = useRef({} as WaveSurfer);
   const audioContainerRef = useRef({} as HTMLElement);
   const handleClick = (ev: any) => {
@@ -490,7 +425,11 @@ function WaveAudio(props: { index: number; audio_name: string }) {
       waveColor: "#0569ff",
       progressColor: "#0353cc",
     });
-    const pathToFile = `./source/${props["audio_name"]}`;
+    waveform.on("error", (err) => {
+      console.log("Błąd", err)
+    })
+    const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`
+    console.log(pathToFile);
     waveform.load(pathToFile);
     audioElements.push(waveform);
     waveAudioRef.current = waveform;
