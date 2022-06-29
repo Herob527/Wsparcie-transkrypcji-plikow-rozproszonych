@@ -345,8 +345,8 @@ function Finalise() {
     const data = new FormData(event.currentTarget);
     data.set("should_format", `${format}`)
     data.set("mode", modes[categoriseLevel])
-    data.set("maximum_length", String(config['maximumLength']))
-    data.set("minimum_length", String(config['minimumLength']))
+    data.set("maximum_length", String(config['maximumLength']) )
+    data.set("minimum_length", String(config['minimumLength']) )
     console.log([...data]);
     const finalise = await fetch(`${API_ADDRESS}/finalise`, {
       method: "POST",
