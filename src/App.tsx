@@ -336,14 +336,14 @@ function CategoryAddForm() {
 function Finalise() {
   const [categoriseLevel, setCategoriseLevel] = useState(0);
 
-  const [format, setFormat] = useState(0);
+  const [format, setFormat] = useState(false);
   const [isWorking, setIsWorking] = useState(false)
   const modes = ["tacotron", "multispeaker"]
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     setIsWorking(true)
     const data = new FormData(event.currentTarget);
-    data.set("should_format", `${format}`)
+    data.set("should_format", format as unknown as string )
     data.set("mode", modes[categoriseLevel])
     data.set("maximum_length", String(config['maximumLength']) )
     data.set("minimum_length", String(config['minimumLength']) )
@@ -362,7 +362,7 @@ function Finalise() {
   };
 
   const handleFormatChange = (event: any) => {
-    setFormat(+event.currentTarget.checked);
+    setFormat(event.currentTarget.checked);
   }
   const levelTitles = [
     "Kategoryzacja + Podział na listy",
@@ -394,7 +394,7 @@ function Finalise() {
         id="shouldFormat"
         name="shouldFormat"
         onChange={handleFormatChange}
-        value={format}
+        value={Number(format)}
         title="Jeżeli zaznaczone, to pliki zostaną sformatowane na odpowiedni format. Jeżeli nie, będą skopiowane oryginały."
       />
   }

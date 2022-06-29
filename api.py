@@ -353,7 +353,7 @@ class TacotronFinalise(BaseFinalise):
 				transcription_path = Path(category_path, 'invalid_list.txt')
 			with open(transcription_path, "a", encoding="utf-8") as output:
 				name = i['name'].strip()
-				if self.configuration['should_format']:
+				if self.configuration['should_format'] == 'true':
 					name += '.wav'
 				line = i['transcript'].strip()
 				if not line.endswith((".","?","!")):
@@ -497,7 +497,8 @@ def finalise():
 	x = modes[data["mode"]](data)
 	x.categorise()
 	x.provide_transcription()
-	if data['should_format']:
+	print(data)
+	if data['should_format'] == 'true':
 		x.format()
 	return {"Message": "Finalizacja: Jest sukces"}
 
