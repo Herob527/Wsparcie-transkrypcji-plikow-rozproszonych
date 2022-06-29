@@ -17,6 +17,7 @@ F2 - Zatrzymaj / Wznów audio
 - [ ] Dodać wsparcie dla innnych wersji językowych
 - [ ] Dodać ciemny styl
 - [x] Przy konfiguracji dodać rekursywne przeszukiwanie folderów z plikami źródłowymi
+- [ ] Więcej opcji finalizacji
 - [ ] Konfiguracja aplikacji z poziomu interfejsu
 - [ ] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego developmentu
