@@ -17,7 +17,7 @@ F2 - Zatrzymaj / Wznów audio
 - [ ] Dodać wsparcie dla innnych wersji językowych
 - [ ] Dodać ciemny styl
 - [x] Rekursywne przeszukiwanie folderów (w folderach szuka w folderze **wavs**)
-- [ ] Więcej opcji finalizacji
+- [ ] Więcej opcji finalizacji (osobny panel)
 - [ ] Konfiguracja aplikacji z poziomu interfejsu
 - [ ] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego developmentu
