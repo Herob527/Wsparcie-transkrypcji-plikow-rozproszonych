@@ -12,7 +12,6 @@ import type { ITranscriptProps } from "./types/ITranscriptProps";
 import type { ICategoryProps } from "./types/ICategoryProps";
 import type { IPaginationProps } from "./types/IPaginationProps";
 import type { IWaveAudioProps } from "./types/IWaveAudioProps";
-import dataOffsetContext from './offsetContext'
 import {useBetween} from 'use-between'
 const API_ADDRESS = 'http://localhost:5002';
 
