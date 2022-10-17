@@ -7,14 +7,14 @@ from shutil import copy
 import asyncio
 from ffmpeg import FFmpeg
 from typing import List
-
+from sqlalchemy.engine import Engine
 class TacotronFinalise(BaseFinalise):
     """
     This class implements finalisation of the project optimised to train single Tacotron models
     """
 
-    def __init__(self, configuration: dict):
-        BaseFinalise.__init__(self, configuration)
+    def __init__(self, configuration: dict, sql_engine):
+        BaseFinalise.__init__(self, configuration, sql_engine)
         self.output = Path("./tacotron_output")
         self.name = 'distinctive'
         self.ux_name = 'Każda kategoria do jednego folderu'
@@ -24,7 +24,7 @@ class TacotronFinalise(BaseFinalise):
     def categorise(self):
         category_query = self.general_query.group_by(c_categories.c.name)
         category_data = category_query.execute().mappings().all()
-
+        
         for i in category_data:
             category_path = Path(self.output, i["name_1"])
             wavs_path = Path(category_path, "wavs")
@@ -32,6 +32,7 @@ class TacotronFinalise(BaseFinalise):
             category_path.mkdir(exist_ok=True, parents=True)
             wavs_path.mkdir(exist_ok=True, parents=True)
         for i in self.general_data:
+            directory = i['directory']
             name = i["name"].strip()
             category_name = i["name_1"].strip()
             audio_length = i["duration_seconds"]
@@ -41,15 +42,16 @@ class TacotronFinalise(BaseFinalise):
                 audio_length > self.configuration["max_length"]
                 or audio_length < self.configuration["min_length"]
                 or audio_channels != 1
-            ) 
+            )
+            source_path = f"{directory}/{name}" 
             if is_invalid_format and self.configuration['should_filter']:
                 path_for_invalid_length = Path(
                     self.output, category_name, "invalid_length"
                 )
                 path_for_invalid_length.mkdir(exist_ok=True)
-                copy(f"{self.source}/{name}", f"{path_for_invalid_length}")
+                copy(source_path, f"{path_for_invalid_length}")
                 continue
-            copy(f"{self.source}/{name}", f"{output_file_path}")
+            copy(source_path, f"{output_file_path}")
 
     def provide_transcription(self):
         for i in self.general_data:

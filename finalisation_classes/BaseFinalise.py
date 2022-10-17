@@ -2,6 +2,7 @@ from pathlib import Path
 from shutil import rmtree
 from tables_definition import c_audio, c_bindings, c_categories, c_texts
 from sqlalchemy import select, func
+from sqlalchemy.engine import Engine
 from shutil import copy
 import json
 import asyncio
@@ -20,7 +21,7 @@ class BaseFinalise:
             3. Optionally, format exported files.
     """
 
-    def __init__(self, configuration: dict, sql_engine):
+    def __init__(self, configuration: dict, sql_engine: Engine):
         """
         configuration: dict
                 Contains data prompted by user. In the future, it'll be based purely on config.json
