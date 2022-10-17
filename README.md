@@ -33,3 +33,11 @@ W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 
 # Wsparcie techniczne
 Jako iż to wczesna alfa, to też nie udzielam wsparcia technicznego w problemach jakie mogą nastąpić
+
+# Instrukcja użytkowania
+1. Tworzymy plik source
+2. Tworzymy plik source w folderze public
+3. Kopiujemy pliki do source i public
+4. Uruchamiamy API
+5. Po inicjalizacji
+W obecnym stanie TacotronFinalise i MultispeakerFinalise nie są dobrze dostowane pod UI
