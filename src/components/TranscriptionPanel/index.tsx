@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import './style.css'
@@ -12,36 +12,40 @@ import type { ITranscriptProps } from "./types/ITranscriptProps";
 import type { ICategoryProps } from "./types/ICategoryProps";
 import type { IPaginationProps } from "./types/IPaginationProps";
 import type { IWaveAudioProps } from "./types/IWaveAudioProps";
-
+import dataOffsetContext from './offsetContext'
+import {useBetween} from 'use-between'
 const API_ADDRESS = 'http://localhost:5002';
 
 const PanelQueryClient = new QueryClient();
 const CategoryQueryClient = new QueryClient();
 
-// Basically, offset for loading data from database
-const baseObject: [number, React.Dispatch<React.SetStateAction<number>>] = [0, () => { }]
-const PageOffsetContext = createContext(baseObject);
-const usePageOffsetContext = () => useContext(PageOffsetContext);
+const useOffsetData = () => {
+    const [offset, setOffset] = useState(0);
+    console.log('useOffsetData offset: ', offset);
+    return {
+        offset,
+        setOffset
+    }
+}
+
+const useSharedOffset = () => useBetween(useOffsetData);
 
 
 const Wrapper = () => {
     const config = useConfig();
+
     if (config.isLoading) {
         return <p> Lolding config.</p>
     }
+
+
     const configData = config.data as configAPIData.RootObject;
     const workspaceConfig = configData['workspaceConfig'];
-    return (
-        <PageOffsetContext.Consumer>
-            {value => {
-                console.log("Value:", value);
-                return <>
-                    <Panel elementsPerPage={workspaceConfig['elementsPerPage']} offset={0} config={configData} />
-                    <Pagination key='pagination' elementsPerPage={workspaceConfig['elementsPerPage']} />
-                </>
-            }
-            }
-        </PageOffsetContext.Consumer>
+    // @ts-ignore
+    return (<>
+                        <Panel elementsPerPage={workspaceConfig['elementsPerPage']} config={configData} />
+                        <Pagination key='pagination' elementsPerPage={workspaceConfig['elementsPerPage']} />
+</>
     );
 }
 
@@ -52,14 +56,16 @@ export const TranscriptionPanel = () => {
 }
 
 const handlePageChange = (currentPage: number) => {
+    console.log(currentPage);
     document.querySelector(".paginationElement.active")?.classList.remove('active');
     document.querySelector(`.paginationElement:nth-child(${currentPage + 1})`)?.classList.add('active');
 }
 
 function Panel(props: IPanelProps) {
-    const [dataOffset, setDataOffset]: [number, React.Dispatch<React.SetStateAction<number>>] = useState(props['offset']);
+    const {offset, setOffset} = useSharedOffset();
+    
     let { data, isLoading, error, refetch, remove } = useQuery('getLines', async () => {
-        return await fetch(`${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${dataOffset}`, {
+        return await fetch(`${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}`, {
             "method": "GET",
             "headers": {
                 "Accept": "application/json",
@@ -68,14 +74,13 @@ function Panel(props: IPanelProps) {
     }, { "refetchOnWindowFocus": false, "refetchOnMount": false, "refetchOnReconnect": false })
 
     useEffect(() => {
-        keyboardjs.pause()
+        const newPage = offset / props['elementsPerPage'];
+        handlePageChange(newPage);
         refetch();
-        keyboardjs.resume()
         return () => {
             remove();
-            keyboardjs.reset();
         }
-    }, [dataOffset, refetch, remove]);
+    }, [offset, refetch, remove]);
     if (isLoading) {
         return <div> Lolding data... </div>
     }
@@ -84,12 +89,13 @@ function Panel(props: IPanelProps) {
     }
     keyboardjs.bind('ctrl+.', (event: any) => {
         event.preventDefault();
-
-        const newPageOffset = dataOffset + props['elementsPerPage'];
+        console.log('Propsy: ',props);
+        const newPageOffset = offset + props['elementsPerPage'];
+        console.log('Offset: ', newPageOffset);
         const newPage = newPageOffset / props['elementsPerPage'];
-        console.log(newPage);
+        console.log('newPage: ', newPage);
         handlePageChange(newPage);
-        setDataOffset(newPageOffset);
+        setOffset(newPageOffset);
         return false;
     })
     keyboardjs.bind('ctrl+2', (event: any) => {
@@ -120,7 +126,6 @@ function Panel(props: IPanelProps) {
     })
 
     return (
-        <PageOffsetContext.Provider value={[dataOffset, setDataOffset]}>
             <div id='lines'>
                 {data.map((el: any, index: number) => <div data-ordering={index} data-id={el['bindings_id']} className='line' key={`con_${el['audio_name']}_${index}`}>
                     <span key={`sp_${el['audio_name']}`} className='audio_name'> {el['audio_name']}</span>
@@ -130,8 +135,6 @@ function Panel(props: IPanelProps) {
                 </div>)}
             </div>
 
-
-        </PageOffsetContext.Provider>
     )
 }
 
@@ -250,9 +253,9 @@ function Category(props: ICategoryProps) {
 }
 
 function Pagination(props: IPaginationProps) {
-    const [pageOffset, setDataOffset] = usePageOffsetContext();
+    const {offset, setOffset} = useSharedOffset();
     const { elementsPerPage } = props;
-    const currentPage = pageOffset / elementsPerPage;
+    const currentPage = 0 / elementsPerPage;
     const { data, isLoading, remove } = useQuery('amountOfLines', async () => {
         return await fetch(`${API_ADDRESS}/get_size`, {
             "method": "GET",
@@ -266,24 +269,23 @@ function Pagination(props: IPaginationProps) {
     if (isLoading) {
         return <p> Loading pages</p>
     }
-
-    const handleClick = (ev: React.MouseEvent<HTMLDivElement>) => {
-        document.querySelectorAll('.paginationElement').forEach((el) => el.classList.remove('active'))
-        const offset = Number(ev.currentTarget.getAttribute('data-offset'));
-        setDataOffset(offset);
-        ev.currentTarget.classList.add('active');
-
+    const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        event.preventDefault()
+        const newOffset = Number(event.currentTarget.getAttribute('data-offset'))
+        setOffset(newOffset);
+        return false;
     }
     const steps = Math.floor(data / elementsPerPage);
     const pages = Array(steps).fill(0).map((el: number, index: number) =>
-        <div className={`paginationElement ${index === currentPage ? 'active' : ''}`} onClick={handleClick} data-page={index} data-offset={index * elementsPerPage} key={`page_${index * elementsPerPage}`}>
-            <span> {index + 1} </span>
-        </div>);
 
+            <div className={`paginationElement ${index === currentPage ? 'active' : ''}`} onClick={handleClick} data-page={index} data-offset={index * elementsPerPage} key={`page_${index * elementsPerPage}`}>
+                <span> {index + 1} </span>
+            </div>
+    )
     // console.log(pages);
     return (
-        <div id='pagination' className='pages' data-max-offset={steps * elementsPerPage}>{pages}</div>);
-}
+        <div id='pagination' className='pages' data-max-offset={steps * elementsPerPage}>{pages}</div>
+)}
 
 function WaveAudio(props: IWaveAudioProps) {
     const waveAudioRef = useRef({} as WaveSurfer);
@@ -339,7 +341,6 @@ function WaveAudio(props: IWaveAudioProps) {
         waveAudioRef.current = waveform;
         return () => {
             waveform.destroy();
-            keyboardjs.reset();
         };
     })
     return <div id={`waveform_${props["index"]}`} data-ordering={props["index"]} onClick={handleClick}></div>;
