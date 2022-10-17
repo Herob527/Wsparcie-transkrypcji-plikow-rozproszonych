@@ -8,8 +8,9 @@ body {
 }
 
 #root {
-  display: flex;
-  flex-flow: column nowrap;
+  position: relative;
+  max-width: 100vw;
+  max-height: 100vh;
 }
 
 /*# sourceMappingURL=index.css.map */

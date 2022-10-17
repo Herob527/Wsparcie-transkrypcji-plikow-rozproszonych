@@ -1,4 +1,4 @@
-
+import contextlib
 from dataclasses import dataclass
 from math import floor
 from pprint import pprint
@@ -8,11 +8,26 @@ from flask_restful import Resource, Api, reqparse
 from pathlib import Path
 from flask_cors import CORS
 import sqlalchemy
-from sqlalchemy import Table, Column, Integer, create_engine, MetaData, String, insert, select, ForeignKey, exc, and_, func, Float, engine
+from sqlalchemy import (
+    Table,
+    Column,
+    Integer,
+    create_engine,
+    MetaData,
+    String,
+    insert,
+    select,
+    ForeignKey,
+    exc,
+    and_,
+    func,
+    Float,
+    engine,
+)
 from random import shuffle
 from shutil import rmtree, copy
 from pydub import AudioSegment, exceptions
-from multiprocessing import Pool, cpu_count
+from multiprocessing.pool import ThreadPool
 import time
 import json
 from typing import List
@@ -21,498 +36,436 @@ from ffmpeg import FFmpeg
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
-logging.basicConfig(filename='api_info.log', encoding='utf-8', filemode='a', level=logging.INFO)
-logging.basicConfig(filename='api_errors.log', encoding='utf-8', filemode='a', level=logging.ERROR)
+
+log_dir = Path("logs")
+log_dir.mkdir(exist_ok=True)
+
+logging.basicConfig(
+    filename=f"{log_dir}/api_logs_{time.strftime('%y-%m-%d_%H_%M_%S')}.log",
+    encoding="utf-8",
+    filemode="w",
+    level=logging.INFO,
+)
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
-_engine = create_engine('sqlite:///file_category.db',
-						connect_args={'check_same_thread': False},)
+_engine = create_engine(
+    "sqlite:///FS_segregation.db",
+    connect_args={"check_same_thread": False},
+)
 metadata = MetaData(_engine)
 
-
-c_bindings = Table('bindings', metadata,
-				   Column('id', Integer, primary_key=True,
-						  autoincrement=True, nullable=False),
-				   Column('audio_id', Integer, ForeignKey(
-					   'audio.id', onupdate='CASCADE', ondelete='RESTRICT'), nullable=False),
-				   Column('category_id', Integer, ForeignKey(
-					   'categories.id', onupdate='CASCADE', ondelete='RESTRICT'), nullable=False),
-				   Column('text_id', Integer, ForeignKey(
-					   'texts.id', onupdate='CASCADE', ondelete='RESTRICT'), nullable=False)
-				   )
-c_categories = Table(
-	'categories', metadata,
-	Column('id', Integer, primary_key=True, nullable=False, autoincrement=True),
-	Column('name', String, nullable=False, unique=True)
-)
-
-c_texts = Table('texts', metadata,
-				Column('id', Integer, primary_key=True),
-				Column('transcript', String, default=None),
-				)
-
-c_audio = Table('audio', metadata,
-				Column('id', Integer, primary_key=True),
-				Column('name', String, nullable=False),
-				Column('directory', String, default=None),
-				Column('duration_seconds', Float, nullable=False),
-				Column('channels', Integer, nullable=False),
-				Column('frame_rate', Integer, nullable=False))
+from tables_definition import *
 
 
 class r_config(Resource):
-	def get(self):
-		pass
+    def get(self):
+        with open("config.json", "r", encoding="utf-8") as output:
+            return json.load(output)
 
-	def patch(self):
-		pass
+    def patch(self):
+        pass
 
 
 class r_status(Resource):
-	def get(self):
-		pass
+    def get(self):
+        pass
 
-	def patch(self):
-		pass
+    def patch(self):
+        pass
 
 
 class r_bindings(Resource):
-	def get(self):
-		parser = reqparse.RequestParser()
-		parser.add_argument(
-			'offset', type=int, help='From which point searching will start', default=0)
-		parser.add_argument('limit', type=int,
-							help='How much rows must be fetched', default=30)
-		args = parser.parse_args()
-		with _engine.connect() as conn:
-			query = \
-				select(c_bindings.c)  \
-				.limit(args['limit']).offset(args['offset'])
-			res: List[engine.Row] = conn.execute(query).mappings().all()
-			return [dict(row) for row in res]
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument(
+            "offset", type=int, help="From which point searching will start", default=0
+        )
+        parser.add_argument(
+            "limit", type=int, help="How much rows must be fetched", default=30
+        )
+        args = parser.parse_args()
+        with _engine.connect() as conn:
+            query = select(c_bindings.c).limit(args["limit"]).offset(args["offset"])
+            res: List[engine.Row] = conn.execute(query).mappings().all()
+            return [dict(row) for row in res]
 
 
 class r_texts(Resource):
-	def get(self):
-		parser = reqparse.RequestParser()
-		parser.add_argument(
-			'offset', type=int, help='From which point searching will start', default=0)
-		parser.add_argument('limit', type=int,
-							help='How much rows must be fetched', default=30)
-		args = parser.parse_args()
-		with _engine.connect() as conn:
-			query = \
-				select(c_texts.c)   \
-				.select_from(c_bindings.join(c_texts))  \
-				.limit(args['limit']).offset(args['offset'])
-			res: List[engine.Row] = conn.execute(query).mappings().all()
-			return [dict(row) for row in res]
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument(
+            "offset", type=int, help="From which point searching will start", default=0
+        )
+        parser.add_argument(
+            "limit", type=int, help="How much rows must be fetched", default=30
+        )
+        args = parser.parse_args()
+        with _engine.connect() as conn:
+            query = (
+                select(c_texts.c)
+                .select_from(c_bindings.join(c_texts))
+                .limit(args["limit"])
+                .offset(args["offset"])
+                .order_by(c_categories.c.name)
+            )
+            res: List[engine.Row] = conn.execute(query).mappings().all()
+            return [dict(row) for row in res]
 
-	def patch(self):
-		data = request.get_json()
-		with _engine.connect() as conn:
-			query = c_texts.update().where(
-				c_texts.c.id == data['bindings_id']).values(transcript=data['text'])
-			try:
-				conn.execute(query)
-			except Exception as e:
-				print(e.args)
-				return jsonify({"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"})
-		return jsonify({"Success": "Tekst zaktualizowany pomyślnie"})
+    def patch(self):
+        data = request.get_json()
+        with _engine.connect() as conn:
+            query = (
+                c_texts.update()
+                .where(c_texts.c.id == data["bindings_id"])
+                .values(transcript=data["text"])
+            )
+            try:
+                conn.execute(query)
+            except Exception as e:
+                print(e.args)
+                return jsonify(
+                    {"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"}
+                )
+        return jsonify({"Success": "Tekst zaktualizowany pomyślnie"})
 
 
 class r_categories(Resource):
-	def get(self):
-		with _engine.connect() as conn:
-			query = select(c_categories.c).order_by(c_categories.c.name)
-			res: List[engine.Row] = conn.execute(query).mappings().all()
-			return [dict(row) for row in res]
+    def get(self):
+        with _engine.connect() as conn:
+            query = select(c_categories.c).order_by(c_categories.c.name)
+            res: List[engine.Row] = conn.execute(query).mappings().all()
+            return [dict(row) for row in res]
 
-	def post(self):
-		data = request.get_json()
-		with _engine.connect() as conn:
-			query = c_categories.insert().values(name=data['category_name'])
-			try:
-				conn.execute(query)
-			except sqlalchemy.exc.IntegrityError:
-				return jsonify({"Error": f"Kategoria {data['category_name']} już istnieje"})
-			except Exception as e:
-				return jsonify({"Error": f"Nieznany błąd: {e.args[0]}"})
-		return jsonify({"Success": f"Kategoria {data['category_name']} została pomyślnie dodana"})
+    def post(self):
+        data = request.get_json()
+        with _engine.connect() as conn:
+            query = c_categories.insert().values(name=data["category_name"])
+            try:
+                conn.execute(query)
+            except sqlalchemy.exc.IntegrityError:
+                return jsonify(
+                    {"Error": f"Kategoria {data['category_name']} już istnieje"}
+                )
+            except Exception as e:
+                return jsonify({"Error": f"Nieznany błąd: {e.args[0]}"})
+        return jsonify(
+            {"Success": f"Kategoria {data['category_name']} została pomyślnie dodana"}
+        )
 
-	def patch(self):
-		data = request.get_json()
-		with _engine.connect() as conn:
-			query = c_bindings.update().where(
-				c_bindings.c.id == data['bindings_id']).values(category_id=data['category_id'])
-			try:
-				conn.execute(query)
-			except Exception as e:
-				print(e.args)
-				return jsonify({"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"})
-		return jsonify({"Success": "Kategoria pomyślnie zaktualizowana"})
+    def delete(self):
+        category_id = int(request.get_json())
+        with _engine.connect() as conn:
+            query = (
+                c_bindings.update()
+                .where(c_bindings.c.category_id == category_id)
+                .values(category_id=0)
+            )
+            delete_query = c_categories.delete(c_categories.c.id == category_id)
+            try:
+                conn.execute(query)
+                conn.execute(delete_query)
+            except Exception as e:
+                print(e.args)
+                return jsonify({"Error": f"Błąd w czasie usuwania. Treść: {e.args}"})
+            return jsonify({"Success": "Usuwanie się powiodło"})
+
+    def patch(self):
+        data = request.get_json()
+        print(data)
+        with _engine.connect() as conn:
+            query = (
+                c_categories.update()
+                .where(c_categories.c.id == data["category_id"])
+                .values(name=data["new_value"])
+            )
+            try:
+                conn.execute(query)
+            except Exception as e:
+                print(e.args)
+                return jsonify(
+                    {"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"}
+                )
+        return jsonify({"Success": "Kategoria pomyślnie zaktualizowana"})
 
 
 class r_audios(Resource):
-	def get(self):
-		parser = reqparse.RequestParser()
-		parser.add_argument(
-			'offset', type=int, help='From which point searching will start', default=0)
-		parser.add_argument('limit', type=int,
-							help='How much row must be fetched', default=30)
-		args = parser.parse_args()
-		with _engine.connect() as conn:
-			query = \
-				select(c_audio.c) \
-				.limit(args['limit']).offset(args['offset'])
-			res: List[engine.Row] = conn.execute(query).mappings().all()
-			return [dict(row) for row in res]
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument(
+            "offset", type=int, help="From which point searching will start", default=0
+        )
+        parser.add_argument(
+            "limit", type=int, help="How much row must be fetched", default=30
+        )
+        args = parser.parse_args()
+        with _engine.connect() as conn:
+            query = select(c_audio.c).limit(args["limit"]).offset(args["offset"])
+            res: List[engine.Row] = conn.execute(query).mappings().all()
+            return [dict(row) for row in res]
 
-	def patch(self):
-		pass
+    def patch(self):
+        pass
 
 
-@app.route('/get_size', methods=['GET'])
+@app.route("/set_category", methods=["PATCH"])
+def set_category():
+    data = request.get_json()
+    (
+        category_id,
+        bindings_id,
+    ) = (data["category_id"], data["bindings_id"])
+    with _engine.connect():
+        query = (
+            c_bindings.update()
+            .values(category_id=category_id)
+            .where(c_bindings.c.id == bindings_id)
+        )
+        query.execute()
+
+    return {"Success": "Kategoria pomyślnie zaktualizowana"}
+
+
+@app.route("/get_size", methods=["GET"])
 def get_size():
-	res = select([func.count()]).select_from(c_bindings).execute()
-	return jsonify(dict(res.mappings().all()[0]))
- 
+    res = select([func.count()]).select_from(c_bindings).execute()
+    return jsonify(dict(res.mappings().all()[0]))
 
+
+
+def get_audio(path: Path):
+    try:
+        return AudioSegment.from_file(path)
+    except exceptions.CouldntDecodeError as e:
+        logging.error(f"Couldn't decode audio. Path to audio: {path}")
+        return None
+    except FileNotFoundError as e:
+        logging.error(f"Couldn't find file. Path to audio: {path}")
+        return None
+    
+def insert_data_to_database(index, path, additional_data, audio, file_name):
+    category_id, text = additional_data["category_id"], additional_data["text"]
+    
+    frame_rate, channels, duration_seconds = (
+        audio.frame_rate,
+        audio.channels,
+        round(audio.duration_seconds, 4),
+    )    
+    try:
+        c_texts.insert(
+                {"id": index, "transcript": text}
+            ).execute()
+    except sqlalchemy.exc.IntegrityError:
+        logging.error(
+                f"Failed to enter text {text} with id {index}. It already exists."
+            )
+
+    try:
+        c_audio.insert(
+                {
+                    "id": index,
+                    "name": file_name,
+                    "channels": channels,
+                    "duration_seconds": duration_seconds,
+                    "frame_rate": frame_rate,
+                    "directory": str(path.parent),
+                }
+            ).execute()
+    except sqlalchemy.exc.IntegrityError:
+        logging.error(
+                f"Failed to enter audio {file_name} with id {index}. It exists."
+            )
+    try:
+        c_bindings.insert(
+                {
+                    "id": index,
+                    "audio_id": index,
+                    "text_id": index,
+                    "category_id": category_id,
+                }
+            ).execute()
+
+    except sqlalchemy.exc.IntegrityError:
+        logging.error(f"Failed to enter binding with id {index}. It exists.")
 
 def insert_data(index: int, path: Path, additional_data: dict = None) -> None:
-	category_id = 0
-	if additional_data['category_name']:
-		query = select(c_categories.c.id).where(c_categories.c.name == additional_data['category_name'])
-		res = query.execute().mappings().all()
-		category_id = res[0]['id']
-	try:
-		audio = AudioSegment.from_file(path)
-	except exceptions.CouldntDecodeError as e:
-		logging.error(f"Couldn't decode audio. Path to audio: {path}")
-		return
-	except FileNotFoundError as e:
-		logging.error(f"Couldn't find file. Path to audio: {path}")
-		return
+    audio = get_audio(path)
+    if audio is None:
+        return
+    file_name = path.parts[-1]
+    with _engine.connect() as conn:
+        insert_data_to_database(index, path, additional_data, audio, file_name)
 
 
-	frame_rate, channels, duration_seconds = [
-		audio.frame_rate, audio.channels, round(audio.duration_seconds, 4)]
-	file_name = path.parts[-1]
-	
-	with _engine.connect() as conn:
-		c_texts.insert({"id": index, "transcript": ""}).execute()
-		c_audio.insert({"id": index, "name": file_name, "channels": channels,
-					   "duration_seconds": duration_seconds, "frame_rate": frame_rate, 'directory': str(path.parent)}).execute()
-		c_bindings.insert({"id": index, "audio_id": index,
-						  "text_id": index, "category_id": category_id}).execute()
 
 
-@app.route('/setup_database', methods=['POST'])
+@app.route("/get_lines", methods=["GET"])
+def get_line():
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "offset", type=int, help="From which point searching will start", default=0
+    )
+    parser.add_argument(
+        "limit", type=int, help="How much row must be fetched", default=30
+    )
+
+    args = parser.parse_args()
+    general_query = (
+        select(
+            c_bindings.c.id.label("bindings_id"),
+            c_categories.c.id.label("category_id"),
+            c_audio.c.name.label("audio_name"),
+            c_audio.c.directory.label("audio_directory"),
+            c_categories.c.name.label("category_name"),
+            c_texts.c.transcript,
+        )
+        .join(c_audio)
+        .join(c_categories)
+        .join(c_texts)
+        .order_by(c_categories.c.name)
+        .limit(args["limit"])
+        .offset(args["offset"])
+    )
+    print(general_query)
+    general_data: List[dict] = (
+        general_query.order_by(c_audio.c.name).execute().mappings().all()
+    )
+    return jsonify([dict(row) for row in general_data])
+
+
+@app.route("/setup_database", methods=["POST"])
 def setup_database():
-	source_path = Path('./source')
-	print("Usuwanie istniejących tabel")
-	if c_categories.exists():
-		c_categories.drop()
-	if c_texts.exists():
-		c_texts.drop()
-	if c_audio.exists():
-		c_audio.drop()
-	if c_bindings.exists():
-		c_bindings.drop()
-	print("Tworzenie nowych tabel tabel")
-	c_categories.create()
-	c_texts.create()
-	c_audio.create()
-	c_bindings.create()
+    source_path = Path("./source")
+    initial_categories = {
+        """
+            Category used for files with unassigned category. Default category.
+        """
+        "unknown": {"id": 0, "name": "Nieznany", "initial_category": "Nieznany"},
+        """
+            Category set by user, who identify a file as... trash, insufficient for later usage or something. It's up to them
+        """
+        "trash": {"id": 1, "name": "Odpad", "initial_category": "Odpad"},
+    }
+    print("Usuwanie istniejących tabel")
+    if c_categories.exists():
+        c_categories.drop()
+    if c_texts.exists():
+        c_texts.drop()
+    if c_audio.exists():
+        c_audio.drop()
+    if c_bindings.exists():
+        c_bindings.drop()
+    print("Tworzenie nowych tabel tabel")
+    c_categories.create()
+    c_texts.create()
+    c_audio.create()
+    c_bindings.create()
 
-	print("Wstawianie danych")
-	start_time = time.time()
-	with _engine.connect():
-		c_categories.insert({"id": 0, "name": "Nieznane"}).execute()
-		c_categories.insert({"id": 1, "name": "Odpad"}).execute()
+    print("Wstawianie danych")
+    start_time = time.time()
+    for val in initial_categories.values():
+        c_categories.insert().values(
+            id=val["id"], name=val["name"], initial_category=val["initial_category"]
+        ).execute()
 
-		data = []
-		for entry in source_path.iterdir():
-			if entry.is_dir():
-				c_categories.insert({"name": entry.name}).execute()
-				wavs_folder = Path(entry, 'wavs')
-				data.extend((file, {
-				    "category_name": entry.name,
-				    'directory': entry
-				}) for file in wavs_folder.iterdir())
-				continue
-			data.append((entry, {"category_name": "Nieznane"}))
-		source_dir_content = [(index, *i) for index, i in enumerate(data)]
-		with Pool(cpu_count()) as pool:
-			pool.starmap(insert_data, source_dir_content)
+    with _engine.connect():
+        dirs = [i for i in source_path.iterdir() if i.is_dir()]
+        unknowns = [i for i in source_path.iterdir() if i.suffix == ".wav"]
+        
+        data = [
+            {
+                "path": unknown,
+                "additional_data": {"category_name": "Nieznany", "text": "", "category_id": 0},
+            }
+            for unknown in unknowns
+        ]
 
-	total_time = time.time() - start_time
-	print(f'Baza ustawiona. Wykorzystany czas: {round(total_time,2)} sekund')
-	return {"Response": "Baza ustawiona"}
+        for index, dir in enumerate(dirs, 2):
+            with contextlib.suppress(sqlalchemy.exc.IntegrityError):
+                c_categories.insert().values(
+                    name=dir.name, initial_category=dir.name
+                ).execute()
 
+            path_to_text = Path(dir, f"{dir.name}.txt")
+            with open(str(path_to_text), "r", encoding="utf-8") as f_input:
+                for line in f_input:
+                    wav, transcript = line.strip().split("|")
+                    data.append(
+                        {
+                            "path": Path(dir, "wavs", wav),
+                            "additional_data": {
+                                "category_id": index,
+                                "category_name": dir.name,
+                                "text": transcript,
+                            },
+                        }
+                    )
 
-def export_audio_segment(path: Path, should_convert_multi_channel: bool = False):
-	audio = AudioSegment.from_file(path)
-	if not should_convert_multi_channel and audio.channels > 1:
-		multi_channel_path = Path(*path.parts[:-2], 'multi_channel')
-		multi_channel_path.mkdir(exist_ok=True)
-		audio.export(Path(multi_channel_path, path.name))
-		return
-	audio.export(path, format='wav', parameters=[
-				 '-ac', '1', '-ar', '22050', '-y'])
+        with ThreadPoolExecutor() as executor:
+            for index, i in enumerate(data):
+                x = executor.submit(insert_data, index, i["path"], i["additional_data"])
+                x.result()
 
-
-class BaseFinalise:
-	"""
-	Base class containing methods to perform finalisation of project.
-	That is:
-		1. Export files to given category
-		2. Provide transcription
-		3. Optionally, format exported files.
-	"""
-
-	def __init__(self, configuration: dict):
-		"""
-		configuration: dict 
-			Contains data prompted by user. In the future, it'll be based purely on config.json
-		"""
-		self.general_query = select(c_bindings, c_audio, c_categories, c_texts) \
-			.join(c_audio).join(c_categories).join(c_texts) \
-			.where(c_categories.c.name != 'Nieznane').where(c_categories.c.name != 'Odpad').where(c_texts.c.transcript != '')
-
-		self.general_data: List[dict] = self.general_query.order_by(
-			c_audio.c.name).execute().mappings().all()
-		self.configuration = configuration
-		self.source = Path('./source')
-	def categorise(self):
-		"""
-			This method aims to export files to categories basing on the data from database.
-		"""
-		pass
-
-	def provide_transcription(self):
-		"""
-			This method aims to provide transcription for each category and correct small errors like the lack of dot at the end.
-			Run after self.categorise().
-		"""
-		pass
-
-	def format(self):
-		"""
-			This method formats files if it's prompted by user.
-			Run after self.categorise().
-		"""
-		pass
+    total_time = time.time() - start_time
+    print(f"Baza ustawiona. Wykorzystany czas: {round(total_time, 2)} sekund")
+    return {"Response": "Baza ustawiona"}
 
 
-class TacotronFinalise(BaseFinalise):
-	"""
-	This class implements finalisation of the project optimised to train single Tacotron models
-	"""
-	def __init__(self, configuration: dict):
-		BaseFinalise.__init__(self, configuration)
-		self.output = Path('./tacotron_output')
-		if self.output.exists():
-			rmtree(self.output)
-
-	def categorise(self):
-		category_query = self.general_query.group_by(c_categories.c.name)
-		category_data = category_query.execute().mappings().all()
-		
-		for i in category_data:
-			category_path = Path(self.output, i['name_1'])
-			wavs_path = Path(category_path, 'wavs')
-			audio_channels = i['channels']
-			category_path.mkdir(exist_ok=True, parents = True)
-			wavs_path.mkdir(exist_ok=True, parents = True)
-		for i in self.general_data:
-			name = i['name'].strip()
-			category_name = i['name_1'].strip()
-			audio_length = i['duration_seconds']
-			output_file_path = Path(self.output, category_name, 'wavs')
-			is_invalid_format = audio_length > self.configuration['maximum_length'] or audio_length < self.configuration['minimum_length'] or audio_channels != 1 
-			if is_invalid_format:
-				path_for_invalid_length = Path(self.output, category_name, 'invalid_length')
-				path_for_invalid_length.mkdir(exist_ok=True)
-				copy(f'{self.source}/{name}', f'{path_for_invalid_length}')    
-				continue
-			copy(f'{self.source}/{name}', f'{output_file_path}')
-
-	def provide_transcription(self):
-		for i in self.general_data:
-			audio_length = i['duration_seconds']
-			audio_channels = i['channels']
-			category_name = i['name_1']
-			category_path = Path(self.output, category_name)
-			transcription_path = Path(category_path, 'list.txt')
-			is_invalid_format = audio_length > self.configuration['maximum_length'] or audio_length < self.configuration['minimum_length'] or audio_channels != 1 
-			if is_invalid_format:
-				transcription_path = Path(category_path, 'invalid_list.txt')
-			with open(transcription_path, "a", encoding="utf-8") as output:
-				name = i['name'].strip()
-				if self.configuration['should_format'] == 'true':
-					name += '.wav'
-				line = i['transcript'].strip()
-				if not line.endswith((".","?","!")):
-					line += line.join(".")
-				output.write(f"{name}|{line}\n")      
-
-	def format(self):
-		category_query = self.general_query.group_by(c_categories.c.name)
-		category_data = category_query.execute().mappings().all()
-		for category in category_data:
-			wavs_path = Path(self.output, category['name_1'], 'wavs')
-			temp_folder = Path(wavs_path, 'temp')
-			temp_folder.mkdir()
-			audios = (i for i in wavs_path.iterdir() if i.is_file())
-			for audio in audios:
-				output_name = f'{temp_folder}/{audio.name}' if audio.name.endswith('.wav') else f'{temp_folder}/{audio.name}.wav'
-				current_file = FFmpeg().option('y').input(audio).output(output_name, ar=22050, ac=1)
-
-				@current_file.on('stderr')
-				def on_stderr(line):
-					#print('stderr:', line)
-					pass
-
-				@current_file.on('error')
-				def on_error(code):
-					print('Error:', code, f' on file: {audio}')
-				@current_file.on('completed')
-				def on_completed():
-					audio.unlink()
-					print(f'Completed formating file: {audio}')
-				asyncio.run(current_file.execute())
-			
-			for audio in temp_folder.iterdir():
-				copy(audio, wavs_path)
-			rmtree(temp_folder)
+from finalisation_classes import (
+    TacotronFinalise,
+    MultiSpeakerFinalise,
+    get_methods,
+    EnderalFinalise,
+)
 
 
-class MultiSpeakerFinalise(BaseFinalise):
-	"""
-	This class implements finalisation of the project optimised to train multispeaker models like Flowtron or Uberduck Pipeline Tacotron
-	"""
-	def __init__(self, configuration: dict):
-		self.output = Path('./multispeaker_output')
-		if self.output.exists():
-			rmtree(self.output) 
-		self.output.mkdir()
-		BaseFinalise.__init__(self, configuration)
-		self.model_info = select(c_categories.c.id, c_categories.c.name,
-									   func.round(func.sum(c_audio.c.duration_seconds) / 60, 2).label('n_files')) \
-			.select_from(c_audio) \
-			.join(c_bindings).join(c_categories) \
-			.join(c_texts).group_by(c_bindings.c.category_id) \
-			.where(c_texts.c.transcript != '').where(c_categories.c.name not in ['Nieznane', 'Odpad']).execute().mappings().all()
-
-	def categorise(self):
-		wavs_path = Path(self.output, 'wavs')
-		invalid_wavs_path = Path(self.output, 'invalid_wavs') 
-		wavs_path.mkdir()
-		invalid_wavs_path.mkdir() 
-		
-		for i in self.general_data:
-			current_folder = wavs_path
-			audio_length = i['duration_seconds']
-			audio_channels = i['channels']
-			is_invalid_format = audio_length > self.configuration['maximum_length'] or audio_length < self.configuration['minimum_length'] or audio_channels != 1
-			if is_invalid_format:
-				current_folder = invalid_wavs_path
-			output_name = f"{i['category_id']}_{i['name']}"
-			source_path = Path('source', i['name'])
-			output_path = Path(current_folder, output_name)
-				
-			copy(source_path, output_path)
-			
-
-	def provide_transcription(self):
-		data_path = Path(self.output, 'texts')
-		data_path.mkdir()
-		with open(Path(data_path, 'model_info.json'), "w", encoding='utf-8') as model_info_output:
-			actors = [dict(i) for i in self.model_info]
-			output_data = {
-				"name":"", 
-				"n_speakers": len(actors),
-				"tacotron": "",
-				"train_list": "",
-				"actors": actors
-			}
-			json.dump(output_data, model_info_output)
-		existing_data = [i for i in self.general_data if Path(self.output, 'wavs', f"{i['category_id']}_{i['name']}").exists()]
-		validation_data_amount = len(existing_data) // 10
-		validation_data = existing_data[:validation_data_amount:]
-		training_data = existing_data[validation_data_amount:]
-		with open(Path(data_path, 'list_train.txt'),"w", encoding='utf-8') as train_output, \
-			 open(Path(data_path, 'list_val.txt'),"w", encoding='utf-8') as val_output:
-			for entry in training_data:
-				name, category_id, transcript = entry['name'], entry['category_id'], entry['transcript']
-				if self.configuration['should_format']:
-					name += '.wav'
-				train_output.write(f"wavs/{category_id}_{name}|{transcript}|{category_id}\n")
-			for entry in validation_data:
-				name, category_id, transcript = entry['name'], entry['category_id'], entry['transcript']
-				if self.configuration['should_format']:
-					name += '.wav'
-				val_output.write(f"wavs/{category_id}_{name}|{transcript}|{category_id}\n")
-
-	def format(self):
-		temp_folder = Path(self.output, 'wavs', 'temp')
-		wavs_path = Path(self.output, 'wavs')
-		temp_folder.mkdir()
-		audios = [i for i in wavs_path.iterdir() if i.is_file()] 
-		for audio in audios:
-			output_name = f'{temp_folder}/{audio.name}' if audio.name.endswith('.wav') else f'{temp_folder}/{audio.name}.wav'
-			current_file = FFmpeg().option('y').input(audio).output(output_name, ar=22050, ac=1)
- 
-			@current_file.on('stderr')
-			def on_stderr(line):
-				#print('stderr:', line)
-				pass
-
-			@current_file.on('error')
-			def on_error(code):
-				print('Error:', code, f' on file: {audio}')
-			@current_file.on('completed')
-			def on_completed():
-				audio.unlink()
-				print(f'Completed formating file: {audio}')
-			asyncio.run(current_file.execute())
-		
-		for audio in temp_folder.iterdir():
-			copy(audio, wavs_path)
-		rmtree(temp_folder)       
-
-@app.route('/finalise', methods=['POST'])
+@app.route("/finalise", methods=["POST"])
 def finalise():
-	data = request.get_json()
-	data['minimum_length'] = float(data['minimum_length'])
-	data['maximum_length'] = float(data["maximum_length"])
-	modes = {
-		"tacotron": TacotronFinalise,
-		"multispeaker": MultiSpeakerFinalise 
-	}
-	x = modes[data["mode"]](data)
-	x.categorise()
-	x.provide_transcription()
-	print(data)
-	if data['should_format'] == 'true':
-		x.format()
-	return {"Message": "Finalizacja: Jest sukces"}
+    print(get_methods())
+    config = request.get_json()
 
-api.add_resource(r_bindings, '/bindings')
-api.add_resource(r_texts, '/texts')
-api.add_resource(r_categories, '/categories')
-api.add_resource(r_audios, '/audios')
-api.add_resource(r_status, '/status')
-api.add_resource(r_config, '/config')
+    config["min_length"] = float(config["min_length"])
+    config["max_length"] = float(config["max_length"])
 
-if __name__ == '__main__':
-	status_file_path = Path('./status.json')
-	if not status_file_path.exists():
-		setup_database()
-		with open('status.json', 'w', encoding='utf-8') as json_output:
-			json.dump({"isDatabaseSet": True}, json_output)
-	app.run(port=5002, debug=True)
+    config["output_sample_rate"] = int(config["output_sample_rate"])
+    config["output_channels"] = int(config["output_channels"])
+
+    config["should_format"] = "should_format" in config.keys()
+    config["should_filter"] = "should_filter" in config.keys()
+    modes = {
+        "distinctive": TacotronFinalise.TacotronFinalise,
+        "to_one_folder": MultiSpeakerFinalise.MultiSpeakerFinalise,
+        "enderal-finalise": EnderalFinalise.EnderalFinalise,
+    }
+
+    currentMode = modes[config["export_method"]](config, sql_engine=_engine)
+    currentMode.categorise()
+    currentMode.provide_transcription()
+    print(config)
+    if config["should_format"]:
+        currentMode.format()
+    return {"Message": "Finalizacja: Jest sukces"}
+
+
+api.add_resource(r_bindings, "/bindings")
+api.add_resource(r_texts, "/texts")
+api.add_resource(r_categories, "/categories")
+api.add_resource(r_audios, "/audios")
+api.add_resource(r_status, "/status")
+api.add_resource(r_config, "/config")
+
+
+def create_status_file():
+    with open("status.json", "w", encoding="utf-8") as json_output:
+        json.dump({"isDatabaseSet": True}, json_output)
+
+
+if __name__ == "__main__":
+    status_file_path = Path("./status.json")
+
+    if not status_file_path.exists():
+        setup_database()
+        create_status_file()
+    app.run(port=5002, debug=True)

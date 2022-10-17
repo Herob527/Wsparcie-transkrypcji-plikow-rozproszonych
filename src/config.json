@@ -1,6 +1,25 @@
 {
-    "elementsPerPage": 20,
-    "source": "./source",
-    "minimumLength": 1,
-    "maximumLength": 10
+    "finalizationConfig": {
+        "minimumLength": 1,
+        "maximumLength": 10,
+        "allowedAmountOfChannels": [1],
+        "formatParams": {
+            "ar": 22050,
+            "af": ""
+
+        },
+        "invalidBehavior": "ignore"
+    },
+    "workspaceConfig": {
+        "elementsPerPage": 100,
+        "theme": "light"
+    },
+    "apiConfig": {
+        "sourceFolder": "./source",
+        "databaseConnectionConfig": {
+            "connectionString":"sqlite:///file_category.db"
+        },
+        "startUpProcesses": 4,
+        "finalizationProcesses": 4
+    }
 }

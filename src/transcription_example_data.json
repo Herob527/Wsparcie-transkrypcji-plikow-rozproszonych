@@ -1,0 +1,49 @@
+{
+    "data": {
+    "audio.id": {
+        "description": "ID pliku audio",
+        "type": "integer",
+        "example_value": 1
+    },
+    "audio.length": {
+        "description": "Długość pliku audio w sekundach",
+        "type": "float",
+        "example_value": 2.534
+    },
+    "audio.name": {
+        "description": "Nazwa pliku audio (po formatowaniu, jeżeli zaaplikowane)",
+        "type": "string",
+        "example_value": "ala_ma_kota.wav"
+    },
+    "audio.channels": {
+        "description": "Ilość kanałów (po formatowaniu, jeżeli zaaplikowane)",
+        "type": "integer",
+        "example_value": 2
+    },
+    "audio.frame_rate" : {
+        "description": "Częstotliwość próbkowania (po formatowaniu, jeżeli zaplikowane)",
+        "type": "integer",
+        "example_value": 22050
+    },
+    "category.name": {
+        "description": "Nazwa kategorii",
+        "type": "string",
+        "example_value": "Herob"
+    },
+    "category.id": {
+        "description": "ID kategorii",
+        "type": "integer",
+        "example_value": 2
+    },
+    "text.id": {
+        "description": "ID tekstu",
+        "type": "integer",
+        "example_value": 2
+    },
+    "text.transcript": {
+        "description": "Transkrypt",
+        "type": "string",
+        "example_value": "To jest transkrypt tejże liniki."
+    }
+}
+}

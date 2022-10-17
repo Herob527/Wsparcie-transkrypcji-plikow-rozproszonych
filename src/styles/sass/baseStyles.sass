@@ -1,0 +1,77 @@
+@import 'Vars.sass'
+    
+.btn_regular
+    transition: background-color .1s, transition .5s
+    transition-timing-function: ease-out
+    background-color: dodgerblue
+    color: $background-color
+    border-radius: 0.15rem
+    font-size: 1rem
+    padding: 0.2rem
+    &:hover
+        background-color: $primary_color
+    &:focus
+        background-color: $secondary_color
+
+.card__container
+    display: flex
+    flex-flow: row wrap
+    padding: $gap_size * 8
+    grid-gap: $gap_size * 8
+    justify-content: center
+
+.card__container__large
+    display: flex
+    flex-flow: row wrap
+    padding: $gap_size 
+    grid-gap: $gap_size
+
+.card
+    display: flex
+    flex-flow: column nowrap 
+    align-items: center
+    grid-gap: $gap_size
+    padding: $gap_size * 6
+    border: 2px solid $primary_color
+    min-width: 400px
+    min-height: 400px
+    background-color: white
+    & > *
+        font: 1rem Verdana
+
+    
+.card__title
+    font: 1.5rem Arial
+    text-align: center
+        
+.card__input
+    font: 1rem Verdana
+    background: $primary_color
+    color: white
+    border: 2px solid $secondary_color
+    padding: $gap_size
+    &:focus
+        border: 2px solid $secondary_color
+        background: $secondary_color
+        outline: none
+    &:hover
+        background: $secondary_color
+
+.card__input__button
+    font: 1rem Verdana
+    padding: $gap_size * 2
+
+.card__input__textarea
+    min-height: 50px
+    max-height: 100px
+    min-width: 250px
+    max-width: 300px
+
+.card__select
+    background: $primary_color
+
+.card__row
+    display: flex
+    flex-flow: row nowrap
+    grid-gap: 0.2rem
+

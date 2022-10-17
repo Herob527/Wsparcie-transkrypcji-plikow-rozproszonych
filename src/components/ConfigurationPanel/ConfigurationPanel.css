@@ -1,0 +1,12 @@
+#category_manager {
+  max-height: 100vh;
+  overflow-y: scroll;
+}
+
+#btn_confirm_all {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+/*# sourceMappingURL=ConfigurationPanel.css.map */

@@ -1,0 +1,100 @@
+#lines {
+  flex: 1;
+  overflow: hidden;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 14% 19% 44% 19%;
+  grid-gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+.line .audio_name {
+  word-break: break-all;
+  font: 1.2rem Arial;
+}
+.line .transcript_area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.line .transcript_area .transcript {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  font: 1.2rem Arial;
+  padding: 0.5rem;
+}
+.line .transcript_area .transcript:focus {
+  border: 1px solid dodgerblue !important;
+}
+.line .transcript_area .special_char_container {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+  margin: 0 0.5rem 0.5rem 0;
+  padding: 0.5rem;
+  border: 1px solid grey;
+}
+.line .transcript_area .special_char_container .special_character {
+  font: 1.2rem Arial;
+}
+.line .transcript_area .special_char_container .special_character:not(:last-of-type) {
+  margin-right: 0.5rem;
+}
+.line .category {
+  font: 1.2rem Arial;
+}
+.line:not(:last-of-type) {
+  margin-bottom: 1rem;
+}
+
+#pagination {
+  z-index: 10;
+  overflow-x: scroll;
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 0.2rem 0 0;
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+}
+#pagination .paginationElement {
+  will-change: filter;
+  transition: filter 0.2s;
+  padding: 1.5rem;
+  position: relative;
+  background-color: white;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid dodgerblue;
+}
+#pagination .paginationElement.active {
+  background: dodgerblue;
+  color: white;
+  border: 2px solid #065ad8;
+}
+#pagination .paginationElement:nth-of-type(n + 1):not(:last-of-type) {
+  margin: 0 0.2rem 0 0;
+}
+#pagination .paginationElement:hover {
+  filter: brightness(1.5);
+}
+#pagination .paginationElement:hover span {
+  transform: scale(1.1);
+}
+#pagination .paginationElement span {
+  position: absolute;
+  font: 1.2rem Verdana;
+}
+
+/*# sourceMappingURL=style.css.map */

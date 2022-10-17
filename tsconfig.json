@@ -23,5 +23,8 @@
   },
   "include": [
     "src"
+, "type.ts"  ],
+  "exclude": [
+    ".src/sd_App.tsx"
   ]
 }

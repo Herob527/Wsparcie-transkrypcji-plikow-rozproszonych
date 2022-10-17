@@ -1,0 +1,50 @@
+{
+    "workspaceConfig": {
+        "elementsPerPage": 100,
+        "theme": "light"
+    },
+    "apiConfig": {
+        "sourceFolder": "./source",
+        "databaseConnectionConfig": {
+            "connectionString":"sqlite:///file_category.db"
+        },
+        "shortcuts": {
+            "toggle_audio": {
+                "key": "ctrl+1",
+                "desc": "Toggles audio in a line where select or textarea is focused."
+            },
+            "move_to_textarea" : {
+                "key": "ctrl+2",
+                "desc": "Toggles focus to textarea in focused line"
+            },
+            "move_to_select": {
+                "key": "ctrl+3",
+                "desc": "Toggles focus to select element in focused line"
+            }
+        }
+    },
+    "finalisationRecent": {
+        "ffmpegConstructor": {
+            "ac": 1,
+            "ar": 22050,
+            "af": "",
+            "type": "wav"
+        },
+        "audioLengthFilter": {
+            "minLength": 0,
+            "maxLength": 1000,
+            "invalidsDir": ""
+        },
+        "exportType": {
+            "onlyText": false,
+            "optionValue": "to_one_folder"
+        },
+        "lineFormat": {
+            "format": ""
+        },
+        "confirmChoices": {
+            "filterByLength": false,
+            "formatAudio": false
+        }
+    }
+}
