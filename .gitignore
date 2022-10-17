@@ -26,7 +26,7 @@ yarn-error.log*
 /enderal_shards_of_the_order
 # Audiofiles
 /static
-source/*
+/source/**
 /public
 /output
 /multispeaker_output
