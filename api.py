@@ -373,7 +373,7 @@ def setup_database():
     with _engine.connect():
         dirs = [i for i in source_path.iterdir() if i.is_dir()]
         unknowns = [i for i in source_path.iterdir() if i.is_file()]
-        
+
         data = [
             {
                 "path": unknown,
@@ -389,19 +389,23 @@ def setup_database():
                 ).execute()
 
             path_to_text = Path(dir, f"{dir.name}.txt")
-            with open(str(path_to_text), "r", encoding="utf-8") as f_input:
-                for line in f_input:
-                    wav, transcript = line.strip().split("|")
-                    data.append(
-                        {
-                            "path": Path(dir, "wavs", wav),
-                            "additional_data": {
-                                "category_id": index,
-                                "category_name": dir.name,
-                                "text": transcript,
-                            },
-                        }
-                    )
+            if path_to_text.exists():
+                with open(str(path_to_text), "r", encoding="utf-8") as f_input:
+                    for line in f_input:
+                        wav, transcript = line.strip().split("|")
+                        data.append(
+                            {
+                                "path": Path(dir, "wavs", wav),
+                                "additional_data": {
+                                    "category_id": index,
+                                    "category_name": dir.name,
+                                    "text": transcript,
+                                },
+                            }
+                        )
+            else:
+                path_to_wavs = Path(dir, 'wavs')
+                data.extend({"path": Path(wav), "additional_data": {"category_id": index, "category_name": dir.name, "text": "",},} for wav in path_to_wavs.iterdir())
 
         with ThreadPoolExecutor() as executor:
             for index, i in enumerate(data):
