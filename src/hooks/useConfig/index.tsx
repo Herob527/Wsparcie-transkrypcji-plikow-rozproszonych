@@ -18,8 +18,9 @@ function useConfig(endpoint = 'config') {
             }).then((res) => res.json()).then((data) => data).catch((error) => error), {
                 "refetchOnMount": false,
                 "refetchOnReconnect": false,
-                "refetchOnWindowFocus": false
+                "refetchOnWindowFocus": false,
             });
+    
     return config;
 }
 
