@@ -372,7 +372,7 @@ def setup_database():
 
     with _engine.connect():
         dirs = [i for i in source_path.iterdir() if i.is_dir()]
-        unknowns = [i for i in source_path.iterdir() if i.suffix == ".wav"]
+        unknowns = [i for i in source_path.iterdir() if i.is_file()]
         
         data = [
             {
