@@ -22,6 +22,7 @@ F2 - Zatrzymaj / Wznów audio
 - [x] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego developmentu
 - [ ] Naprawić problem z wyciekiem pamięci
+
 W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 
 # Dalekie plany
