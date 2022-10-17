@@ -18,7 +18,7 @@ F2 - Zatrzymaj / Wznów audio
 - [ ] Dodać ciemny styl
 - [x] Rekursywne przeszukiwanie folderów (w folderach szuka w folderze **wavs**)
 - [x] Więcej opcji finalizacji (osobny panel) - Wymaga zmian w API
-- [x] Konfiguracja aplikacji z poziomu interfejsu - Alfa
+- [x] Konfiguracja aplikacji z poziomu interfejsu - Wyłącznie kategorie podlegają modyfikacji
 - [x] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego developmentu
 - [ ] Naprawić problem z wyciekiem pamięci
