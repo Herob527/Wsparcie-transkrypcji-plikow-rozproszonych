@@ -1,3 +1,10 @@
+from finalisation_classes import (
+    TacotronFinalise,
+    MultiSpeakerFinalise,
+    get_methods,
+    EnderalFinalise,
+)
+from tables_definition import *
 import contextlib
 from dataclasses import dataclass
 from math import floor
@@ -51,7 +58,7 @@ app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
-with open("./config.json","r", encoding='utf8') as json_input:
+with open("./config.json", "r", encoding='utf8') as json_input:
     config_api = json.load(json_input)['apiConfig']
 
 _engine = create_engine(
@@ -59,8 +66,6 @@ _engine = create_engine(
     connect_args={"check_same_thread": False},
 )
 metadata = MetaData(_engine)
-
-from tables_definition import *
 
 
 class r_config(Resource):
@@ -91,7 +96,8 @@ class r_bindings(Resource):
         )
         args = parser.parse_args()
         with _engine.connect() as conn:
-            query = select(c_bindings.c).limit(args["limit"]).offset(args["offset"])
+            query = select(c_bindings.c).limit(
+                args["limit"]).offset(args["offset"])
             res: List[engine.Row] = conn.execute(query).mappings().all()
             return [dict(row) for row in res]
 
@@ -167,7 +173,8 @@ class r_categories(Resource):
                 .where(c_bindings.c.category_id == category_id)
                 .values(category_id=0)
             )
-            delete_query = c_categories.delete(c_categories.c.id == category_id)
+            delete_query = c_categories.delete(
+                c_categories.c.id == category_id)
             try:
                 conn.execute(query)
                 conn.execute(delete_query)
@@ -206,7 +213,8 @@ class r_audios(Resource):
         )
         args = parser.parse_args()
         with _engine.connect() as conn:
-            query = select(c_audio.c).limit(args["limit"]).offset(args["offset"])
+            query = select(c_audio.c).limit(
+                args["limit"]).offset(args["offset"])
             res: List[engine.Row] = conn.execute(query).mappings().all()
             return [dict(row) for row in res]
 
@@ -232,25 +240,22 @@ def set_category():
     return {"Success": "Kategoria pomyślnie zaktualizowana"}
 
 
-
-
 @app.route("/get_size", methods=["GET"])
 def get_size():
     parser = reqparse.RequestParser()
     parser.add_argument(
         "category_id", type=int, help="Which category will be fetched", default=-1
     )
-    
+
     args = parser.parse_args()
-    
+
     query = select([func.count()]).select_from(c_bindings)
     if args["category_id"] != -1:
         query = query.where(c_bindings.c.category_id == args["category_id"])
     print(args, query)
     res = query.execute()
-    
-    return jsonify(dict(res.mappings().all()[0]))
 
+    return jsonify(dict(res.mappings().all()[0]))
 
 
 def get_audio(path: Path):
@@ -262,51 +267,53 @@ def get_audio(path: Path):
     except FileNotFoundError as e:
         logging.error(f"Couldn't find file. Path to audio: {path}")
         return None
-    
+
+
 def insert_data_to_database(index, path, additional_data, audio, file_name):
     category_id, text = additional_data["category_id"], additional_data["text"]
-    
+
     frame_rate, channels, duration_seconds = (
         audio.frame_rate,
         audio.channels,
         round(audio.duration_seconds, 4),
-    )    
+    )
     try:
         c_texts.insert(
-                {"id": index, "transcript": text}
-            ).execute()
+            {"id": index, "transcript": text}
+        ).execute()
     except sqlalchemy.exc.IntegrityError:
         logging.error(
-                f"Failed to enter text {text} with id {index}. It already exists."
-            )
+            f"Failed to enter text {text} with id {index}. It already exists."
+        )
 
     try:
         c_audio.insert(
-                {
-                    "id": index,
-                    "name": file_name,
-                    "channels": channels,
-                    "duration_seconds": duration_seconds,
-                    "frame_rate": frame_rate,
-                    "directory": str(path.parent),
-                }
-            ).execute()
+            {
+                "id": index,
+                "name": file_name,
+                "channels": channels,
+                "duration_seconds": duration_seconds,
+                "frame_rate": frame_rate,
+                "directory": str(path.parent),
+            }
+        ).execute()
     except sqlalchemy.exc.IntegrityError:
         logging.error(
-                f"Failed to enter audio {file_name} with id {index}. It exists."
-            )
+            f"Failed to enter audio {file_name} with id {index}. It exists."
+        )
     try:
         c_bindings.insert(
-                {
-                    "id": index,
-                    "audio_id": index,
-                    "text_id": index,
-                    "category_id": category_id,
-                }
-            ).execute()
+            {
+                "id": index,
+                "audio_id": index,
+                "text_id": index,
+                "category_id": category_id,
+            }
+        ).execute()
 
     except sqlalchemy.exc.IntegrityError:
         logging.error(f"Failed to enter binding with id {index}. It exists.")
+
 
 def insert_data(index: int, path: Path, additional_data: dict = None) -> None:
     audio = get_audio(path)
@@ -315,7 +322,6 @@ def insert_data(index: int, path: Path, additional_data: dict = None) -> None:
     file_name = path.parts[-1]
     with _engine.connect() as conn:
         insert_data_to_database(index, path, additional_data, audio, file_name)
-
 
 
 @app.route("/get_lines", methods=["GET"])
@@ -349,8 +355,9 @@ def get_line():
         .offset(args["offset"])
     )
     if args['category_id'] != -1:
-        general_query = general_query.where(c_categories.c.id == args["category_id"]) 
-    
+        general_query = general_query.where(
+            c_categories.c.id == args["category_id"])
+
     general_data: List[dict] = (
         general_query.order_by(c_audio.c.name).execute().mappings().all()
     )
@@ -428,24 +435,18 @@ def setup_database():
                         )
             else:
                 path_to_wavs = Path(dir, 'wavs')
-                data.extend({"path": Path(wav), "additional_data": {"category_id": index, "category_name": dir.name, "text": "",},} for wav in path_to_wavs.iterdir())
+                data.extend({"path": Path(wav), "additional_data": {
+                            "category_id": index, "category_name": dir.name, "text": "", }, } for wav in path_to_wavs.iterdir())
 
         with ThreadPoolExecutor() as executor:
             for index, i in enumerate(data):
-                x = executor.submit(insert_data, index, i["path"], i["additional_data"])
+                x = executor.submit(insert_data, index,
+                                    i["path"], i["additional_data"])
                 x.result()
 
     total_time = time.time() - start_time
     print(f"Baza ustawiona. Wykorzystany czas: {round(total_time, 2)} sekund")
     return {"Response": "Baza ustawiona"}
-
-
-from finalisation_classes import (
-    TacotronFinalise,
-    MultiSpeakerFinalise,
-    get_methods,
-    EnderalFinalise,
-)
 
 
 @app.route("/finalise", methods=["POST"])

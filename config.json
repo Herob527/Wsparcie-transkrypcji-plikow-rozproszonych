@@ -1,7 +1,8 @@
 {
     "workspaceConfig": {
         "elementsPerPage": 20,
-        "theme": "light"
+        "theme": "light",
+        "spellcheck": false
     },
     "apiConfig": {
         "sourceFolder": "./source",

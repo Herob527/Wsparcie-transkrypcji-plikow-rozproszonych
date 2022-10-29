@@ -110,11 +110,10 @@ function MainPanel(props: IPanelProps) {
     keyboardjs.bind('ctrl+.', (event: any) => {
 
         event.preventDefault();
-        console.log('Propsy: ', props);
+
         const newPageOffset = offset + props['elementsPerPage'];
-        console.log('Offset: ', newPageOffset);
         const newPage = newPageOffset / props['elementsPerPage'];
-        console.log('newPage: ', newPage);
+
         handlePageChange(newPage);
         setOffset(newPageOffset);
 
@@ -152,7 +151,7 @@ function MainPanel(props: IPanelProps) {
             {data2.map((el: any, index: number) => <div data-ordering={index} data-id={el['bindings_id']} className='line' key={`con_${el['audio_name']}_${index}`}>
                 <span key={`sp_${el['audio_name']}`} className='audio_name'> {el['audio_name']}</span>
                 <WaveAudio key={`wa_${el['audio_name']}_${index}`} index={el['bindings_id']} audio_name={el['audio_name']} audio_dir={el['audio_directory']} />
-                <Transcript key={`tr_${el['audio_name']}_${index}`} transcript={el['transcript']} index={index} />
+                <Transcript key={`tr_${el['audio_name']}_${index}`} transcript={el['transcript']} index={index} spellcheck={props['config']['workspaceConfig']['spellcheck']} />
                 <Category key={`cat_${el['audio_name']}_${index}`} currentCategory={el["category_name"]} id={el["category_id"]} />
             </div>)}
         </div>
@@ -204,7 +203,7 @@ function Transcript(props: ITranscriptProps) {
                 onBlur={handleBlur}
                 tabIndex={props["index"] + 1}
                 className="transcript"
-
+                spellCheck={props['spellcheck']}
             ></textarea>
             <div className='special_char_container' >
                 {specialCharacters.map(el => <button tabIndex={-1} key={el} className="special_character" data-character={el} onClick={handleSpecialCharacters}>{el}</button>)}
@@ -345,19 +344,15 @@ function WaveAudio(props: IWaveAudioProps) {
     keyboardjs.bind('ctrl+1', (event: any) => {
         event.preventDefault();
 
-        if (audioContainerRef.current && waveAudioRef.current && waveAudioRef.current.isReady) {
+        if (waveAudioRef.current.isReady) {
             let currentFocusedElementOrderId = document.activeElement?.parentElement?.getAttribute('data-ordering');
             if (currentFocusedElementOrderId === null) {
                 currentFocusedElementOrderId = document.activeElement?.parentElement?.parentElement?.getAttribute('data-ordering');
             }
-            let outerAudioContainerId;
+            let outerAudioContainerId = audioContainerRef.current.parentElement?.getAttribute('data-ordering');
             // console.table([["audioContainerRef", audioContainerRef.current, Boolean(audioContainerRef.current), ], ["waveAudioRef", waveAudioRef, Boolean(waveAudioRef.current)]])
 
-            const audioContainerId = audioContainerRef.current.parentElement?.getAttribute('data-ordering');
-            outerAudioContainerId = audioContainerId;
-
-
-            if (currentFocusedElementOrderId === outerAudioContainerId && outerAudioContainerId !== null && currentFocusedElementOrderId !== null) {
+            if (currentFocusedElementOrderId === outerAudioContainerId && outerAudioContainerId !== null) {
                 playAudioToggle();
                 document.activeElement?.removeEventListener('blur', pauseAudio);
                 document.activeElement?.addEventListener('blur', pauseAudio);
@@ -366,7 +361,13 @@ function WaveAudio(props: IWaveAudioProps) {
         }
     })
 
-
+    keyboardjs.bind('ctrl+r', (event: any) => {
+        event.preventDefault();
+        if (waveAudioRef.current.isReady) {
+            waveAudioRef.current.stop()
+        }
+        return false;
+    })
     useEffect(() => {
         const audioElement = document.querySelector(
             `#waveform_${props["index"]}`
@@ -386,7 +387,7 @@ function WaveAudio(props: IWaveAudioProps) {
         })
 
         const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`.replaceAll('\\','/')
-        waveform.load(pathToFile, undefined, "none");
+        waveform.load(pathToFile);
         waveAudioRef.current = waveform
         return () => {
             waveform.destroy()

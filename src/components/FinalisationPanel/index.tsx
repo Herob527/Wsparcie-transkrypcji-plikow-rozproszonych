@@ -20,7 +20,14 @@ const useFinaliseRes = () => {
         "Finished": "#1dbf00",
         "Error": "#f50c0c"
     }
+    const messages = {
+        "None": "Jestem gotowy!",
+        "Executing": "Robię!",
+        "Finished": "I po sprawie...",
+        "Error": "Błąd, tylko jaki?"
+    }
     return {
+        messages,
         colors,
         finaliseState,
         setFinaliseState
@@ -58,9 +65,6 @@ function Wrapper() {
             setFinaliseState("Error");
             return err;
         })
-        setTimeout(() => {
-            setFinaliseState("None")
-        }, 5000);
         console.log(res);
     }
     return (<form id='FinalisationPanel' className='card__container' onSubmit={handleSubmit}>
@@ -172,7 +176,7 @@ function LineFormat(props: any) {
 
 /* There, user decides, if they want to use additional things like formatting, filtering and to finalise project */
 function Decisions(props: any) {
-    const { colors, finaliseState } = useSharedFinaliseRes();
+    const { messages, colors, finaliseState } = useSharedFinaliseRes();
     return (
         <div id='decision' className='card'>
             <p className='card__title'> Zatwierdzenie finalizacji  </p>
@@ -181,6 +185,7 @@ function Decisions(props: any) {
             <label htmlFor='should_format'> Formatuj pliki audio </label>
             <input type='checkbox' name='should_format' id='should_format' title='Dodatkowo formatuje pliki audio' />
             <button style={{ backgroundColor: colors[finaliseState] }} className='card__input card__input__button' disabled={finaliseState === "Executing"}> Finalizuj </button>
+            <p> {messages[finaliseState]}</p>
         </div>
     )
 }

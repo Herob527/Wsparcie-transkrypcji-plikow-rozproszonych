@@ -3,6 +3,7 @@ export namespace configAPIData {
     export interface WorkspaceConfig {
         elementsPerPage: number;
         theme: string;
+        spellcheck: boolean
     }
 
     export interface DatabaseConnectionConfig {
