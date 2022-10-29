@@ -6,7 +6,8 @@
     "apiConfig": {
         "sourceFolder": "./source",
         "databaseConnectionConfig": {
-            "connectionString":"sqlite:///file_category.db"
+            "connectionString":"sqlite:///segregation.db", 
+            "params": {}
         },
         "shortcuts": {
             "toggle_audio": {

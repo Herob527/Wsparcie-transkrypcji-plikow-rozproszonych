@@ -1,9 +1,23 @@
 @import '../../styles/sass/Vars'
 
-#lines
-    flex: 1
-    overflow: hidden
-
+#Panel
+    display: flex
+    flex-flow: row nowrap
+    position: relative
+    gap: 1rem
+    #lines
+        width: 80%
+        flex: 8
+        padding: 0.2rem
+        
+    #side_panel
+        width: 20%
+        position: sticky
+        flex: 2
+        top: 5%
+        left: 0
+        padding: 0.2rem
+        align-self: flex-start
 .line
     display: grid
     grid-template-columns: 14% 19% 44% 19%

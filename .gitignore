@@ -24,13 +24,15 @@ yarn-error.log*
 /enderal - forgotten stories.esm
 /forgotten_stories_t
 /enderal_shards_of_the_order
+
 # Audiofiles
 /static
-/source/**
+/*source/**
 /public
 /output
 /multispeaker_output
 /tacotron_output
+
 /logs
 # Untracked files:
 .prettierrc 
@@ -47,3 +49,4 @@ karty_postaci.csv
 files.txt
 texts.txt
 status.json
+*.7z

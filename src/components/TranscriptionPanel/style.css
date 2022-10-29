@@ -1,6 +1,22 @@
-#lines {
-  flex: 1;
-  overflow: hidden;
+#Panel {
+  display: flex;
+  flex-flow: row nowrap;
+  position: relative;
+  gap: 1rem;
+}
+#Panel #lines {
+  width: 80%;
+  flex: 8;
+  padding: 0.2rem;
+}
+#Panel #side_panel {
+  width: 20%;
+  position: sticky;
+  flex: 2;
+  top: 5%;
+  left: 0;
+  padding: 0.2rem;
+  align-self: flex-start;
 }
 
 .line {

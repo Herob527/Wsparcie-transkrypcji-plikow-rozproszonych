@@ -51,8 +51,11 @@ app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
+with open("./config.json","r", encoding='utf8') as json_input:
+    config_api = json.load(json_input)['apiConfig']
+
 _engine = create_engine(
-    "sqlite:///FS_segregation.db",
+    'sqlite:///segregation.db',
     connect_args={"check_same_thread": False},
 )
 metadata = MetaData(_engine)
@@ -228,9 +231,23 @@ def set_category():
     return {"Success": "Kategoria pomyślnie zaktualizowana"}
 
 
+
+
 @app.route("/get_size", methods=["GET"])
 def get_size():
-    res = select([func.count()]).select_from(c_bindings).execute()
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "category_id", type=int, help="Which category will be fetched", default=-1
+    )
+    
+    args = parser.parse_args()
+    
+    query = select([func.count()]).select_from(c_bindings)
+    if args["category_id"] != -1:
+        query = query.where(c_bindings.c.category_id == args["category_id"])
+    print(args, query)
+    res = query.execute()
+    
     return jsonify(dict(res.mappings().all()[0]))
 
 
@@ -300,7 +317,6 @@ def insert_data(index: int, path: Path, additional_data: dict = None) -> None:
 
 
 
-
 @app.route("/get_lines", methods=["GET"])
 def get_line():
     parser = reqparse.RequestParser()
@@ -310,7 +326,9 @@ def get_line():
     parser.add_argument(
         "limit", type=int, help="How much row must be fetched", default=30
     )
-
+    parser.add_argument(
+        "category_id", type=int, help="Which category will be fetched", default=-1
+    )
     args = parser.parse_args()
     general_query = (
         select(
@@ -328,16 +346,19 @@ def get_line():
         .limit(args["limit"])
         .offset(args["offset"])
     )
-    print(general_query)
+    if args['category_id'] != -1:
+        general_query = general_query.where(c_categories.c.id == args["category_id"]) 
+    
     general_data: List[dict] = (
         general_query.order_by(c_audio.c.name).execute().mappings().all()
     )
+    print(len(general_data))
     return jsonify([dict(row) for row in general_data])
 
 
 @app.route("/setup_database", methods=["POST"])
 def setup_database():
-    source_path = Path("./source")
+    source_path = Path(config_api['sourceFolder'])
     initial_categories = {
         """
             Category used for files with unassigned category. Default category.

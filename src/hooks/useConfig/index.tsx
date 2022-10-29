@@ -7,9 +7,6 @@ import { useQueryClient, QueryClientProvider, useQuery, QueryClient } from 'reac
 const API_ADDRESS = 'http://localhost:5002';
 
 
-
-
-
 function useConfig(endpoint = 'config') {
     const config = useQuery('configData',
         async () =>

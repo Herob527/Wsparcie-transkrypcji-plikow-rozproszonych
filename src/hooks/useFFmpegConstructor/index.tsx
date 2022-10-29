@@ -6,7 +6,8 @@ import { useQueryClient, QueryClientProvider, useQuery, QueryClient } from 'reac
 function useFFmpegConstructor() {
     return {
         "createCommand": (ac: number = 1, ar: number = 22050, af: string = "", output_type:string = 'wav' ) => {
-            if (output_type === '' || ac <= 0 || ar <= 0 || Number.isNaN(ac) || Number.isNaN(ar)) {
+            const valueIsInvalid = output_type === '' || ac <= 0 || ar <= 0 || Number.isNaN(ac) || Number.isNaN(ar);
+            if (valueIsInvalid) {
                 return "";
             }
             return `ffmpeg.exe -i "plikel.mp3" -ac ${ac} -ar ${ar} ${af ? '-af '+af : "" } plikel.${output_type}`

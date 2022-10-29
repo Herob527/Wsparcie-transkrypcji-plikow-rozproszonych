@@ -8,9 +8,12 @@ from sqlalchemy import (
     create_engine,
     MetaData,
 )
-
+import json
+with open("./config.json","r", encoding='utf8') as json_input:
+    config_api = json.load(json_input)['apiConfig']
+    
 _engine = create_engine(
-    "sqlite:///FS_segregation.db",
+    'sqlite:///segregation.db',
     connect_args={"check_same_thread": False},
 )
 metadata = MetaData(_engine)

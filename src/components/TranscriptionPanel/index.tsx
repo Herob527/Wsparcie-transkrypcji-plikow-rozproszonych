@@ -1,33 +1,44 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import WaveSurfer from "wavesurfer.js";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import './style.css'
-import useConfig from '../../hooks/useConfig'
-import type { configAPIData } from '../../../type'
+
+import React, { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+
+import WaveSurfer from "wavesurfer.js";
 // @ts-ignore
 import keyboardjs from 'keyboardjs';
 
+
+
+// Hooks
+import useConfig from '../../hooks/useConfig'
+import { useFilterByCategory, useSharedFilterCategory } from '../../hooks/useFilterByCategory';
+import { useBetween, free } from 'use-between'
+import { useStateIfMounted } from 'use-state-if-mounted'
+
+// Types
+import type { configAPIData } from '../../../type'
 import type { IPanelProps } from "./types/IPanelProps";
 import type { ITranscriptProps } from "./types/ITranscriptProps";
 import type { ICategoryProps } from "./types/ICategoryProps";
 import type { IPaginationProps } from "./types/IPaginationProps";
 import type { IWaveAudioProps } from "./types/IWaveAudioProps";
-import { useBetween } from 'use-between'
+
+import { SidePanel } from './SidePanel'
 const API_ADDRESS = 'http://localhost:5002';
 
 const PanelQueryClient = new QueryClient();
 const CategoryQueryClient = new QueryClient();
 
 const useOffsetData = () => {
-    const [offset, setOffset] = useState(0);
-    console.log('useOffsetData offset: ', offset);
+    const [offset, setOffset] = useStateIfMounted(0);
     return {
         offset,
         setOffset
     }
 }
 
-const useSharedOffsetState = () => useBetween(useOffsetData);
+const useSharedOffsetState = () => useBetween(useOffsetData,);
+
 
 
 const Wrapper = () => {
@@ -41,13 +52,18 @@ const Wrapper = () => {
     const workspaceConfig = configData['workspaceConfig'];
 
     return (<>
-        <Panel elementsPerPage={workspaceConfig['elementsPerPage']} config={configData} />
+        <section id='Panel'>
+            <MainPanel elementsPerPage={workspaceConfig['elementsPerPage']} config={configData} />
+            <SidePanel />
+        </section>
         <Pagination key='pagination' elementsPerPage={workspaceConfig['elementsPerPage']} />
     </>
     );
 }
 
 export const TranscriptionPanel = () => {
+    useEffect(() => { return () => {
+    }})
     return (<QueryClientProvider key="query_provider" client={PanelQueryClient}>
         <Wrapper key='panel' />
     </QueryClientProvider>);
@@ -68,31 +84,23 @@ interface ILineFromAPI {
 }
 type dataFromAPI = ILineFromAPI[]
 
-function Panel(props: IPanelProps) {
+function MainPanel(props: IPanelProps) {
     const { offset, setOffset } = useSharedOffsetState();
-    const isMounted = useRef(false);
-    console.log('isMounted: ', isMounted.current)
-    console.log('Current offset: ', offset)
-
-    let { data, isLoading, error, refetch, remove } = useQuery('getLines', async () => {
-        return await fetch(`${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}`, {
+    const { filterCategory } = useSharedFilterCategory();
+    let { data, isLoading, error, refetch, remove } = useQuery([offset, filterCategory], async () => {
+        return await fetch(`${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}&category_id=${filterCategory}`, {
             "method": "GET",
             "headers": {
                 "Accept": "application/json",
             }
-        }).then((res) => res.json()).then((data) => data).catch((error) => error)
-    }, { "refetchOnWindowFocus": false, "refetchOnReconnect": false, "refetchOnMount": false })
+        }).then((res) => res.json()).then((data) => {handlePageChange(offset / props['elementsPerPage']);return data}).catch((error) => error)
+    }, { "refetchOnWindowFocus": false, "refetchOnReconnect": false, "refetchOnMount": false, "cacheTime": 0 })
     let data2: dataFromAPI = data;
     useEffect(() => {
-        isMounted.current = true;
-        const newPage = offset / props['elementsPerPage'];
-        handlePageChange(newPage);
-        refetch();
-        console.dir(PanelQueryClient.getQueriesData("getLines"));
         return () => {
-            isMounted.current = false
+
         }
-    }, [offset, refetch, remove]);
+    }, []);
     if (isLoading) {
         return <div> Lolding data... </div>
     }
@@ -100,16 +108,16 @@ function Panel(props: IPanelProps) {
         return <div> {error} </div>
     }
     keyboardjs.bind('ctrl+.', (event: any) => {
-        if (isMounted.current) {
-            event.preventDefault();
-            console.log('Propsy: ', props);
-            const newPageOffset = offset + props['elementsPerPage'];
-            console.log('Offset: ', newPageOffset);
-            const newPage = newPageOffset / props['elementsPerPage'];
-            console.log('newPage: ', newPage);
-            handlePageChange(newPage);
-            setOffset(newPageOffset);
-        }
+
+        event.preventDefault();
+        console.log('Propsy: ', props);
+        const newPageOffset = offset + props['elementsPerPage'];
+        console.log('Offset: ', newPageOffset);
+        const newPage = newPageOffset / props['elementsPerPage'];
+        console.log('newPage: ', newPage);
+        handlePageChange(newPage);
+        setOffset(newPageOffset);
+
         return false;
     })
     keyboardjs.bind('ctrl+2', (event: any) => {
@@ -143,7 +151,7 @@ function Panel(props: IPanelProps) {
         <div id='lines'>
             {data2.map((el: any, index: number) => <div data-ordering={index} data-id={el['bindings_id']} className='line' key={`con_${el['audio_name']}_${index}`}>
                 <span key={`sp_${el['audio_name']}`} className='audio_name'> {el['audio_name']}</span>
-                <WaveAudio key={`wa_${el['audio_name']}_${index}`} index={index} audio_name={el['audio_name']} audio_dir={el['audio_directory']} />
+                <WaveAudio key={`wa_${el['audio_name']}_${index}`} index={el['bindings_id']} audio_name={el['audio_name']} audio_dir={el['audio_directory']} />
                 <Transcript key={`tr_${el['audio_name']}_${index}`} transcript={el['transcript']} index={index} />
                 <Category key={`cat_${el['audio_name']}_${index}`} currentCategory={el["category_name"]} id={el["category_id"]} />
             </div>)}
@@ -153,7 +161,7 @@ function Panel(props: IPanelProps) {
 }
 
 function Transcript(props: ITranscriptProps) {
-    const [text, setText] = useState(props["transcript"]);
+    const [text, setText] = useStateIfMounted(props["transcript"]);
 
     const handleChange = async (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
 
@@ -204,12 +212,14 @@ function Transcript(props: ITranscriptProps) {
 
 function Category(props: ICategoryProps) {
     const { id, currentCategory } = props;
-    const [category, setCategory] = useState(id)
+    const [category, setCategory] = useStateIfMounted(id)
     const { isLoading, error, data, refetch, remove } = useQuery("get_category", async () => {
         const res = await fetch(`${API_ADDRESS}/categories`);
         return await res.json();
-    });
-
+    }, {"cacheTime": 0});
+    useEffect(() => () => {
+        remove();
+    }, [remove])
     if (isLoading)
         return (
             <select disabled={true}>
@@ -222,6 +232,7 @@ function Category(props: ICategoryProps) {
                 <option> Błąd: {error}</option>
             </select>
         );
+
     const handleChange = async (ev: any) => {
         console.log(ev.target.value)
         const bindingId = ev.currentTarget.parentElement.getAttribute("data-id");
@@ -239,13 +250,17 @@ function Category(props: ICategoryProps) {
         })
             .then((res) => res.json())
             .catch((err) => err);
-        
+
         return;
     };
-    const handleClick = () => {
+    const handleClick = (ev: React.PointerEvent<HTMLSelectElement>) => {
         refetch()
+
         return;
     };
+    const handleCopy = (ev: React.ClipboardEvent) => {
+        console.log(ev);
+    }
     const categories = data.map((category: any, index: number) => (
         <option key={`option_${category["id"]}_${index}`} value={category["id"]}>
             {category["name"].trim()}
@@ -257,6 +272,7 @@ function Category(props: ICategoryProps) {
                 title="Kategorie głosów"
                 onChange={handleChange}
                 onClick={handleClick}
+                onCopy={handleCopy}
                 value={category}
                 className="category"
             >
@@ -268,18 +284,22 @@ function Category(props: ICategoryProps) {
 
 function Pagination(props: IPaginationProps) {
     const { offset, setOffset } = useSharedOffsetState();
+    const { filterCategory } = useSharedFilterCategory();
     const { elementsPerPage } = props;
     const currentPage = 0 / elementsPerPage;
-    const { data, isLoading, remove } = useQuery('amountOfLines', async () => {
-        return await fetch(`${API_ADDRESS}/get_size`, {
+    const { data, isLoading, remove } = useQuery([filterCategory], async () => {
+        return await fetch(`${API_ADDRESS}/get_size?category_id=${filterCategory}`, {
             "method": "GET",
             "headers": {
                 "Accept": "application/json",
             }
         }).then(response => response.json()).then(data => data['count_1']).catch(error => error)
-    }, {
-        "keepPreviousData": true
     })
+    useEffect(() => () => {
+        remove(); 
+        free(useSharedFilterCategory)
+        free(useSharedOffsetState);
+    }, [remove, free])
     if (isLoading) {
         return <p> Loading pages</p>
     }
@@ -290,7 +310,7 @@ function Pagination(props: IPaginationProps) {
         return false;
     }
     const steps = Math.floor(data / elementsPerPage);
-    const pages = Array(steps).fill(0).map((el: number, index: number) =>
+    const pages = Array(steps + 1).fill(0).map((el: number, index: number) =>
 
         <div className={`paginationElement ${index === currentPage ? 'active' : ''}`} onClick={handleClick} data-page={index} data-offset={index * elementsPerPage} key={`page_${index * elementsPerPage}`}>
             <span> {index + 1} </span>
@@ -318,46 +338,54 @@ function WaveAudio(props: IWaveAudioProps) {
         return;
     }
     const handleClick = playAudioToggle;
+
     keyboardjs.bind('ctrl+1', (event: any) => {
         event.preventDefault();
-        let currentFocusedElementOrderId = document.activeElement?.parentElement?.getAttribute('data-ordering');
-        if (currentFocusedElementOrderId === null) {
-            currentFocusedElementOrderId = document.activeElement?.parentElement?.parentElement?.getAttribute('data-ordering');
+
+        if (audioContainerRef.current && waveAudioRef.current) {
+            let currentFocusedElementOrderId = document.activeElement?.parentElement?.getAttribute('data-ordering');
+            if (currentFocusedElementOrderId === null) {
+                currentFocusedElementOrderId = document.activeElement?.parentElement?.parentElement?.getAttribute('data-ordering');
+            }
+            let outerAudioContainerId;
+            // console.table([["audioContainerRef", audioContainerRef.current, Boolean(audioContainerRef.current), ], ["waveAudioRef", waveAudioRef, Boolean(waveAudioRef.current)]])
+
+            const audioContainerId = audioContainerRef.current.parentElement?.getAttribute('data-ordering');
+            outerAudioContainerId = audioContainerId;
+
+
+            if (currentFocusedElementOrderId === outerAudioContainerId && outerAudioContainerId !== null && currentFocusedElementOrderId !== null) {
+                playAudioToggle();
+                document.activeElement?.removeEventListener('blur', pauseAudio);
+                document.activeElement?.addEventListener('blur', pauseAudio);
+            }
+            return false;
         }
-        let outerAudioContainerId;
-
-        const audioContainerId = audioContainerRef.current.getAttribute('data-ordering');
-        outerAudioContainerId = audioContainerId;
-
-
-        if (currentFocusedElementOrderId === outerAudioContainerId && outerAudioContainerId !== null && currentFocusedElementOrderId !== null) {
-            playAudioToggle();
-            document.activeElement?.removeEventListener('blur', pauseAudio);
-            document.activeElement?.addEventListener('blur', pauseAudio);
-        }
-        return false;
     })
-    
+
 
     useEffect(() => {
         const audioElement = document.querySelector(
             `#waveform_${props["index"]}`
         ) as HTMLElement;
         audioContainerRef.current = audioElement;
-        const waveform = WaveSurfer.create({
-            container: audioElement,
-            waveColor: "#0569ff",
-            progressColor: "#0353cc",
-        });
+        const waveform = new WaveSurfer({
+            "container": audioElement,
+            "waveColor": "#0569ff",
+            "progressColor": "#0353cc",
+            "responsive": true
+        })
+        waveform.init();
+
         waveform.on("error", (err) => {
             console.log("Błąd: ", err)
         })
 
-        const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`
+        const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`.replaceAll('\\','/')
         waveform.load(pathToFile);
-        waveAudioRef.current = waveform;
+        waveAudioRef.current = waveform
         return () => {
-            waveform.destroy();
+            waveform.destroy()
         };
     })
     return <div id={`waveform_${props["index"]}`} data-ordering={props["index"]} onClick={handleClick}></div>;
