@@ -5,12 +5,28 @@ import useTranscriptFormatter from '../../hooks/useTranscriptFormatter'
 import useFFmpegConstructor from '../../hooks/useFFmpegConstructor'
 import useConfig from '../../hooks/useConfig'
 import { QueryClient, QueryClientProvider } from 'react-query'
-
+import { useBetween } from 'use-between'
 const API_ADDRESS = 'http://localhost:5002';
 
 const ConfigClient = new QueryClient();
 
+type FinalisationStates = "None" | "Executing" | "Finished" | "Error"
 
+const useFinaliseRes = () => {
+    const [finaliseState, setFinaliseState] = useState("None" as FinalisationStates);
+    const colors = {
+        "None": "#1e90ff",
+        "Executing": "#959595",
+        "Finished": "#1dbf00",
+        "Error":"#f50c0c"
+    }
+    return {
+        colors,
+        finaliseState,
+        setFinaliseState
+    }
+}
+const useSharedFinaliseRes = () => useBetween(useFinaliseRes);
 
 export const FinalisationPanel = (props: any) => {
     return (
@@ -18,38 +34,49 @@ export const FinalisationPanel = (props: any) => {
             <Wrapper />
         </QueryClientProvider>
 
- )
+    )
 }
 function Wrapper() {
-const {isLoading, data} = useConfig()
+    const {setFinaliseState} =  useSharedFinaliseRes();
+    const { isLoading, data } = useConfig()
     if (isLoading) {
         return <div className='card'> Loading</div>;
     }
     const finaliseData = data["finalisationRecent"]
     const handleSubmit = async (ev: React.MouseEvent<HTMLFormElement>) => {
         ev.preventDefault();
+        setFinaliseState("Executing");
         const formData = new FormData(ev.currentTarget);
         const res = await fetch(`${API_ADDRESS}/finalise`, {
             method: 'POST',
             body: JSON.stringify(Object.fromEntries(formData)),
-            headers: { 'Content-Type': 'application/json'}
-        }).then((response) => response.json()).then(data => data).catch((err) => err)
+            headers: { 'Content-Type': 'application/json' }
+        }).then((response) => response.json()).then(data => {
+            setFinaliseState("Finished")
+            return data;
+        }).catch((err) => {
+            setFinaliseState("Error");
+            return err;
+        })
+        setTimeout(() => {
+            setFinaliseState("None")
+        }, 5000);
         console.log(res);
     }
     return (<form id='FinalisationPanel' className='card__container' onSubmit={handleSubmit}>
-        
-            <SimpleFfmpegConstructor />
-            <AudioLengthRanges 
-                minLength={finaliseData["audioLengthFilter"]["minLength"]} 
-                maxLength={finaliseData["audioLengthFilter"]["maxLength"]}
-                invalidsDir={finaliseData["audioLengthFilter"]["invalidsDir"]}
-            />
-            <ExportTypeConfig />
-            <LineFormat />
-            <Consequences />
-            <Decisions />
 
-    </form> )
+        <SimpleFfmpegConstructor />
+        <AudioLengthRanges
+            minLength={finaliseData["audioLengthFilter"]["minLength"]}
+            maxLength={finaliseData["audioLengthFilter"]["maxLength"]}
+            invalidsDir={finaliseData["audioLengthFilter"]["invalidsDir"]}
+        />
+        <ExportTypeConfig />
+        <LineFormat />
+        <Consequences />
+        <Decisions />
+
+    </form>)
 }
 
 function SimpleFfmpegConstructor(props: any) {
@@ -81,7 +108,7 @@ function SimpleFfmpegConstructor(props: any) {
             <input type='number' className='card__input' onInput={handleInput_sampleRate} name='output_sample_rate' id='output_sample_rate' min='1' title='Wyjściowa częstotliwość próbkowania' value={sampleRate} />
 
             <label htmlFor='output_audio_filter'> Dodatkowe filtry (-af)</label>
-            <input type='text' className='card__input' onInput={handleInput_audioFilter} name='output_audio_filter' id='output_audio_filter' title='Wyjściowy filtr audio' value={audioFilter}  />
+            <input type='text' className='card__input' onInput={handleInput_audioFilter} name='output_audio_filter' id='output_audio_filter' title='Wyjściowy filtr audio' value={audioFilter} />
 
             <label htmlFor='output_type'> Docelowy typ (rozszerzenie)</label>
             <input type='text' className='card__input' onInput={handleInput_outputType} name='output_type' id='output_type' title='Rozszerzenie wyjściowego audio. Domyślnie wav' value={outputType} />
@@ -92,7 +119,7 @@ function SimpleFfmpegConstructor(props: any) {
     )
 }
 
-function AudioLengthRanges({minLength, maxLength, invalidsDir} : any ) {
+function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
 
     return (
         <div id="audioLengthRanges" className='card'>
@@ -100,7 +127,7 @@ function AudioLengthRanges({minLength, maxLength, invalidsDir} : any ) {
             <label htmlFor="min_length"> Minimalna długość pliku audio [s] </label>
             <input type="number" id='min_length' value={minLength} name='min_length' min='0' className='card__input' title='Minimalna długość audio' />
             <label htmlFor="max_length"> Maksymalna długość pliku audio [s] </label>
-            <input type="number" id='max_length' value={maxLength } name='max_length' min='0' className='card__input' title='Maksymalna długość audio' />
+            <input type="number" id='max_length' value={maxLength} name='max_length' min='0' className='card__input' title='Maksymalna długość audio' />
             <label htmlFor="invalids_dir"> Nazwa folderu dla plików spoza podanego zakresu </label>
             <input type="text" id='invalids_dir' value={invalidsDir} name='invalids_dir' className='card__input' />
         </div>
@@ -117,7 +144,7 @@ function ExportTypeConfig(props: any) {
                 <option value='enderal-finalise'> Enderal </option>
                 <option value='to_one_folder'> Każda kategoria do jednego folderu </option>
                 <option value='distinctive'> Każda kategoria do osobnego folderu </option>
-                
+
             </select>
         </div>
     )
@@ -142,6 +169,7 @@ function LineFormat(props: any) {
 
 /* There, user decides, if they want to use additional things like formatting, filtering and to finalise project */
 function Decisions(props: any) {
+    const {colors, finaliseState} =  useSharedFinaliseRes();
     return (
         <div id='decision' className='card'>
             <p className='card__title'> Zatwierdzenie finalizacji  </p>
@@ -149,19 +177,19 @@ function Decisions(props: any) {
             <input type='checkbox' name='should_filter' id='should_filter' title='Uwzględnij filtr długości audio' />
             <label htmlFor='should_format'> Formatuj pliki audio </label>
             <input type='checkbox' name='should_format' id='should_format' title='Dodatkowo formatuje pliki audio' />
-            <button className='card__input card__input__button'> Finalizuj </button>
+            <button style={{backgroundColor: colors[finaliseState]}} className='card__input card__input__button' disabled={finaliseState === "Executing"}> Finalizuj </button>
         </div>
     )
 }
 
-function ExampleLine({text} : {text: string}) {
-    
+function ExampleLine({ text }: { text: string }) {
+
     const formatter = useTranscriptFormatter();
     formatter.format(text as string);
     return (
-    <>            
-        <label htmlFor='lineExample'> Przykład linijki </label>
-        <textarea id="lineExample" className='card__input card__input__textarea' readOnly value={formatter.format(text)}/>
+        <>
+            <label htmlFor='lineExample'> Przykład linijki </label>
+            <textarea id="lineExample" className='card__input card__input__textarea' readOnly value={formatter.format(text)} />
         </>);
 }
 

@@ -13,7 +13,7 @@ with open("./config.json","r", encoding='utf8') as json_input:
     config_api = json.load(json_input)['apiConfig']
     
 _engine = create_engine(
-    'sqlite:///segregation.db',
+    config_api["databaseConnectionConfig"]["connectionString"],
     connect_args={"check_same_thread": False},
 )
 metadata = MetaData(_engine)
@@ -46,8 +46,7 @@ c_categories = Table(
     "categories",
     metadata,
     Column("id", Integer, primary_key=True, nullable=False, autoincrement=True),
-    Column("name", String, nullable=False, unique=True),
-    Column("initial_category", String, nullable=False),
+    Column("name", String, nullable=False, unique=True)
 )
 
 c_texts = Table(

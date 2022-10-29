@@ -55,7 +55,7 @@ with open("./config.json","r", encoding='utf8') as json_input:
     config_api = json.load(json_input)['apiConfig']
 
 _engine = create_engine(
-    'sqlite:///segregation.db',
+    config_api["databaseConnectionConfig"]["connectionString"],
     connect_args={"check_same_thread": False},
 )
 metadata = MetaData(_engine)
@@ -119,6 +119,7 @@ class r_texts(Resource):
 
     def patch(self):
         data = request.get_json()
+        print(data)
         with _engine.connect() as conn:
             query = (
                 c_texts.update()
@@ -338,11 +339,12 @@ def get_line():
             c_audio.c.directory.label("audio_directory"),
             c_categories.c.name.label("category_name"),
             c_texts.c.transcript,
+            c_audio.c.duration_seconds
         )
         .join(c_audio)
         .join(c_categories)
         .join(c_texts)
-        .order_by(c_categories.c.name)
+        .order_by(c_audio.c.duration_seconds)
         .limit(args["limit"])
         .offset(args["offset"])
     )

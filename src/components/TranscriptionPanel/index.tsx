@@ -170,7 +170,8 @@ function Transcript(props: ITranscriptProps) {
     };
     const handleBlur = async (ev: React.FocusEvent<HTMLTextAreaElement>) => {
         setText(ev.target.value);
-        const bindingId = ev.currentTarget.parentElement?.getAttribute("data-id");
+        const bindingId = ev.currentTarget.parentElement?.parentElement?.getAttribute("data-id");
+        console.log(bindingId)
         const res = await fetch(`${API_ADDRESS}/texts`, {
             method: "PATCH",
             headers: {
@@ -182,7 +183,9 @@ function Transcript(props: ITranscriptProps) {
             }),
         })
             .then((res) => res.json())
+            .then(data => data)
             .catch((err) => err);
+        console.log(res);
         return false;
     };
     const specialCharacters = ["ř"]
