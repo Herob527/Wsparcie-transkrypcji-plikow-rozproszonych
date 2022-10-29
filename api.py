@@ -6,41 +6,23 @@ from finalisation_classes import (
 )
 from tables_definition import *
 import contextlib
-from dataclasses import dataclass
-from math import floor
-from pprint import pprint
-from re import I
 from flask import Flask, jsonify, request, make_response
 from flask_restful import Resource, Api, reqparse
 from pathlib import Path
 from flask_cors import CORS
 import sqlalchemy
 from sqlalchemy import (
-    Table,
-    Column,
-    Integer,
     create_engine,
     MetaData,
-    String,
-    insert,
     select,
-    ForeignKey,
-    exc,
-    and_,
     func,
-    Float,
     engine,
 )
-from random import shuffle
-from shutil import rmtree, copy
 from pydub import AudioSegment, exceptions
-from multiprocessing.pool import ThreadPool
 import time
 import json
 from typing import List
 import logging
-from ffmpeg import FFmpeg
-import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -412,7 +394,7 @@ def setup_database():
             for unknown in unknowns
         ]
 
-        for index, dir in enumerate(dirs, 2):
+        for index, dir in enumerate(dirs, start=2):
             with contextlib.suppress(sqlalchemy.exc.IntegrityError):
                 c_categories.insert().values(
                     name=dir.name, initial_category=dir.name

@@ -24,7 +24,8 @@ class TacotronFinalise(BaseFinalise):
     def categorise(self):
         category_query = self.general_query.group_by(c_categories.c.name)
         category_data = category_query.execute().mappings().all()
-
+        min_length, max_length, should_filter = itemgetter(
+             'min_length', 'max_length', 'should_filter')(self.configuration)
         for i in category_data:
             category_path = Path(self.output, i["name_1"])
             wavs_path = Path(category_path, "wavs")
@@ -39,12 +40,12 @@ class TacotronFinalise(BaseFinalise):
             output_file_path = Path(self.output, category_name, "wavs")
 
             is_invalid_format = (
-                audio_length > self.configuration["max_length"]
-                or audio_length < self.configuration["min_length"]
+                audio_length > max_length
+                or audio_length < min_length
                 or audio_channels != 1
             )
             source_path = f"{directory}/{name}"
-            if is_invalid_format and self.configuration['should_filter']:
+            if should_filter and is_invalid_format:
                 path_for_invalid_length = Path(
                     self.output, category_name, "invalid_length"
                 )
@@ -54,6 +55,8 @@ class TacotronFinalise(BaseFinalise):
             copy(source_path, f"{output_file_path}")
 
     def provide_transcription(self):
+        output_type, min_length, max_length, should_format = itemgetter(
+            'output_type', 'min_length', 'max_length', 'should_format')(self.configuration)
         for i in self.general_data:
             audio_length = i["duration_seconds"]
             audio_channels = i["channels"]
@@ -61,19 +64,19 @@ class TacotronFinalise(BaseFinalise):
             category_path = Path(self.output, category_name)
             transcription_path = Path(category_path, "list.txt")
             is_invalid_format = (
-                audio_length > self.configuration["max_length"]
-                or audio_length < self.configuration["min_length"]
+                audio_length > max_length
+                or audio_length < min_length
                 or audio_channels != 1
             )
 
-            if is_invalid_format and self.configuration['should_filter']:
+            if is_invalid_format and should_format:
                 transcription_path = Path(category_path, "invalid_list.txt")
             with open(transcription_path, "a", encoding="utf-8") as output:
                 name = i["name"].strip()
-                if self.configuration["should_format"] == "true" and not name.endswith(
-                    ".wav"
+                if should_format and not name.endswith(
+                    output_type
                 ):
-                    name += ".wav"
+                    name += f".{output_type}"
                 line = i["transcript"].strip()
                 if not line.endswith((".", "?", "!")):
                     line += line.join(".")
