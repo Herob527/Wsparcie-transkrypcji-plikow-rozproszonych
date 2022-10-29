@@ -2,12 +2,9 @@ from finalisation_classes.BaseFinalise import BaseFinalise
 from pathlib import Path
 from shutil import rmtree
 from tables_definition import *
-from sqlalchemy import select, func
 from shutil import copy
 import asyncio
 from ffmpeg import FFmpeg
-from typing import List
-from sqlalchemy.engine import Engine
 from operator import itemgetter
 
 
@@ -89,9 +86,9 @@ class TacotronFinalise(BaseFinalise):
             'output_type', 'output_audio_filter', 'output_sample_rate', 'output_channels')(self.configuration)
         output_params = {
             "ac": output_channels,
-            "ar": output_sample_rate,
+            "ar": output_sample_rate
         }
-        if output_sample_rate != '':
+        if output_audio_filter != '':
             output_params['af'] = output_audio_filter
 
         for category in category_data:
@@ -126,9 +123,10 @@ class TacotronFinalise(BaseFinalise):
                 def on_completed():
                     audio.unlink()
                     print(f"Completed formating file: {audio}")
-
+                    
                 asyncio.run(current_file.execute())
 
             for audio in temp_folder.iterdir():
                 copy(audio, wavs_path)
             rmtree(temp_folder)
+            
