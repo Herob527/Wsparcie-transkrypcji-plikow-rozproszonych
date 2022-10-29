@@ -8,6 +8,9 @@ import asyncio
 from ffmpeg import FFmpeg
 from typing import List
 from sqlalchemy.engine import Engine
+from operator import itemgetter
+
+
 class TacotronFinalise(BaseFinalise):
     """
     This class implements finalisation of the project optimised to train single Tacotron models
@@ -24,7 +27,7 @@ class TacotronFinalise(BaseFinalise):
     def categorise(self):
         category_query = self.general_query.group_by(c_categories.c.name)
         category_data = category_query.execute().mappings().all()
-        
+
         for i in category_data:
             category_path = Path(self.output, i["name_1"])
             wavs_path = Path(category_path, "wavs")
@@ -37,13 +40,13 @@ class TacotronFinalise(BaseFinalise):
             category_name = i["name_1"].strip()
             audio_length = i["duration_seconds"]
             output_file_path = Path(self.output, category_name, "wavs")
-            
+
             is_invalid_format = (
                 audio_length > self.configuration["max_length"]
                 or audio_length < self.configuration["min_length"]
                 or audio_channels != 1
             )
-            source_path = f"{directory}/{name}" 
+            source_path = f"{directory}/{name}"
             if is_invalid_format and self.configuration['should_filter']:
                 path_for_invalid_length = Path(
                     self.output, category_name, "invalid_length"
@@ -82,22 +85,32 @@ class TacotronFinalise(BaseFinalise):
     def format(self):
         category_query = self.general_query.group_by(c_categories.c.name)
         category_data = category_query.execute().mappings().all()
+        output_type, output_audio_filter, output_sample_rate, output_channels = itemgetter(
+            'output_type', 'output_audio_filter', 'output_sample_rate', 'output_channels')(self.configuration)
+        output_params = {
+            "ac": output_channels,
+            "ar": output_sample_rate,
+        }
+        if output_sample_rate != '':
+            output_params['af'] = output_audio_filter
+
         for category in category_data:
             wavs_path = Path(self.output, category["name_1"], "wavs")
             temp_folder = Path(wavs_path, "temp")
             temp_folder.mkdir()
             audios = (i for i in wavs_path.iterdir() if i.is_file())
+
             for audio in audios:
                 output_name = (
                     f"{temp_folder}/{audio.name}"
-                    if audio.name.endswith(".wav")
-                    else f"{temp_folder}/{audio.name}.wav"
+                    if audio.name.endswith(output_type)
+                    else f"{temp_folder}/{audio.name}.{output_type}"
                 )
                 current_file = (
                     FFmpeg()
                     .option("y")
                     .input(audio)
-                    .output(output_name, ar=22050, ac=1)
+                    .output(output_name, **output_params)
                 )
 
                 @current_file.on("stderr")
@@ -119,4 +132,3 @@ class TacotronFinalise(BaseFinalise):
             for audio in temp_folder.iterdir():
                 copy(audio, wavs_path)
             rmtree(temp_folder)
-

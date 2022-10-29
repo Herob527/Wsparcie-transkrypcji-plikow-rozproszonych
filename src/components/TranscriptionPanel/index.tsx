@@ -345,7 +345,7 @@ function WaveAudio(props: IWaveAudioProps) {
     keyboardjs.bind('ctrl+1', (event: any) => {
         event.preventDefault();
 
-        if (audioContainerRef.current && waveAudioRef.current) {
+        if (audioContainerRef.current && waveAudioRef.current && waveAudioRef.current.isReady) {
             let currentFocusedElementOrderId = document.activeElement?.parentElement?.getAttribute('data-ordering');
             if (currentFocusedElementOrderId === null) {
                 currentFocusedElementOrderId = document.activeElement?.parentElement?.parentElement?.getAttribute('data-ordering');
@@ -376,20 +376,21 @@ function WaveAudio(props: IWaveAudioProps) {
             "container": audioElement,
             "waveColor": "#0569ff",
             "progressColor": "#0353cc",
-            "responsive": true
+            "responsive": true,
         })
+        
         waveform.init();
-
+        
         waveform.on("error", (err) => {
             console.log("Błąd: ", err)
         })
 
         const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`.replaceAll('\\','/')
-        waveform.load(pathToFile);
+        waveform.load(pathToFile, undefined, "none");
         waveAudioRef.current = waveform
         return () => {
             waveform.destroy()
         };
-    })
+    }, [props['audio_name']])
     return <div id={`waveform_${props["index"]}`} data-ordering={props["index"]} onClick={handleClick}></div>;
 };

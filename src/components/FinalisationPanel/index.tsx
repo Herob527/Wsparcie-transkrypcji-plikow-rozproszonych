@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import './FinalisationPanel.css'
 
 import useTranscriptFormatter from '../../hooks/useTranscriptFormatter'
@@ -18,7 +18,7 @@ const useFinaliseRes = () => {
         "None": "#1e90ff",
         "Executing": "#959595",
         "Finished": "#1dbf00",
-        "Error":"#f50c0c"
+        "Error": "#f50c0c"
     }
     return {
         colors,
@@ -37,7 +37,7 @@ export const FinalisationPanel = (props: any) => {
     )
 }
 function Wrapper() {
-    const {setFinaliseState} =  useSharedFinaliseRes();
+    const { setFinaliseState } = useSharedFinaliseRes();
     const { isLoading, data } = useConfig()
     if (isLoading) {
         return <div className='card'> Loading</div>;
@@ -120,16 +120,19 @@ function SimpleFfmpegConstructor(props: any) {
 }
 
 function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
+    const refMinLength = useRef(minLength);
+    const refMaxLength = useRef(maxLength);
+    const refInvalidsDir = useRef(invalidsDir);
 
     return (
         <div id="audioLengthRanges" className='card'>
             <p className='card__title' > Filtr długości audio </p>
             <label htmlFor="min_length"> Minimalna długość pliku audio [s] </label>
-            <input type="number" id='min_length' value={minLength} name='min_length' min='0' className='card__input' title='Minimalna długość audio' />
+            <input type="number" ref={refMinLength} id='min_length' defaultValue={minLength} name='min_length' min='0' className='card__input' title='Minimalna długość audio' />
             <label htmlFor="max_length"> Maksymalna długość pliku audio [s] </label>
-            <input type="number" id='max_length' value={maxLength} name='max_length' min='0' className='card__input' title='Maksymalna długość audio' />
+            <input type="number" ref={refMaxLength} id='max_length' defaultValue={maxLength} name='max_length' min='0' className='card__input' title='Maksymalna długość audio' />
             <label htmlFor="invalids_dir"> Nazwa folderu dla plików spoza podanego zakresu </label>
-            <input type="text" id='invalids_dir' value={invalidsDir} name='invalids_dir' className='card__input' />
+            <input type="text" ref={refInvalidsDir} id='invalids_dir' defaultValue={invalidsDir} name='invalids_dir' className='card__input' />
         </div>
     )
 }
@@ -169,7 +172,7 @@ function LineFormat(props: any) {
 
 /* There, user decides, if they want to use additional things like formatting, filtering and to finalise project */
 function Decisions(props: any) {
-    const {colors, finaliseState} =  useSharedFinaliseRes();
+    const { colors, finaliseState } = useSharedFinaliseRes();
     return (
         <div id='decision' className='card'>
             <p className='card__title'> Zatwierdzenie finalizacji  </p>
@@ -177,7 +180,7 @@ function Decisions(props: any) {
             <input type='checkbox' name='should_filter' id='should_filter' title='Uwzględnij filtr długości audio' />
             <label htmlFor='should_format'> Formatuj pliki audio </label>
             <input type='checkbox' name='should_format' id='should_format' title='Dodatkowo formatuje pliki audio' />
-            <button style={{backgroundColor: colors[finaliseState]}} className='card__input card__input__button' disabled={finaliseState === "Executing"}> Finalizuj </button>
+            <button style={{ backgroundColor: colors[finaliseState] }} className='card__input card__input__button' disabled={finaliseState === "Executing"}> Finalizuj </button>
         </div>
     )
 }
