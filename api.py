@@ -25,6 +25,12 @@ from typing import List
 import logging
 from concurrent.futures import ThreadPoolExecutor
 
+from api_endpoints.r_status import r_status
+from api_endpoints.r_config import r_config
+from api_endpoints.r_bindings import r_bindings
+from api_endpoints.r_texts import r_texts
+from api_endpoints.r_categories import r_categories
+from api_endpoints.r_audios import r_audios
 
 log_dir = Path("logs")
 log_dir.mkdir(exist_ok=True)
@@ -48,161 +54,6 @@ _engine = create_engine(
     connect_args={"check_same_thread": False},
 )
 metadata = MetaData(_engine)
-
-
-class r_config(Resource):
-    def get(self):
-        with open("config.json", "r", encoding="utf-8") as output:
-            return json.load(output)
-
-    def patch(self):
-        pass
-
-
-class r_status(Resource):
-    def get(self):
-        pass
-
-    def patch(self):
-        pass
-
-
-class r_bindings(Resource):
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument(
-            "offset", type=int, help="From which point searching will start", default=0
-        )
-        parser.add_argument(
-            "limit", type=int, help="How much rows must be fetched", default=30
-        )
-        args = parser.parse_args()
-        with _engine.connect() as conn:
-            query = select(c_bindings.c).limit(
-                args["limit"]).offset(args["offset"])
-            res: List[engine.Row] = conn.execute(query).mappings().all()
-            return [dict(row) for row in res]
-
-
-class r_texts(Resource):
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument(
-            "offset", type=int, help="From which point searching will start", default=0
-        )
-        parser.add_argument(
-            "limit", type=int, help="How much rows must be fetched", default=30
-        )
-        args = parser.parse_args()
-        with _engine.connect() as conn:
-            query = (
-                select(c_texts.c)
-                .select_from(c_bindings.join(c_texts))
-                .limit(args["limit"])
-                .offset(args["offset"])
-                .order_by(c_categories.c.name)
-            )
-            res: List[engine.Row] = conn.execute(query).mappings().all()
-            return [dict(row) for row in res]
-
-    def patch(self):
-        data = request.get_json()
-        print(data)
-        with _engine.connect() as conn:
-            query = (
-                c_texts.update()
-                .where(c_texts.c.id == data["bindings_id"])
-                .values(transcript=data["text"])
-            )
-            try:
-                conn.execute(query)
-            except Exception as e:
-                print(e.args)
-                return jsonify(
-                    {"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"}
-                )
-        return jsonify({"Success": "Tekst zaktualizowany pomyślnie"})
-
-
-class r_categories(Resource):
-    def get(self):
-        with _engine.connect() as conn:
-            query = select(c_categories.c).order_by(c_categories.c.name)
-            res: List[engine.Row] = conn.execute(query).mappings().all()
-            return [dict(row) for row in res]
-
-    def post(self):
-        data = request.get_json()
-        with _engine.connect() as conn:
-            query = c_categories.insert().values(name=data["category_name"])
-            try:
-                conn.execute(query)
-            except sqlalchemy.exc.IntegrityError:
-                return jsonify(
-                    {"Error": f"Kategoria {data['category_name']} już istnieje"}
-                )
-            except Exception as e:
-                return jsonify({"Error": f"Nieznany błąd: {e.args[0]}"})
-        return jsonify(
-            {"Success": f"Kategoria {data['category_name']} została pomyślnie dodana"}
-        )
-
-    def delete(self):
-        category_id = int(request.get_json())
-        with _engine.connect() as conn:
-            query = (
-                c_bindings.update()
-                .where(c_bindings.c.category_id == category_id)
-                .values(category_id=0)
-            )
-            delete_query = c_categories.delete(
-                c_categories.c.id == category_id)
-            try:
-                conn.execute(query)
-                conn.execute(delete_query)
-            except Exception as e:
-                print(e.args)
-                return jsonify({"Error": f"Błąd w czasie usuwania. Treść: {e.args}"})
-            return jsonify({"Success": "Usuwanie się powiodło"})
-
-    def patch(self):
-        data = request.get_json()
-        print(data)
-        with _engine.connect() as conn:
-            query = (
-                c_categories.update()
-                .where(c_categories.c.id == data["category_id"])
-                .values(name=data["new_value"])
-            )
-            try:
-                conn.execute(query)
-            except Exception as e:
-                print(e.args)
-                return jsonify(
-                    {"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"}
-                )
-        return jsonify({"Success": "Kategoria pomyślnie zaktualizowana"})
-
-
-class r_audios(Resource):
-    def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument(
-            "offset", type=int, help="From which point searching will start", default=0
-        )
-        parser.add_argument(
-            "limit", type=int, help="How much row must be fetched", default=30
-        )
-        args = parser.parse_args()
-        with _engine.connect() as conn:
-            query = select(c_audio.c).limit(
-                args["limit"]).offset(args["offset"])
-            res: List[engine.Row] = conn.execute(query).mappings().all()
-            return [dict(row) for row in res]
-
-    def patch(self):
-        pass
-
 
 @app.route("/set_category", methods=["PATCH"])
 def set_category():
@@ -302,8 +153,7 @@ def insert_data(index: int, path: Path, additional_data: dict = None) -> None:
     if audio is None:
         return
     file_name = path.parts[-1]
-    with _engine.connect() as conn:
-        insert_data_to_database(index, path, additional_data, audio, file_name)
+    insert_data_to_database(index, path, additional_data, audio, file_name)
 
 
 @app.route("/get_lines", methods=["GET"])

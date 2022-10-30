@@ -17,10 +17,11 @@ F2 - Zatrzymaj / Wznów audio
 - [ ] Dodać wsparcie dla innnych wersji językowych
 - [ ] Dodać ciemny styl
 - [x] Rekursywne przeszukiwanie folderów (w folderach szuka w folderze **wavs**)
-- [x] Więcej opcji finalizacji (osobny panel) - Wymaga zmian w API
+- [x] Więcej opcji finalizacji (osobny panel) - Wymaga zmian w API w klasach finalizacji
 - [x] Konfiguracja aplikacji z poziomu interfejsu - Wyłącznie kategorie podlegają modyfikacji
 - [x] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego development
+- [ ] Rozwiązazć problem wycieku pamięci
 
 W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 
