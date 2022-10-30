@@ -21,7 +21,7 @@ F2 - Zatrzymaj / Wznów audio
 - [x] Konfiguracja aplikacji z poziomu interfejsu - Wyłącznie kategorie podlegają modyfikacji
 - [x] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego development
-- [ ] Rozwiązazć problem wycieku pamięci
+- [x] Rozwiązazć problem wycieku pamięci - powód - Wavesurfer nie zwalniał pamięci po wywołaniu destroy()
 
 W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 
