@@ -42,7 +42,7 @@
             "optionValue": "to_one_folder"
         },
         "lineFormat": {
-            "format": ""
+            "format": "wavs/{audio_name}|{text_transcript}"
         },
         "confirmChoices": {
             "filterByLength": false,

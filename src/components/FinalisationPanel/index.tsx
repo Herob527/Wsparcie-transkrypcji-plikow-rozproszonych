@@ -76,7 +76,9 @@ function Wrapper() {
             invalidsDir={finaliseData["audioLengthFilter"]["invalidsDir"]}
         />
         <ExportTypeConfig />
-        <LineFormat />
+        <LineFormat 
+            lineFormat={finaliseData["lineFormat"]["format"]}
+        />
         <Consequences />
         <Decisions />
 
@@ -158,10 +160,9 @@ function ExportTypeConfig(props: any) {
 }
 
 function LineFormat(props: any) {
-    const [lineFormat, setLineFormat] = useState("");
+    const [lineFormat, setLineFormat] = useState(props['lineFormat']);
     const handleInput = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
         const newValue = ev.currentTarget.value;
-
         setLineFormat(newValue);
     }
     return (

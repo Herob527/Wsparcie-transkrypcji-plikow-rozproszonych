@@ -22,6 +22,7 @@ F2 - Zatrzymaj / Wznów audio
 - [x] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego development
 - [x] Rozwiązazć problem wycieku pamięci - powód - Wavesurfer nie zwalniał pamięci po wywołaniu destroy()
+- [x] Użytkownik decyduje o tym, co jest w linijce - Wymaga zmian po stronie klas finalizacji. Na ten czas tylko TacotronFinalise wspiera to.
 
 W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 
@@ -30,7 +31,7 @@ W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 - [ ] Przetestować chmurowe systemy bazodanowe
 - [ ] Przepisać API na nowo, żeby ułatwić implementację na inne systemy bazodanowe
 - [ ] Zaimplementować wsparcie auto-tranksrypcji
-
+- [ ] Startowanie nie byłoby automatyczne, tylko z GUI
 # Wsparcie techniczne
 Jako iż to wczesna alfa, to też nie udzielam wsparcia technicznego w problemach jakie mogą nastąpić
 
