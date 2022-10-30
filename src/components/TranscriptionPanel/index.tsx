@@ -1,4 +1,4 @@
-import './style.css'
+import './style.sass'
 
 import React, { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";

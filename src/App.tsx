@@ -2,8 +2,8 @@ import { TranscriptionPanel } from "./components/TranscriptionPanel";
 import { ConfigurationPanel } from './components/ConfigurationPanel';
 import { FinalisationPanel } from './components/FinalisationPanel'
 import React, { useState } from "react";
-import './styles/sass/App.css'
-import './styles/sass/baseStyles.css'
+import './styles/App.sass'
+import './styles/baseStyles.sass'
 
 interface I_ComponentsMap {
     transcript: JSX.Element,

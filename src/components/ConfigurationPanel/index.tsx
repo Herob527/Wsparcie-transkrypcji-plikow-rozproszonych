@@ -1,5 +1,5 @@
 
-import "./ConfigurationPanel.css";
+import "./ConfigurationPanel.sass";
 import { E_API_ADDRESS } from "../../App"
 import React, { useEffect, useState, useRef, MouseEvent } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import './FinalisationPanel.css'
+import './FinalisationPanel.sass'
 
 import useTranscriptFormatter from '../../hooks/useTranscriptFormatter'
 import useFFmpegConstructor from '../../hooks/useFFmpegConstructor'
