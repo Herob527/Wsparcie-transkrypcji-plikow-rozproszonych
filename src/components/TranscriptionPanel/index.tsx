@@ -7,8 +7,6 @@ import WaveSurfer from "wavesurfer.js";
 // @ts-ignore
 import keyboardjs from 'keyboardjs';
 
-
-
 // Hooks
 import useConfig from '../../hooks/useConfig'
 import { useFilterByCategory, useSharedFilterCategory } from '../../hooks/useFilterByCategory';
@@ -31,7 +29,10 @@ const CategoryQueryClient = new QueryClient();
 
 const useOffsetData = () => {
     const [offset, setOffset] = useStateIfMounted(0);
+    const [maxOffset, setMaxOffset] = useStateIfMounted(0);
     return {
+        maxOffset,
+        setMaxOffset,
         offset,
         setOffset
     }
@@ -62,8 +63,10 @@ const Wrapper = () => {
 }
 
 export const TranscriptionPanel = () => {
-    useEffect(() => { return () => {
-    }})
+    useEffect(() => {
+        return () => {
+        }
+    })
     return (<QueryClientProvider key="query_provider" client={PanelQueryClient}>
         <Wrapper key='panel' />
     </QueryClientProvider>);
@@ -85,7 +88,7 @@ interface ILineFromAPI {
 type dataFromAPI = ILineFromAPI[]
 
 function MainPanel(props: IPanelProps) {
-    const { offset, setOffset } = useSharedOffsetState();
+    const { maxOffset, offset, setOffset } = useSharedOffsetState();
     const { filterCategory } = useSharedFilterCategory();
     let { data, isLoading, error, refetch, remove } = useQuery([offset, filterCategory], async () => {
         return await fetch(`${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}&category_id=${filterCategory}`, {
@@ -93,12 +96,12 @@ function MainPanel(props: IPanelProps) {
             "headers": {
                 "Accept": "application/json",
             }
-        }).then((res) => res.json()).then((data) => {handlePageChange(offset / props['elementsPerPage']);return data}).catch((error) => error)
-    }, { "refetchOnWindowFocus": false, "refetchOnReconnect": false, "refetchOnMount": false, "cacheTime": 0 })
+        }).then((res) => res.json()).then((data) => { handlePageChange(offset / props['elementsPerPage']); return data }).catch((error) => error)
+    }, { "refetchOnWindowFocus": false, "refetchOnReconnect": false, "refetchOnMount": false, "cacheTime": 0})
     let data2: dataFromAPI = data;
     useEffect(() => {
         return () => {
-
+            remove();
         }
     }, []);
     if (isLoading) {
@@ -107,11 +110,16 @@ function MainPanel(props: IPanelProps) {
     if (error) {
         return <div> {error} </div>
     }
+    console.log(offset);
     keyboardjs.bind('ctrl+.', (event: any) => {
 
         event.preventDefault();
 
         const newPageOffset = offset + props['elementsPerPage'];
+        console.log(newPageOffset, maxOffset);
+        if (newPageOffset >= maxOffset) {
+            return;
+        }
         const newPage = newPageOffset / props['elementsPerPage'];
 
         handlePageChange(newPage);
@@ -218,7 +226,7 @@ function Category(props: ICategoryProps) {
     const { isLoading, error, data, refetch, remove } = useQuery("get_category", async () => {
         const res = await fetch(`${API_ADDRESS}/categories`);
         return await res.json();
-    }, {"cacheTime": 0});
+    }, { "cacheTime": 0 });
     useEffect(() => () => {
         remove();
     }, [remove])
@@ -285,7 +293,7 @@ function Category(props: ICategoryProps) {
 }
 
 function Pagination(props: IPaginationProps) {
-    const { offset, setOffset } = useSharedOffsetState();
+    const { maxOffset, setMaxOffset, offset, setOffset } = useSharedOffsetState();
     const { filterCategory } = useSharedFilterCategory();
     const { elementsPerPage } = props;
     const currentPage = 0 / elementsPerPage;
@@ -298,7 +306,7 @@ function Pagination(props: IPaginationProps) {
         }).then(response => response.json()).then(data => data['count_1']).catch(error => error)
     })
     useEffect(() => () => {
-        remove(); 
+        remove();
         free(useSharedFilterCategory)
         free(useSharedOffsetState);
     }, [remove, free])
@@ -312,12 +320,13 @@ function Pagination(props: IPaginationProps) {
         return false;
     }
     const steps = Math.floor(data / elementsPerPage);
-    const pages = Array(steps + 1).fill(0).map((el: number, index: number) =>
+    const pages = Array(steps).fill(0).map((el: number, index: number) =>
 
         <div className={`paginationElement ${index === currentPage ? 'active' : ''}`} onClick={handleClick} data-page={index} data-offset={index * elementsPerPage} key={`page_${index * elementsPerPage}`}>
             <span> {index + 1} </span>
         </div>
     )
+    setMaxOffset(steps * elementsPerPage)
     // console.log(pages);
     return (
         <div id='pagination' className='pages' data-max-offset={steps * elementsPerPage}>{pages}</div>
@@ -378,19 +387,27 @@ function WaveAudio(props: IWaveAudioProps) {
             "waveColor": "#0569ff",
             "progressColor": "#0353cc",
             "responsive": true,
+            "closeAudioContext": true,
+            "drawingContextAttributes": {
+                "desynchronized": true
+            }
         })
-        
+
         waveform.init();
-        
+
         waveform.on("error", (err) => {
             console.log("Błąd: ", err)
         })
 
-        const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`.replaceAll('\\','/')
+        const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`.replaceAll('\\', '/')
         waveform.load(pathToFile);
         waveAudioRef.current = waveform
         return () => {
-            waveform.destroy()
+
+            waveAudioRef.current.destroy();
+            //@ts-ignore
+            waveAudioRef.current = null;
+            audioContainerRef.current.remove();
         };
     }, [props['audio_name']])
     return <div id={`waveform_${props["index"]}`} data-ordering={props["index"]} onClick={handleClick}></div>;

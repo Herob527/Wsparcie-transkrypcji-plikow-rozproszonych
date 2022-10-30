@@ -21,11 +21,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Enderal specific projects dirs
 /enderal - forgotten stories.esm
 /forgotten_stories_t
 /enderal_shards_of_the_order
 
-# Audiofiles
+# Audiodirs
 /static
 /source
 /*source/**
@@ -35,9 +36,9 @@ yarn-error.log*
 /tacotron_output
 
 /logs
+
 # Untracked files:
 .prettierrc 
-*.db 
 ffmpeg.exe 
 api_logs.log 
 remove_all.py
@@ -50,6 +51,8 @@ karty_postaci.csv
 files.txt
 texts.txt
 status.json
-*.7z
 
-TruncateSilence_Copy.bat
+# Excluded types
+*.db 
+*.7z
+*.bat

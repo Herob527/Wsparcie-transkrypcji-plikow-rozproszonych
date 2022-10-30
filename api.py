@@ -6,8 +6,8 @@ from finalisation_classes import (
 )
 from tables_definition import *
 import contextlib
-from flask import Flask, jsonify, request, make_response
-from flask_restful import Resource, Api, reqparse
+from flask import Flask, jsonify, request
+from flask_restful import Api, reqparse
 from pathlib import Path
 from flask_cors import CORS
 import sqlalchemy
@@ -16,7 +16,6 @@ from sqlalchemy import (
     MetaData,
     select,
     func,
-    engine,
 )
 from pydub import AudioSegment, exceptions
 import time
@@ -39,7 +38,7 @@ logging.basicConfig(
     filename=f"{log_dir}/api_logs_{time.strftime('%y-%m-%d_%H_%M_%S')}.log",
     encoding="utf-8",
     filemode="w",
-    level=logging.INFO,
+    errors=f"{log_dir}/api_logs_{time.strftime('%y-%m-%d_%H_%M_%S')}.errors_log"
 )
 
 app = Flask(__name__)
@@ -193,7 +192,6 @@ def get_line():
     general_data: List[dict] = (
         general_query.order_by(c_audio.c.name).execute().mappings().all()
     )
-    print(len(general_data))
     return jsonify([dict(row) for row in general_data])
 
 
