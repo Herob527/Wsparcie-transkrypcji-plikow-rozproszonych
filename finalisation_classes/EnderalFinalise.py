@@ -19,25 +19,25 @@ class EnderalFinalise(BaseFinalise):
             self.general_query = con.execute(
                 text(
                     """
-with audio_text as (
-    select audio.name as a_name, t2.transcript
-    from audio
-             join bindings b2 on audio.id = b2.audio_id
-             join texts t2 on b2.text_id = t2.id
-),
-     category_audio as (
-         select distinct audio.name as a_name, c2.name as c_name
-         from audio
-                  join bindings b2 on audio.id = b2.audio_id
-                  join categories c2 on b2.category_id = c2.id
-         where c_name not in ('1Odpad', 'Nieznane')
-         group by audio.name
-     )
-select distinct a.name as name,ca.c_name, at.transcript
-from audio a
-         join audio_text at on a.name = at.a_name
-         join category_audio as ca on ca.a_name = a.name
-order by a.name desc;
+                    with audio_text as (
+                        select audio.name as a_name, t2.transcript
+                        from audio
+                                join bindings b2 on audio.id = b2.audio_id
+                                join texts t2 on b2.text_id = t2.id
+                    ),
+                        category_audio as (
+                            select distinct audio.name as a_name, c2.name as c_name
+                            from audio
+                                    join bindings b2 on audio.id = b2.audio_id
+                                    join categories c2 on b2.category_id = c2.id
+                            where c_name not in ('1Odpad', 'Nieznane')
+                            group by audio.name
+                        )
+                    select distinct a.name as name,ca.c_name, at.transcript
+                    from audio a
+                            join audio_text at on a.name = at.a_name
+                            join category_audio as ca on ca.a_name = a.name
+                    order by a.name desc;
                     """
                 )
             )

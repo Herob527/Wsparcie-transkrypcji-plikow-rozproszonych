@@ -349,30 +349,39 @@ function WaveAudio(props: IWaveAudioProps) {
         return;
     }
     const handleClick = playAudioToggle;
-
-    keyboardjs.bind('ctrl+1', (event: any) => {
-        event.preventDefault();
-
-        if (waveAudioRef.current.isReady) {
-            let currentFocusedElementOrderId = document.activeElement?.parentElement?.getAttribute('data-ordering');
-            if (currentFocusedElementOrderId === null) {
-                currentFocusedElementOrderId = document.activeElement?.parentElement?.parentElement?.getAttribute('data-ordering');
-            }
-            let outerAudioContainerId = audioContainerRef.current.parentElement?.getAttribute('data-ordering');
-            // console.table([["audioContainerRef", audioContainerRef.current, Boolean(audioContainerRef.current), ], ["waveAudioRef", waveAudioRef, Boolean(waveAudioRef.current)]])
-
-            if (currentFocusedElementOrderId === outerAudioContainerId && outerAudioContainerId !== null) {
-                playAudioToggle();
-                document.activeElement?.removeEventListener('blur', pauseAudio);
-                document.activeElement?.addEventListener('blur', pauseAudio);
-            }
+    const isCurrentContainer = () => {
+        /**
+         * Restricts keyboard binds to current container and checks if audio can be launched.
+         */
+        if (waveAudioRef.current === null) {
             return false;
         }
+        if (!waveAudioRef.current.isReady) {
+            return false;
+        }
+        let currentFocusedElementOrderId = document.activeElement?.parentElement?.getAttribute('data-ordering');
+        if (currentFocusedElementOrderId === null) {
+            currentFocusedElementOrderId = document.activeElement?.parentElement?.parentElement?.getAttribute('data-ordering');
+        }
+        let outerAudioContainerId = audioContainerRef.current.parentElement?.getAttribute('data-ordering');
+        // console.table([["audioContainerRef", audioContainerRef.current, Boolean(audioContainerRef.current), ], ["waveAudioRef", waveAudioRef, Boolean(waveAudioRef.current)]])
+        return outerAudioContainerId === currentFocusedElementOrderId && outerAudioContainerId !== null; 
+    }
+    keyboardjs.bind('ctrl+1', (event: any) => {
+        event.preventDefault();
+        if (isCurrentContainer()) {
+
+            playAudioToggle();
+            document.activeElement?.removeEventListener('blur', pauseAudio);
+            document.activeElement?.addEventListener('blur', pauseAudio);
+        }
+            
+        return false;
     })
 
     keyboardjs.bind('ctrl+r', (event: any) => {
         event.preventDefault();
-        if (waveAudioRef.current.isReady) {
+        if (isCurrentContainer()) {
             waveAudioRef.current.stop()
         }
         return false;
@@ -406,7 +415,12 @@ function WaveAudio(props: IWaveAudioProps) {
 
             waveAudioRef.current.destroy();
             //@ts-ignore
+            waveAudioRef.current.backend = null;
+            //@ts-ignore
+            delete waveAudioRef.current.backend
+            //@ts-ignore
             waveAudioRef.current = null;
+            
             audioContainerRef.current.remove();
         };
     }, [props['audio_name']])

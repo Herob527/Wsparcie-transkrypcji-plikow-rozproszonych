@@ -18,6 +18,8 @@ class TacotronFinalise(BaseFinalise):
         self.output = Path("./tacotron_output")
         self.name = 'distinctive'
         self.ux_name = 'Każda kategoria do jednego folderu'
+        if self.configuration['line_format_input'] == '':
+            self.configuration['line_format_input'] = 'wavs/{audio_name}|{text_transcript}'
         if self.output.exists():
             rmtree(self.output)
 
@@ -25,18 +27,18 @@ class TacotronFinalise(BaseFinalise):
         category_query = self.general_query.group_by(c_categories.c.name)
         category_data = category_query.execute().mappings().all()
         min_length, max_length, should_filter = itemgetter(
-             'min_length', 'max_length', 'should_filter')(self.configuration)
+            'min_length', 'max_length', 'should_filter')(self.configuration)
         for i in category_data:
-            category_path = Path(self.output, i["name_1"])
+            category_path = Path(self.output, i["category_name"])
             wavs_path = Path(category_path, "wavs")
-            audio_channels = i["channels"]
+            audio_channels = i["audio_channels"]
             category_path.mkdir(exist_ok=True, parents=True)
             wavs_path.mkdir(exist_ok=True, parents=True)
         for i in self.general_data:
-            directory = i['directory']
-            name = i["name"].strip()
-            category_name = i["name_1"].strip()
-            audio_length = i["duration_seconds"]
+            directory = i["audio_directory"]
+            name = i["audio_name"].strip()
+            category_name = i["category_name"].strip()
+            audio_length = i["audio_length"]
             output_file_path = Path(self.output, category_name, "wavs")
 
             is_invalid_format = (
@@ -55,12 +57,12 @@ class TacotronFinalise(BaseFinalise):
             copy(source_path, f"{output_file_path}")
 
     def provide_transcription(self):
-        output_type, min_length, max_length, should_format = itemgetter(
-            'output_type', 'min_length', 'max_length', 'should_format')(self.configuration)
+        output_type, min_length, max_length, should_format, line_format_input, should_filter = itemgetter(
+            'output_type', 'min_length', 'max_length', 'should_format', 'line_format_input', 'should_filter')(self.configuration)
         for i in self.general_data:
-            audio_length = i["duration_seconds"]
-            audio_channels = i["channels"]
-            category_name = i["name_1"]
+            audio_length = i["audio_length"]
+            audio_channels = i["audio_channels"]
+            category_name = i["category_name"]
             category_path = Path(self.output, category_name)
             transcription_path = Path(category_path, "list.txt")
             is_invalid_format = (
@@ -68,19 +70,14 @@ class TacotronFinalise(BaseFinalise):
                 or audio_length < min_length
                 or audio_channels != 1
             )
-
-            if is_invalid_format and should_format:
+            if is_invalid_format and should_filter:
                 transcription_path = Path(category_path, "invalid_list.txt")
             with open(transcription_path, "a", encoding="utf-8") as output:
-                name = i["name"].strip()
-                if should_format and not name.endswith(
-                    output_type
-                ):
-                    name += f".{output_type}"
-                line = i["transcript"].strip()
+                formatted_line = line_format_input.format_map(i)
+                line = formatted_line.strip()
                 if not line.endswith((".", "?", "!")):
                     line += line.join(".")
-                output.write(f"wavs/{name}|{line}\n")
+                output.write(f"{formatted_line}\n")
 
     def format(self):
         category_query = self.general_query.group_by(c_categories.c.name)
@@ -95,7 +92,7 @@ class TacotronFinalise(BaseFinalise):
             output_params['af'] = output_audio_filter
 
         for category in category_data:
-            wavs_path = Path(self.output, category["name_1"], "wavs")
+            wavs_path = Path(self.output, category["category_name"], "wavs")
             temp_folder = Path(wavs_path, "temp")
             temp_folder.mkdir()
             audios = (i for i in wavs_path.iterdir() if i.is_file())
@@ -126,10 +123,9 @@ class TacotronFinalise(BaseFinalise):
                 def on_completed():
                     audio.unlink()
                     print(f"Completed formating file: {audio}")
-                    
+
                 asyncio.run(current_file.execute())
 
             for audio in temp_folder.iterdir():
                 copy(audio, wavs_path)
             rmtree(temp_folder)
-            

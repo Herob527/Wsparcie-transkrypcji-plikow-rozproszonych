@@ -167,8 +167,8 @@ function LineFormat(props: any) {
     return (
         <div id='lineFormat' className='card'>
             <p className='card__title'> Format linijki  </p>
-            <label htmlFor='lineFormatInput'> Format linijki w transkrypcji </label>
-            <textarea id="lineFormatInput" className='card__input card__input__textarea' onInput={handleInput} value={lineFormat} name='lineFormatInput' />
+            <label htmlFor='line_format_input'> Format linijki w transkrypcji </label>
+            <textarea id="line_format_input" className='card__input card__input__textarea' onInput={handleInput} value={lineFormat} name='line_format_input' />
             <ExampleLine text={lineFormat} />
         </div>
     )

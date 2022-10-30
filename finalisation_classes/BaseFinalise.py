@@ -1,8 +1,8 @@
 from pathlib import Path
 from shutil import rmtree
 from tables_definition import c_audio, c_bindings, c_categories, c_texts
-from sqlalchemy import select, func
-from sqlalchemy.engine import Engine
+from sqlalchemy import select
+from sqlalchemy.engine import Engine, RowMapping
 from shutil import copy
 import json
 import asyncio
@@ -37,7 +37,21 @@ class BaseFinalise:
         """
         self.ux_name: str
         self.general_query = (
-            select(c_bindings, c_audio, c_categories, c_texts)
+            select(c_bindings.c.id.label('bingind_id'), 
+                    
+                    c_audio.c.id.label('audio_id'),
+                    c_audio.c.name.label('audio_name'),
+                    c_audio.c.duration_seconds.label('audio_length'),
+                    c_audio.c.channels.label('audio_channels'),
+                    c_audio.c.frame_rate.label('audio_frame_rate'),
+                    c_audio.c.directory.label('audio_directory'),
+                    
+                    c_categories.c.id.label('category_id'),
+                    c_categories.c.name.label('category_name'),
+                    
+                    c_texts.c.id.label('text_id'),
+                    c_texts.c.transcript.label('text_transcript'),
+                   )
             .join(c_audio)
             .join(c_categories)
             .join(c_texts)
@@ -46,7 +60,7 @@ class BaseFinalise:
             .where(c_texts.c.transcript != "")
         )
 
-        self.general_data: List[dict] = (
+        self.general_data: List[RowMapping] = (
             self.general_query.order_by(c_audio.c.name).execute().mappings().all()
         )
         self.configuration = configuration
