@@ -31,7 +31,8 @@ W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 - [ ] Przetestować chmurowe systemy bazodanowe
 - [ ] Przepisać API na nowo, żeby ułatwić implementację na inne systemy bazodanowe
 - [ ] Zaimplementować wsparcie auto-tranksrypcji
-- [ ] Startowanie nie byłoby automatyczne, tylko z GUI
+- [ ] Startowanie nie byłoby automatyczne jak teraz, tylko z GUI
+
 # Wsparcie techniczne
 Jako iż to wczesna alfa, to też nie udzielam wsparcia technicznego w problemach jakie mogą nastąpić
 
