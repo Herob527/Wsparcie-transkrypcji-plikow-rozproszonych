@@ -1,9 +1,8 @@
 import './style.sass'
 
-import React, { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
-import WaveSurfer from "wavesurfer.js";
 // @ts-ignore
 import keyboardjs from 'keyboardjs';
 
@@ -19,9 +18,11 @@ import type { IPanelProps } from "./types/IPanelProps";
 import type { ITranscriptProps } from "./types/ITranscriptProps";
 import type { ICategoryProps } from "./types/ICategoryProps";
 import type { IPaginationProps } from "./types/IPaginationProps";
-import type { IWaveAudioProps } from "./types/IWaveAudioProps";
 
 import { SidePanel } from './SidePanel'
+import { WaveAudio } from './WaveAudio';
+import { useHotkeys } from 'react-hotkeys-hook';
+
 const API_ADDRESS = 'http://localhost:5002';
 
 const PanelQueryClient = new QueryClient();
@@ -88,6 +89,9 @@ interface ILineFromAPI {
 type dataFromAPI = ILineFromAPI[]
 
 function MainPanel(props: IPanelProps) {
+    useHotkeys('ctrl+1', (event) => {
+        event.preventDefault();
+    })
     const { maxOffset, offset, setOffset } = useSharedOffsetState();
     const { filterCategory } = useSharedFilterCategory();
     let { data, isLoading, error, refetch, remove } = useQuery([offset, filterCategory], async () => {
@@ -333,96 +337,3 @@ function Pagination(props: IPaginationProps) {
     )
 }
 
-function WaveAudio(props: IWaveAudioProps) {
-    const waveAudioRef = useRef({} as WaveSurfer);
-    const audioContainerRef = useRef({} as HTMLElement);
-    const playAudioToggle = () => {
-        if (!waveAudioRef.current.isPlaying()) {
-            waveAudioRef.current.play();
-            return;
-        }
-        waveAudioRef.current.pause();
-        return;
-    };
-    const pauseAudio = () => {
-        waveAudioRef.current.pause();
-        return;
-    }
-    const handleClick = playAudioToggle;
-    const isCurrentContainer = () => {
-        /**
-         * Restricts keyboard binds to current container and checks if audio can be launched.
-         */
-        if (waveAudioRef.current === null) {
-            return false;
-        }
-        if (!waveAudioRef.current.isReady) {
-            return false;
-        }
-        let currentFocusedElementOrderId = document.activeElement?.parentElement?.getAttribute('data-ordering');
-        if (currentFocusedElementOrderId === null) {
-            currentFocusedElementOrderId = document.activeElement?.parentElement?.parentElement?.getAttribute('data-ordering');
-        }
-        let outerAudioContainerId = audioContainerRef.current.parentElement?.getAttribute('data-ordering');
-        // console.table([["audioContainerRef", audioContainerRef.current, Boolean(audioContainerRef.current), ], ["waveAudioRef", waveAudioRef, Boolean(waveAudioRef.current)]])
-        return outerAudioContainerId === currentFocusedElementOrderId && outerAudioContainerId !== null; 
-    }
-    keyboardjs.bind('ctrl+1', (event: any) => {
-        event.preventDefault();
-        if (isCurrentContainer()) {
-
-            playAudioToggle();
-            document.activeElement?.removeEventListener('blur', pauseAudio);
-            document.activeElement?.addEventListener('blur', pauseAudio);
-        }
-            
-        return false;
-    })
-
-    keyboardjs.bind('ctrl+r', (event: any) => {
-        event.preventDefault();
-        if (isCurrentContainer()) {
-            waveAudioRef.current.stop()
-        }
-        return false;
-    })
-    useEffect(() => {
-        const audioElement = document.querySelector(
-            `#waveform_${props["index"]}`
-        ) as HTMLElement;
-        audioContainerRef.current = audioElement;
-        const waveform = new WaveSurfer({
-            "container": audioElement,
-            "waveColor": "#0569ff",
-            "progressColor": "#0353cc",
-            "responsive": true,
-            "closeAudioContext": true,
-            "drawingContextAttributes": {
-                "desynchronized": true
-            }
-        })
-
-        waveform.init();
-
-        waveform.on("error", (err) => {
-            console.log("Błąd: ", err)
-        })
-
-        const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`.replaceAll('\\', '/')
-        waveform.load(pathToFile);
-        waveAudioRef.current = waveform
-        return () => {
-
-            waveAudioRef.current.destroy();
-            //@ts-ignore
-            waveAudioRef.current.backend = null;
-            //@ts-ignore
-            delete waveAudioRef.current.backend
-            //@ts-ignore
-            waveAudioRef.current = null;
-            
-            audioContainerRef.current.remove();
-        };
-    }, [props['audio_name']])
-    return <div id={`waveform_${props["index"]}`} data-ordering={props["index"]} onClick={handleClick}></div>;
-};

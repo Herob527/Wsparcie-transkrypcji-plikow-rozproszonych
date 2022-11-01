@@ -84,7 +84,6 @@ def get_size():
     query = select([func.count()]).select_from(c_bindings)
     if args["category_id"] != -1:
         query = query.where(c_bindings.c.category_id == args["category_id"])
-    print(args, query)
     res = query.execute()
 
     return jsonify(dict(res.mappings().all()[0]))
@@ -301,7 +300,6 @@ def finalise():
     currentMode = modes[config["export_method"]](config, sql_engine=_engine)
     currentMode.categorise()
     currentMode.provide_transcription()
-    print(config)
     if config["should_format"]:
         currentMode.format()
     return {"Message": "Finalizacja: Jest sukces"}

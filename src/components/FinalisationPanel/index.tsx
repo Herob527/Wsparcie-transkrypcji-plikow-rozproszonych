@@ -69,7 +69,7 @@ function Wrapper() {
     }
     return (<form id='FinalisationPanel' className='card__container' onSubmit={handleSubmit}>
 
-        <SimpleFfmpegConstructor />
+        <OutputFormat />
         <AudioLengthRanges
             minLength={finaliseData["audioLengthFilter"]["minLength"]}
             maxLength={finaliseData["audioLengthFilter"]["maxLength"]}
@@ -85,8 +85,7 @@ function Wrapper() {
     </form>)
 }
 
-function SimpleFfmpegConstructor(props: any) {
-    const ffmpegConstrucor = useFFmpegConstructor()
+function OutputFormat(props: any) {
     const [channels, setChannels] = useState(1);
     const [sampleRate, setSampleRate] = useState(22050);
     const [audioFilter, setAudioFilter] = useState("");
@@ -106,21 +105,19 @@ function SimpleFfmpegConstructor(props: any) {
     }
     return (
         <div id='simpleFfmpegConstructor' className='card'>
-            <p className='card__title'> Konstruktor komendy FFmpeg </p>
+            <p className='card__title'> Parametry formatowania FFmpeg </p>
             <label htmlFor='output_channels'> Ilość kanałów (-ac)</label>
             <input type='number' className='card__input' onInput={handleInput_channels} name='output_channels' id='output_channels' min='1' title='Wyjściowa ilośc kanałów' value={channels} />
 
             <label htmlFor='output_sample_rate'> Częstotliwość dźwięku (-ar)</label>
             <input type='number' className='card__input' onInput={handleInput_sampleRate} name='output_sample_rate' id='output_sample_rate' min='1' title='Wyjściowa częstotliwość próbkowania' value={sampleRate} />
 
-            <label htmlFor='output_audio_filter'> Dodatkowe filtry (-af)</label>
+            <label htmlFor='output_audio_filter'> Dodatkowe filtry audio (-af)</label>
             <input type='text' className='card__input' onInput={handleInput_audioFilter} name='output_audio_filter' id='output_audio_filter' title='Wyjściowy filtr audio' value={audioFilter} />
 
             <label htmlFor='output_type'> Docelowy typ (rozszerzenie)</label>
             <input type='text' className='card__input' onInput={handleInput_outputType} name='output_type' id='output_type' title='Rozszerzenie wyjściowego audio. Domyślnie wav' value={outputType} />
 
-            <label htmlFor='example_command'> Przykładowa Komenda </label>
-            <textarea id='example_command' className='card__input card__input__textarea' readOnly value={ffmpegConstrucor.createCommand(channels, sampleRate, audioFilter, outputType)} />
         </div>
     )
 }
@@ -128,7 +125,6 @@ function SimpleFfmpegConstructor(props: any) {
 function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
     const refMinLength = useRef(minLength);
     const refMaxLength = useRef(maxLength);
-    const refInvalidsDir = useRef(invalidsDir);
 
     return (
         <div id="audioLengthRanges" className='card'>
@@ -137,8 +133,6 @@ function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
             <input type="number" ref={refMinLength} id='min_length' defaultValue={minLength} name='min_length' min='0' className='card__input' title='Minimalna długość audio' />
             <label htmlFor="max_length"> Maksymalna długość pliku audio [s] </label>
             <input type="number" ref={refMaxLength} id='max_length' defaultValue={maxLength} name='max_length' min='0' className='card__input' title='Maksymalna długość audio' />
-            <label htmlFor="invalids_dir"> Nazwa folderu dla plików spoza podanego zakresu </label>
-            <input type="text" ref={refInvalidsDir} id='invalids_dir' defaultValue={invalidsDir} name='invalids_dir' className='card__input' />
         </div>
     )
 }
@@ -147,8 +141,6 @@ function ExportTypeConfig(props: any) {
     return (
         <div id='exportTypeConfig' className='card'>
             <p className='card__title'> Typ eksportu </p>
-            <label htmlFor='only_text'> Eksport tylko tekstów </label>
-            <input type='checkbox' id='only_text' name='only_text' title='Eksportuje wyłącznie transkrypt bez tykania audio' />
             <select name='export_method' className='card__input'>
                 <option value='enderal-finalise'> Enderal </option>
                 <option value='to_one_folder'> Każda kategoria do jednego folderu </option>
