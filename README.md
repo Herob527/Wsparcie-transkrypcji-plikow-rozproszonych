@@ -19,7 +19,7 @@ F2 - Zatrzymaj / Wznów audio
 - [x] Rekursywne przeszukiwanie folderów (w folderach szuka w folderze **wavs**)
 - [x] Więcej opcji finalizacji (osobny panel) - Wymaga zmian w API w klasach finalizacji
 - [x] Konfiguracja aplikacji z poziomu interfejsu - Wyłącznie kategorie podlegają modyfikacji
-- [ ] Zaimplementować skróty klawiszowe - Wykryto wycieki pamięci... Konieczna zmiana biblioteki
+- [x] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego development
 - [x] Rozwiązazć problem wycieku pamięci - powód - Wavesurfer nie zwalniał pamięci po wywołaniu destroy()
 - [x] Użytkownik decyduje o tym, co jest w linijce - Wymaga zmian po stronie klas finalizacji. Na ten czas tylko TacotronFinalise wspiera to.
