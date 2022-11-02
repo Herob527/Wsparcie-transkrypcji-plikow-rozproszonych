@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useQuery } from "react-query";
 import { useFilterByCategory, useSharedFilterCategory } from '../../../hooks/useFilterByCategory'
+import {useSharedOffsetState} from '../index'
 import './style.sass'
 // import {useSharedFilterCategory} from '../index'
 
@@ -29,7 +30,7 @@ function AddCategory() {
 
 function FilterByCategory() {
     const { filterCategory, setFilterCategory } = useSharedFilterCategory();
-
+    const {setOffset} = useSharedOffsetState();
     const { isLoading, error, data, refetch, remove } = useQuery("get_category", async () => {
         const res = await fetch(`${API_ADDRESS}/categories`);
         return await res.json();
@@ -60,6 +61,7 @@ function FilterByCategory() {
     const handleChange = async (ev: any) => {
         const categoryId = parseInt(ev.target.value);
         setFilterCategory(categoryId);
+        setOffset(0);
         console.log(categoryId);
         return;
     };

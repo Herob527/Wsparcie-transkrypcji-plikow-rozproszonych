@@ -1,50 +1,51 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import WaveSurfer from "wavesurfer.js";
 import keyboardjs from 'keyboardjs';
-import { IWaveAudioProps } from "../types/IWaveAudioProps";
 import './style.sass'
-import { useStateIfMounted } from "use-state-if-mounted";
-import  useIsMounted  from 'ismounted'
-import { useHotkeys } from 'react-hotkeys-hook'
+
+
+const icons = {
+    "play": "\ue034",
+    "pause": "\ue037",
+    "stop": "\ue047"
+}
+interface IWaveAudioProps {
+    index: number;
+    audio_name: string;
+    audio_dir: string;
+}
 
 export function WaveAudio(props: IWaveAudioProps) {
-    const isMounted = useIsMounted();
     const waveAudioRef = useRef({} as WaveSurfer);
     const audioContainerRef = useRef({} as HTMLElement);
-    const [isPlaying, setIsPlaying] = useStateIfMounted(false);
+    const audioPlayElement = useRef({} as HTMLSpanElement);
 
     const stopAudio = () => {
         waveAudioRef.current.stop();
-        setIsPlaying(false);
+    }
+    const playAudio = () => {
+        waveAudioRef.current.play();
     }
     const playAudioToggle = () => {
-
-        if (!waveAudioRef.current.isPlaying()) {
-            waveAudioRef.current.play();
-            setIsPlaying(true)
+        console.dir(waveAudioRef.current);
+        if (waveAudioRef.current.isPlaying()) {
+            console.log('Playing. Pause the audio.')
+            waveAudioRef.current.pause();
             return;
         }
-        waveAudioRef.current.pause();
-        setIsPlaying(false)
+        console.log('Not playing. Start the audio');
+        waveAudioRef.current.play();
         return;
     };
     const pauseAudio = () => {
         waveAudioRef.current.pause();
-        setIsPlaying(false)
         return;
     };
-    const handleClick = playAudioToggle;
-    // useHotkeys('ctrl+1', (event) => {
-    //     event.preventDefault();
-    //     if (isCurrentContainer()) {
-    //         playAudioToggle();
-    //         document.activeElement?.removeEventListener('blur', pauseAudio);
-    //         document.activeElement?.addEventListener('blur', pauseAudio);
-    //     }
-    // })
+
     const isCurrentContainer = () => {
         /**
          * Restricts keyboard binds to current container and checks if audio can be launched.
+         * It isn't pleasant if you hear every audio at once
          */
         if (waveAudioRef.current === null) {
             return false;
@@ -57,9 +58,9 @@ export function WaveAudio(props: IWaveAudioProps) {
             currentFocusedElementOrderId = document.activeElement?.parentElement?.parentElement?.getAttribute('data-ordering');
         }
         let outerAudioContainerId = audioContainerRef.current.parentElement?.getAttribute('data-ordering');
-        // console.table([["audioContainerRef", audioContainerRef.current, Boolean(audioContainerRef.current), ], ["waveAudioRef", waveAudioRef, Boolean(waveAudioRef.current)]])
-        return outerAudioContainerId === currentFocusedElementOrderId && outerAudioContainerId !== null; 
+        return outerAudioContainerId === currentFocusedElementOrderId && outerAudioContainerId !== null;
     }
+
     keyboardjs.bind('ctrl+1', (event: any) => {
         event.preventDefault();
         if (isCurrentContainer()) {
@@ -67,7 +68,6 @@ export function WaveAudio(props: IWaveAudioProps) {
             document.activeElement?.removeEventListener('blur', pauseAudio);
             document.activeElement?.addEventListener('blur', pauseAudio);
         }
-            
         return false;
     })
 
@@ -79,53 +79,61 @@ export function WaveAudio(props: IWaveAudioProps) {
         return false;
     })
     useEffect(() => {
-        const audioElement  = document.querySelector(
+        const audioElement = document.querySelector(
             `#waveform_${props["index"]}`
         ) as HTMLDivElement;
-        audioElement.addEventListener("click", playAudioToggle);
+        audioPlayElement.current = document.querySelector(`#waveform_${props["index"]} .audio_play`) as HTMLSpanElement
         audioContainerRef.current = audioElement;
+
         const waveform = new WaveSurfer({
             "container": audioElement,
             "waveColor": "#0569ff",
             "progressColor": "#0353cc",
             "responsive": true
-        });
-
-        waveform.init();
-
+        }).init();
         waveform.on("error", (err) => {
             console.log("Błąd: ", err);
         });
         waveform.on("play", () => {
-            setIsPlaying(true)
+            audioPlayElement.current.innerText = icons['play'];
         })
         waveform.on("pause", () => {
-            setIsPlaying(false)
+            audioPlayElement.current.innerText = icons['pause'];
         })
         waveform.on("finished", () => {
-            setIsPlaying(false);
+            audioPlayElement.current.innerText = icons['pause'];
         })
-        const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`.replaceAll('\\', '/');
+        const pathToFile = `${props['audio_dir']}/${props["audio_name"]}`
         waveform.load(pathToFile);
+
+
         waveAudioRef.current = waveform;
+        audioContainerRef.current.addEventListener("click", playAudioToggle);
+        audioPlayElement.current.addEventListener("click", playAudioToggle);
         return () => {
-            console.log('destructor');
+            audioContainerRef.current.removeEventListener("click", playAudioToggle);
+            audioPlayElement.current.removeEventListener("click", playAudioToggle);
             waveAudioRef.current.destroy();
-            
+            waveAudioRef.current.unAll();
+            // Memory leak fix
             //@ts-ignore
             waveAudioRef.current.backend = null;
             //@ts-ignore
+            delete waveAudioRef.current.backend
+            //@ts-ignore
             waveAudioRef.current = null;
         };
-    }, [props['audio_name']]);
+    });
+
+
     return <>
-        <div className='waveform' id={`waveform_${props["index"]}`} data-ordering={props["index"]} key={ `wav_cont_${props['index']}`}>
-        <div className='waveform__options'>
-            <span className="waveform__option material-symbols-outlined" key={ `wav_button_toggle_${props['index']}`} onClick={() => playAudioToggle()} title={"Uruchom / Zatrzymaj odtwarzanie - Ctrl + 1"}> {!isPlaying ? "\ue037": "\ue034"} </span>
-            <span className="waveform__option material-symbols-outlined" key={ `wav_button_stop_${props['index']}`}  onClick={() => stopAudio()} title={"Zatrzymaj i wskaźnik na początek - Ctrl + r"}> {"\ue047"} </span>
+        <div className='waveform' id={`waveform_${props["index"]}`} data-ordering={props["index"]} key={`wav_cont_${props['index']}`}>
+            <div className='waveform__options'>
+                <span className="waveform__option material-symbols-outlined audio_play" key={`wav_button_toggle_${props['index']}`} onClick={() => playAudioToggle()} title={"Uruchom / Zatrzymaj odtwarzanie - Ctrl + 1"}> {icons['pause']} </span>
+                <span className="waveform__option material-symbols-outlined audio_stop" key={`wav_button_stop_${props['index']}`} onClick={() => stopAudio()} title={"Zatrzymaj i wskaźnik na początek - Ctrl + r"}> {icons['stop']} </span>
+            </div>
         </div>
-        </div>
-        
+
     </>;
 
 

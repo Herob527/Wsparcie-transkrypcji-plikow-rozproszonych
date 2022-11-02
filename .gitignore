@@ -51,7 +51,7 @@ karty_postaci.csv
 files.txt
 texts.txt
 status.json
-
+recalculate_durations.py
 # Excluded types
 *.db 
 *.7z

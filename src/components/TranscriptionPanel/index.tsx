@@ -9,9 +9,10 @@ import keyboardjs from 'keyboardjs';
 // Hooks
 import useConfig from '../../hooks/useConfig'
 import { useFilterByCategory, useSharedFilterCategory } from '../../hooks/useFilterByCategory';
+
 import { useBetween, free } from 'use-between'
 import { useStateIfMounted } from 'use-state-if-mounted'
-
+import useIsMounted from 'ismounted'
 // Types
 import type { configAPIData } from '../../../type'
 import type { IPanelProps } from "./types/IPanelProps";
@@ -39,8 +40,7 @@ const useOffsetData = () => {
     }
 }
 
-const useSharedOffsetState = () => useBetween(useOffsetData,);
-
+export const useSharedOffsetState = () => useBetween(useOffsetData,);
 
 
 const Wrapper = () => {
@@ -89,11 +89,9 @@ interface ILineFromAPI {
 type dataFromAPI = ILineFromAPI[]
 
 function MainPanel(props: IPanelProps) {
-    useHotkeys('ctrl+1', (event) => {
-        event.preventDefault();
-    })
     const { maxOffset, offset, setOffset } = useSharedOffsetState();
     const { filterCategory } = useSharedFilterCategory();
+    const isMounted = useIsMounted();
     let { data, isLoading, error, refetch, remove } = useQuery([offset, filterCategory], async () => {
         return await fetch(`${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}&category_id=${filterCategory}`, {
             "method": "GET",
@@ -114,11 +112,11 @@ function MainPanel(props: IPanelProps) {
     if (error) {
         return <div> {error} </div>
     }
-    console.log(offset);
+    console.log(`MainPanel - Offset: ${offset}`);
     keyboardjs.bind('ctrl+.', (event: any) => {
 
         event.preventDefault();
-
+        if (!isMounted.current) return;
         const newPageOffset = offset + props['elementsPerPage'];
         console.log(newPageOffset, maxOffset);
         if (newPageOffset >= maxOffset) {
@@ -273,6 +271,7 @@ function Category(props: ICategoryProps) {
         return;
     };
     const handleCopy = (ev: React.ClipboardEvent) => {
+        ev.preventDefault();
         console.log(ev);
     }
     const categories = data.map((category: any, index: number) => (
@@ -323,7 +322,8 @@ function Pagination(props: IPaginationProps) {
         setOffset(newOffset);
         return false;
     }
-    const steps = Math.floor(data / elementsPerPage);
+    let steps = Math.ceil(data / elementsPerPage);
+
     const pages = Array(steps).fill(0).map((el: number, index: number) =>
 
         <div className={`paginationElement ${index === currentPage ? 'active' : ''}`} onClick={handleClick} data-page={index} data-offset={index * elementsPerPage} key={`page_${index * elementsPerPage}`}>
