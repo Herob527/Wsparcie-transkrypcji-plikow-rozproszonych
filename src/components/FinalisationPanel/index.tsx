@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import './FinalisationPanel.sass'
 
 import useTranscriptFormatter from '../../hooks/useTranscriptFormatter'
-import useFFmpegConstructor from '../../hooks/useFFmpegConstructor'
 import useConfig from '../../hooks/useConfig'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { useBetween } from 'use-between'
@@ -14,11 +13,11 @@ type FinalisationStates = "None" | "Executing" | "Finished" | "Error"
 
 const useFinaliseRes = () => {
     const [finaliseState, setFinaliseState] = useState("None" as FinalisationStates);
-    const colors = {
-        "None": "#1e90ff",
-        "Executing": "#959595",
-        "Finished": "#1dbf00",
-        "Error": "#f50c0c"
+    const errorColors = {
+        "None": "default",
+        "Executing": "executing",
+        "Finished": "finished",
+        "Error": "error"
     }
     const messages = {
         "None": "Jestem gotowy!",
@@ -28,7 +27,7 @@ const useFinaliseRes = () => {
     }
     return {
         messages,
-        colors,
+        colors: errorColors,
         finaliseState,
         setFinaliseState
     }
@@ -177,7 +176,7 @@ function Decisions(props: any) {
             <input type='checkbox' name='should_filter' id='should_filter' title='Uwzględnij filtr długości audio' />
             <label htmlFor='should_format'> Formatuj pliki audio </label>
             <input type='checkbox' name='should_format' id='should_format' title='Dodatkowo formatuje pliki audio' />
-            <button style={{ backgroundColor: colors[finaliseState] }} className='card__input card__input__button' disabled={finaliseState === "Executing"}> Finalizuj </button>
+            <button className={`card__input card__input__button ${colors[finaliseState]}`} disabled={finaliseState === "Executing"}> Finalizuj </button>
             <p> {messages[finaliseState]}</p>
         </div>
     )

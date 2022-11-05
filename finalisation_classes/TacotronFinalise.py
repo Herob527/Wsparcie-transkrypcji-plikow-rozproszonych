@@ -74,9 +74,9 @@ class TacotronFinalise(BaseFinalise):
                 transcription_path = Path(category_path, "invalid_list.txt")
             with open(transcription_path, "a", encoding="utf-8") as output:
                 formatted_line = line_format_input.format_map(i)
-                line = formatted_line.strip()
+                line:str = formatted_line.strip()
                 if not line.endswith((".", "?", "!")):
-                    line += line.join(".")
+                    line += "."
                 output.write(f"{formatted_line}\n")
 
     def format(self):

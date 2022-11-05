@@ -1,14 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useQuery } from "react-query";
-import { useFilterByCategory, useSharedFilterCategory } from '../../../hooks/useFilterByCategory'
+import { useSharedFilterCategory } from '../../../hooks/useFilterByCategory'
 import {useSharedOffsetState} from '../index'
 import './style.sass'
-// import {useSharedFilterCategory} from '../index'
 
 const API_ADDRESS = 'http://localhost:5002';
 
 export const SidePanel = () => {
-    return (<section id='side_panel'>
+    return (<section id='side_panel' className="card__container">
         <AddCategory />
         <FilterByCategory />
     </section>)
@@ -18,12 +17,11 @@ function AddCategory() {
     const handleSubmit = (ev: React.FormEvent) => {
         ev.preventDefault();
     }
-    return (<article id='add_category'>
-        <h1>Dodaj nową kategorię </h1> 
-        <form onSubmit={handleSubmit} className='side_form'>
-            <label htmlFor="new_category_name" className='form__label'> Nazwa nowej kategorii</label>
-            <input name='category_name'  className='form__input' id='new_category_name'/>
-            <input type='submit' className='form__input form__submit'/>
+    return (<article id='add_category' className='card'>
+        <h1 className='card__title'> Dodaj nową kategorię </h1>
+        <form onSubmit={handleSubmit} className='side_form card__container'>
+            <input name='category_name'  className='card__input' id='new_category_name'/>
+            <input type='submit' className='card__input card__input__button'/>
         </form>
     </article>)
 }
@@ -36,7 +34,6 @@ function FilterByCategory() {
         return await res.json();
     });
     useEffect(() => {
-        console.log(filterCategory)
         return () => {
             remove();
         }
@@ -70,14 +67,14 @@ function FilterByCategory() {
 
         return;
     };
-    return (<article className='fitler_by_category'>
-        <h1> Filtruj po kategorii </h1>
+    return (<article className='fitler_by_category card' >
+        <h1 className="card__title"> Filtruj po kategorii </h1>
         <select
             title="Kategorie głosów"
             onChange={handleChange}
             onClick={handleClick}
             value={filterCategory}
-            className="category form__input"
+            className="category card__input"
         >
             <option value={-1} key={'option_all'}>
                 Wszystkie

@@ -8,18 +8,10 @@
     background: $background-color
     padding-top: 1rem
     #lines
-        width: 80%
         flex: 8
         padding: 0.2rem
         
-    #side_panel
-        width: 20%
-        position: sticky
-        flex: 2
-        top: 5%
-        left: 0
-        padding: 0.2rem
-        align-self: flex-start
+
 .line
     display: grid
     grid-template-columns: 14% 19% 44% 19%
@@ -92,7 +84,7 @@
         border: 2px solid $primary_color
         &.active
             background: $primary_color
-            color: white
+            color: $font-color
             border: 2px solid $secondary_color
         &:nth-of-type(n + 1):not(:last-of-type)
             margin: 0 $pagination_gaps 0 0

@@ -1,6 +1,6 @@
 import './style.sass'
 
-import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
+import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
 // @ts-ignore
@@ -8,7 +8,7 @@ import keyboardjs from 'keyboardjs';
 
 // Hooks
 import useConfig from '../../hooks/useConfig'
-import { useFilterByCategory, useSharedFilterCategory } from '../../hooks/useFilterByCategory';
+import { useSharedFilterCategory } from '../../hooks/useFilterByCategory';
 
 import { useBetween, free } from 'use-between'
 import { useStateIfMounted } from 'use-state-if-mounted'
@@ -22,7 +22,6 @@ import type { IPaginationProps } from "./types/IPaginationProps";
 
 import { SidePanel } from './SidePanel'
 import { WaveAudio } from './WaveAudio';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 const API_ADDRESS = 'http://localhost:5002';
 
@@ -92,7 +91,7 @@ function MainPanel(props: IPanelProps) {
     const { maxOffset, offset, setOffset } = useSharedOffsetState();
     const { filterCategory } = useSharedFilterCategory();
     const isMounted = useIsMounted();
-    let { data, isLoading, error, refetch, remove } = useQuery([offset, filterCategory], async () => {
+    let { data, isLoading, error, remove } = useQuery([offset, filterCategory], async () => {
         return await fetch(`${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}&category_id=${filterCategory}`, {
             "method": "GET",
             "headers": {
@@ -105,7 +104,7 @@ function MainPanel(props: IPanelProps) {
         return () => {
             remove();
         }
-    }, []);
+    }, [remove]);
     if (isLoading) {
         return <div> Lolding data... </div>
     }
@@ -223,7 +222,7 @@ function Transcript(props: ITranscriptProps) {
 }
 
 function Category(props: ICategoryProps) {
-    const { id, currentCategory } = props;
+    const { id } = props;
     const [category, setCategory] = useStateIfMounted(id)
     const { isLoading, error, data, refetch, remove } = useQuery("get_category", async () => {
         const res = await fetch(`${API_ADDRESS}/categories`);
@@ -240,32 +239,19 @@ function Category(props: ICategoryProps) {
         );
     if (error)
         return (
-            <select disabled={true}>
+            <select  disabled={true}>
                 <option> Błąd: {error}</option>
             </select>
         );
 
     const handleChange = async (ev: any) => {
         console.log(ev.target.value)
-        const bindingId = ev.currentTarget.parentElement.getAttribute("data-id");
         const categoryId = ev.target.value;
         setCategory(categoryId);
-        const res = await fetch(`${API_ADDRESS}/set_category`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                category_id: categoryId,
-                bindings_id: bindingId
-            }),
-        })
-            .then((res) => res.json())
-            .catch((err) => err);
 
         return;
     };
-    const handleClick = (ev: React.PointerEvent<HTMLSelectElement>) => {
+    const handleClick = () => {
         refetch()
 
         return;
@@ -296,7 +282,7 @@ function Category(props: ICategoryProps) {
 }
 
 function Pagination(props: IPaginationProps) {
-    const { maxOffset, setMaxOffset, offset, setOffset } = useSharedOffsetState();
+    const { setMaxOffset, setOffset } = useSharedOffsetState();
     const { filterCategory } = useSharedFilterCategory();
     const { elementsPerPage } = props;
     const currentPage = 0 / elementsPerPage;
@@ -312,7 +298,7 @@ function Pagination(props: IPaginationProps) {
         remove();
         free(useSharedFilterCategory)
         free(useSharedOffsetState);
-    }, [remove, free])
+    }, [remove])
     if (isLoading) {
         return <p> Loading pages</p>
     }

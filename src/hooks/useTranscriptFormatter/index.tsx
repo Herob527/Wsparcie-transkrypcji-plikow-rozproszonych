@@ -1,6 +1,4 @@
-import { useState, useEffect } from "react";
 
-import { useQueryClient, QueryClientProvider, useQuery, QueryClient } from 'react-query';
 import formatterData from '../../../src/transcription_example_data.json';
 
 
