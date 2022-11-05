@@ -36,23 +36,3 @@ W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
 # Wsparcie techniczne
 Jako iż to wczesna alfa, to też nie udzielam wsparcia technicznego w problemach jakie mogą nastąpić
 
-# Instrukcja
-1. Tworzymy plik **source** w folderze z projektem i w folderze **public**
-2. Kopiujemy foldery i pliki audio tam
-3. Odpalamy API
-4. Czekamy aż się sfinalizuje projekt
-5. Po finalizacji odpalamy projekt przy pomocy `react-scripts start`
-
-Struktura folderu source:
-<pre>source
-    1.wav
-    2.wav
-    3.wav
-    Bezi
-        Bezi.txt - Opcjonalne
-        wavs
-            4.wav
-            5.wav
-            6.wav
-            ...
-</pre>
