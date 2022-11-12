@@ -117,7 +117,6 @@ function MainPanel(props: IPanelProps) {
         event.preventDefault();
         if (!isMounted.current) return;
         const newPageOffset = offset + props['elementsPerPage'];
-        console.log(newPageOffset, maxOffset);
         if (newPageOffset >= maxOffset) {
             return;
         }
@@ -272,6 +271,7 @@ function Category(props: ICategoryProps) {
                 onChange={handleChange}
                 onClick={handleClick}
                 onCopy={handleCopy}
+                onCopyCapture={handleCopy}
                 value={category}
                 className="category"
             >

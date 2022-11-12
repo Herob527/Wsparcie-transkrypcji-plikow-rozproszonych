@@ -78,6 +78,12 @@ export function WaveAudio(props: IWaveAudioProps) {
         }
         return false;
     })
+    keyboardjs.bind('ctrl+;', (event: any) => {
+        event.preventDefault();
+        if (isCurrentContainer()) {
+            waveAudioRef.current.skipBackward(0.5)
+        }
+    })
     useEffect(() => {
         const audioElement = document.querySelector(
             `#waveform_${props["index"]}`

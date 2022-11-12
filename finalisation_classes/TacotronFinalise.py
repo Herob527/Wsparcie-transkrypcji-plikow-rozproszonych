@@ -28,17 +28,17 @@ class TacotronFinalise(BaseFinalise):
         category_data = category_query.execute().mappings().all()
         min_length, max_length, should_filter = itemgetter(
             'min_length', 'max_length', 'should_filter')(self.configuration)
-        for i in category_data:
-            category_path = Path(self.output, i["category_name"])
+        for category in category_data:
+            category_path = Path(self.output, category["category_name"])
             wavs_path = Path(category_path, "wavs")
-            audio_channels = i["audio_channels"]
+            audio_channels = category["audio_channels"]
             category_path.mkdir(exist_ok=True, parents=True)
             wavs_path.mkdir(exist_ok=True, parents=True)
-        for i in self.general_data:
-            directory = i["audio_directory"]
-            name = i["audio_name"].strip()
-            category_name = i["category_name"].strip()
-            audio_length = i["audio_length"]
+        for entry in self.general_data:
+            directory = entry["audio_directory"]
+            name = entry["audio_name"].strip()
+            category_name = entry["category_name"].strip()
+            audio_length = entry["audio_length"]
             output_file_path = Path(self.output, category_name, "wavs")
 
             is_invalid_format = (
@@ -59,10 +59,10 @@ class TacotronFinalise(BaseFinalise):
     def provide_transcription(self):
         output_type, min_length, max_length, should_format, line_format_input, should_filter = itemgetter(
             'output_type', 'min_length', 'max_length', 'should_format', 'line_format_input', 'should_filter')(self.configuration)
-        for i in self.general_data:
-            audio_length = i["audio_length"]
-            audio_channels = i["audio_channels"]
-            category_name = i["category_name"]
+        for entry in self.general_data:
+            audio_length = entry["audio_length"]
+            audio_channels = entry["audio_channels"]
+            category_name = entry["category_name"]
             category_path = Path(self.output, category_name)
             transcription_path = Path(category_path, "list.txt")
             is_invalid_format = (
@@ -73,7 +73,7 @@ class TacotronFinalise(BaseFinalise):
             if is_invalid_format and should_filter:
                 transcription_path = Path(category_path, "invalid_list.txt")
             with open(transcription_path, "a", encoding="utf-8") as output:
-                formatted_line = line_format_input.format_map(i)
+                formatted_line = line_format_input.format_map(entry)
                 line:str = formatted_line.strip()
                 if not line.endswith((".", "?", "!")):
                     line += "."

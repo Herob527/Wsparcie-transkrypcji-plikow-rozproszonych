@@ -23,8 +23,6 @@ export default function App() {
     const purpouses = Object.keys(componentsMap) as Purpouse[];
     const currentPurpouse: Purpouse = purpouses[0] as Purpouse;
     const [currentComponent, setCurrentComponent] = useState(componentsMap[currentPurpouse]);
-    
-
     const handleClick = (event: React.MouseEvent) => {
         const purpouse = event.currentTarget?.getAttribute('data-purpouse') as Purpouse;
         if (purpouse === null) {

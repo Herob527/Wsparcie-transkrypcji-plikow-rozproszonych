@@ -31,6 +31,8 @@ from api_endpoints.r_texts import r_texts
 from api_endpoints.r_categories import r_categories
 from api_endpoints.r_audios import r_audios
 
+print(c_audio.columns)
+
 log_dir = Path("logs")
 log_dir.mkdir(exist_ok=True)
 
