@@ -169,14 +169,37 @@ function MainPanel(props: IPanelProps) {
 
 function Transcript(props: ITranscriptProps) {
     const [text, setText] = useStateIfMounted(props["transcript"]);
-
+    const isMounted = useIsMounted();
+    useEffect(() => {
+        if (!isMounted.current) return
+        const textareaElement = document.querySelector(`textarea[tabindex='${props["index"] + 1}']`) as HTMLTextAreaElement;
+        const isValid = validateEntry(textareaElement);
+        if (!isValid) textareaElement.classList.add('error');
+    })
+    const endingChars = ['.','?','!'];
+    const validateEntry = (el: HTMLTextAreaElement) => {
+        const valueLength = el.value.length;
+        for (const char of endingChars) {
+            if (el.value.lastIndexOf(char) === valueLength - 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     const handleChange = async (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
-
+        const isValid = validateEntry(ev.currentTarget);
+        if (!isValid) {
+            ev.currentTarget.classList.add('error')
+        } else {
+            ev.currentTarget.classList.remove('error')
+        }
         setText(ev.currentTarget.value);
         return false;
     };
     const handleBlur = async (ev: React.FocusEvent<HTMLTextAreaElement>) => {
         setText(ev.target.value);
+
         const bindingId = ev.currentTarget.parentElement?.parentElement?.getAttribute("data-id");
         console.log(bindingId)
         const res = await fetch(`${API_ADDRESS}/texts`, {
