@@ -22,7 +22,11 @@
             "move_to_select": {
                 "key": "ctrl+3",
                 "desc": "Toggles focus to select element in focused line"
-            }
+            },
+            "move_backwards": {
+
+            },
+            "stop_audio": {}
         }
     },
     "finalisationRecent": {
