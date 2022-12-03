@@ -15,7 +15,7 @@ function useFFmpegConstructor() {
         return '';
       }
       return `ffmpeg.exe -i "plikel.mp3" -ac ${ac} -ar ${ar} ${
-        af ? '-af ' + af : ''
+        af ? `-af ${af}` : ''
       } plikel.${outputType}`;
     },
   };

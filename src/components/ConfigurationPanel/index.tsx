@@ -115,7 +115,7 @@ function CategoriesManager(props: any) {
         className='card__row'
       >
         <input
-          key={'input' + cProps['tabIndex'] + 1 + cProps['categoryId']}
+          key={`input${cProps['tabIndex']}${1}${cProps['categoryId']}`}
           tabIndex={cProps['tabIndex'] + 1}
           type='text'
           className='category_name card__input'

@@ -37,6 +37,12 @@
         "comma-spacing": "error",
         "arrow-spacing": "error",
         "no-shadow":"error",
-        "prefer-const": "error"
+        "prefer-const": "error",
+        "prefer-template": "error",
+        "prefer-reflect":"error",
+        "prefer-spread": "error",
+        "use-isnan": "error",
+        "no-irregular-whitespace": "error",
+        "no-shadow-restricted-names": "error"
     }
 }

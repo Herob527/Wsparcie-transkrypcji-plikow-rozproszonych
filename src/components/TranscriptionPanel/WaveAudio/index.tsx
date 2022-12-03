@@ -133,8 +133,8 @@ export function WaveAudio(props: IWaveAudioProps) {
       // Memory leak fix
       //@ts-ignore
       waveAudioRef.current.backend = null;
-      //@ts-ignore
-      delete waveAudioRef.current.backend;
+
+      Reflect.deleteProperty(waveAudioRef.current, 'backend')
       //@ts-ignore
       waveAudioRef.current = null;
     };
