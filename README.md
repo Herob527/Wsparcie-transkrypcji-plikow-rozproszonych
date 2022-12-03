@@ -21,7 +21,7 @@ F2 - Zatrzymaj / Wznów audio
 - [x] Konfiguracja aplikacji z poziomu interfejsu - Wyłącznie kategorie podlegają modyfikacji
 - [x] Zaimplementować skróty klawiszowe
 - [ ] Ogólnie dostosować aplikację do ułatwienia rozproszonego development
-- [x] Rozwiązazć problemy wycieku pamięci
+- [ ] Rozwiązazć problemy wycieku pamięci
 - [x] Użytkownik decyduje o tym, co jest w linijce - Wymaga zmian po stronie klas finalizacji. Na ten czas tylko TacotronFinalise wspiera to.
 
 W ogromnym skrócie, uczynić aplikację user friendly i dev friendly
