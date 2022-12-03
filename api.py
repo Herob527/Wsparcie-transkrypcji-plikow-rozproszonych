@@ -7,7 +7,7 @@ from finalisation_classes import (
 from tables_definition import *
 import contextlib
 from flask import Flask, jsonify, request
-from flask_restful import Api, reqparse
+from flask_restful import Api
 from pathlib import Path
 from flask_cors import CORS
 import sqlalchemy
@@ -31,30 +31,25 @@ from api_endpoints.r_texts import r_texts
 from api_endpoints.r_categories import r_categories
 from api_endpoints.r_audios import r_audios
 
-print(c_audio.columns)
-
 log_dir = Path("logs")
 log_dir.mkdir(exist_ok=True)
-
-logging.basicConfig(
-    filename=f"{log_dir}/api_logs_{time.strftime('%y-%m-%d_%H_%M_%S')}.log",
-    encoding="utf-8",
-    filemode="w",
-    errors=f"{log_dir}/api_logs_{time.strftime('%y-%m-%d_%H_%M_%S')}.errors_log"
-)
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
-with open("./config.json", "r", encoding='utf8') as json_input:
-    config_api = json.load(json_input)['apiConfig']
+with open("./config.json", "r", encoding="utf8") as json_input:
+    config_api = json.load(json_input)["apiConfig"]
 
 _engine = create_engine(
     config_api["databaseConnectionConfig"]["connectionString"],
     connect_args={"check_same_thread": False},
+    echo=True,
+    pool_pre_ping=True,
+    pool_recycle=3600,
 )
 metadata = MetaData(_engine)
+
 
 @app.route("/set_category", methods=["PATCH"])
 def set_category():
@@ -76,12 +71,7 @@ def set_category():
 
 @app.route("/get_size", methods=["GET"])
 def get_size():
-    parser = reqparse.RequestParser()
-    parser.add_argument(
-        "category_id", type=int, help="Which category will be fetched", default=-1
-    )
-
-    args = parser.parse_args()
+    args = request.args
 
     query = select([func.count()]).select_from(c_bindings)
     if args["category_id"] != -1:
@@ -94,10 +84,10 @@ def get_size():
 def get_audio(path: Path):
     try:
         return AudioSegment.from_file(path)
-    except exceptions.CouldntDecodeError as e:
+    except exceptions.CouldntDecodeError:
         logging.error(f"Couldn't decode audio. Path to audio: {path}")
         return None
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         logging.error(f"Couldn't find file. Path to audio: {path}")
         return None
 
@@ -111,9 +101,7 @@ def insert_data_to_database(index, path, additional_data, audio, file_name):
         round(audio.duration_seconds, 4),
     )
     try:
-        c_texts.insert(
-            {"id": index, "transcript": text}
-        ).execute()
+        c_texts.insert({"id": index, "transcript": text}).execute()
     except sqlalchemy.exc.IntegrityError:
         logging.error(
             f"Failed to enter text {text} with id {index}. It already exists."
@@ -132,8 +120,7 @@ def insert_data_to_database(index, path, additional_data, audio, file_name):
         ).execute()
     except sqlalchemy.exc.IntegrityError:
         logging.error(
-            f"Failed to enter audio {file_name} with id {index}. It exists."
-        )
+            f"Failed to enter audio {file_name} with id {index}. It exists.")
     try:
         c_bindings.insert(
             {
@@ -158,26 +145,18 @@ def insert_data(index: int, path: Path, additional_data: dict = None) -> None:
 
 @app.route("/get_lines", methods=["GET"])
 def get_line():
-    parser = reqparse.RequestParser()
-    parser.add_argument(
-        "offset", type=int, help="From which point searching will start", default=0
-    )
-    parser.add_argument(
-        "limit", type=int, help="How much row must be fetched", default=30
-    )
-    parser.add_argument(
-        "category_id", type=int, help="Which category will be fetched", default=-1
-    )
-    args = parser.parse_args()
+    args = request.args
     general_query = (
         select(
             c_bindings.c.id.label("bindings_id"),
             c_categories.c.id.label("category_id"),
+            c_categories.c.name.label("category_name"),
             c_audio.c.name.label("audio_name"),
             c_audio.c.directory.label("audio_directory"),
-            c_categories.c.name.label("category_name"),
+            c_audio.c.duration_seconds,
+
             c_texts.c.transcript,
-            c_audio.c.duration_seconds
+
         )
         .join(c_audio)
         .join(c_categories)
@@ -186,7 +165,7 @@ def get_line():
         .limit(args["limit"])
         .offset(args["offset"])
     )
-    if args['category_id'] != -1:
+    if int(args['category_id']) != -1:
         general_query = general_query.where(
             c_categories.c.id == args["category_id"])
 
@@ -198,7 +177,7 @@ def get_line():
 
 @app.route("/setup_database", methods=["POST"])
 def setup_database():
-    source_path = Path(config_api['sourceFolder'])
+    source_path = Path(config_api["sourceFolder"])
     initial_categories = {
         """
             Category used for files with unassigned category. Default category.
@@ -238,36 +217,49 @@ def setup_database():
         data = [
             {
                 "path": unknown,
-                "additional_data": {"category_name": "Nieznany", "text": "", "category_id": 0},
+                "additional_data": {
+                    "category_name": "Nieznany",
+                    "text": "",
+                    "category_id": 0,
+                },
             }
             for unknown in unknowns
         ]
 
-        for index, dir in enumerate(dirs, start=2):
+        for index, directory in enumerate(dirs, start=2):
             with contextlib.suppress(sqlalchemy.exc.IntegrityError):
                 c_categories.insert().values(
-                    name=dir.name, initial_category=dir.name
+                    name=directory.name, initial_category=directory.name
                 ).execute()
 
-            path_to_text = Path(dir, f"{dir.name}.txt")
+            path_to_text = Path(directory, f"{directory.name}.txt")
             if path_to_text.exists():
                 with open(str(path_to_text), "r", encoding="utf-8") as f_input:
                     for line in f_input:
                         wav, transcript = line.strip().split("|")
                         data.append(
                             {
-                                "path": Path(dir, "wavs", wav),
+                                "path": Path(directory, "wavs", wav),
                                 "additional_data": {
                                     "category_id": index,
-                                    "category_name": dir.name,
+                                    "category_name": directory.name,
                                     "text": transcript,
                                 },
                             }
                         )
             else:
-                path_to_wavs = Path(dir, 'wavs')
-                data.extend({"path": Path(wav), "additional_data": {
-                            "category_id": index, "category_name": dir.name, "text": "", }, } for wav in path_to_wavs.iterdir())
+                path_to_wavs = Path(directory, "wavs")
+                data.extend(
+                    {
+                        "path": Path(wav),
+                        "additional_data": {
+                            "category_id": index,
+                            "category_name": directory.name,
+                            "text": "",
+                        },
+                    }
+                    for wav in path_to_wavs.iterdir()
+                )
 
         with ThreadPoolExecutor() as executor:
             for index, i in enumerate(data):
@@ -299,11 +291,11 @@ def finalise():
         "enderal-finalise": EnderalFinalise.EnderalFinalise,
     }
 
-    currentMode = modes[config["export_method"]](config, sql_engine=_engine)
-    currentMode.categorise()
-    currentMode.provide_transcription()
+    current_mode = modes[config["export_method"]](config, sql_engine=_engine)
+    current_mode.categorise()
+    current_mode.provide_transcription()
     if config["should_format"]:
-        currentMode.format()
+        current_mode.format()
     return {"Message": "Finalizacja: Jest sukces"}
 
 
