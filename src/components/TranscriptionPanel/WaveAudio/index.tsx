@@ -142,14 +142,14 @@ export function WaveAudio(props: IWaveAudioProps) {
   return (
     <>
       <div
-        className="waveform"
+        className='waveform'
         id={`waveform_${props['index']}`}
         data-ordering={props['index']}
         key={`wav_cont_${props['index']}`}
       >
-        <div className="waveform__options">
+        <div className='waveform__options'>
           <span
-            className="waveform__option material-symbols-outlined audio_play"
+            className='waveform__option material-symbols-outlined audio_play'
             key={`wav_button_toggle_${props['index']}`}
             onClick={() => playAudioToggle()}
             title={'Uruchom / Zatrzymaj odtwarzanie - Ctrl + 1'}
@@ -157,7 +157,7 @@ export function WaveAudio(props: IWaveAudioProps) {
             {icons['pause']}
           </span>
           <span
-            className="waveform__option material-symbols-outlined audio_stop"
+            className='waveform__option material-symbols-outlined audio_stop'
             key={`wav_button_stop_${props['index']}`}
             onClick={() => stopAudio()}
             title={'Zatrzymaj i wskaźnik na początek - Ctrl + r'}

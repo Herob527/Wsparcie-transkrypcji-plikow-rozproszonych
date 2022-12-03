@@ -41,13 +41,22 @@ export default function App() {
   return (
     <>
       <nav>
-        <button data-purpouse="config" onClick={handleClick}>
+        <button
+          data-purpouse='config'
+          onClick={handleClick}
+        >
           Konfiguracja
         </button>
-        <button data-purpouse="transcript" onClick={handleClick}>
+        <button
+          data-purpouse='transcript'
+          onClick={handleClick}
+        >
           Transkrypcja
         </button>
-        <button data-purpouse="finalise" onClick={handleClick}>
+        <button
+          data-purpouse='finalise'
+          onClick={handleClick}
+        >
           Finalizacja
         </button>
       </nav>

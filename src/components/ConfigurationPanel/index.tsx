@@ -8,10 +8,16 @@ const ConfigQueryClient = new QueryClient();
 export function ConfigurationPanel(props: any) {
   document.title = 'Konfiguracja';
   return (
-    <QueryClientProvider client={ConfigQueryClient} key="query_config_panel">
-      <div id="ConfigurationPanel">
+    <QueryClientProvider
+      client={ConfigQueryClient}
+      key='query_config_panel'
+    >
+      <div id='ConfigurationPanel'>
         <CategoriesManager></CategoriesManager>
-        <div id="side-container" className="card__container">
+        <div
+          id='side-container'
+          className='card__container'
+        >
           <Reset />
           <ElementsPerPage />
           <ThemeList />
@@ -24,9 +30,15 @@ export function ConfigurationPanel(props: any) {
 
 function ElementsPerPage(props: any) {
   return (
-    <form id="elementPerPage" className="card">
-      <p className="card__title"> Ilość elementów na stronę </p>
-      <input type="number" className="card__input" />
+    <form
+      id='elementPerPage'
+      className='card'
+    >
+      <p className='card__title'> Ilość elementów na stronę </p>
+      <input
+        type='number'
+        className='card__input'
+      />
     </form>
   );
 }
@@ -98,27 +110,30 @@ function CategoriesManager(props: any) {
     };
 
     return (
-      <div data-category-id={c_props['categoryId']} className="card__row">
+      <div
+        data-category-id={c_props['categoryId']}
+        className='card__row'
+      >
         <input
           key={'input' + c_props['tabIndex'] + 1 + c_props['categoryId']}
           tabIndex={c_props['tabIndex'] + 1}
-          type="text"
-          className="category_name card__input"
+          type='text'
+          className='category_name card__input'
           value={text}
           title={text}
           onChange={handleInputChange}
         ></input>
         <button
-          className="remove_category card__input card__input__button"
-          title="Zmiłuj się"
+          className='remove_category card__input card__input__button'
+          title='Zmiłuj się'
           onClick={handleDelete}
         >
           Usuń
         </button>
         <button
-          className="confirm_new_name card__input card__input__button"
+          className='confirm_new_name card__input card__input__button'
           onClick={handleUpdate}
-          title="Zatwierdź nową nazwę"
+          title='Zatwierdź nową nazwę'
           data-value={text}
         >
           Zatwierdź
@@ -127,9 +142,12 @@ function CategoriesManager(props: any) {
     );
   }
   return (
-    <div id="category_manager">
-      <p className="card__title"> Zarządzanie kategoriami</p>
-      <div id="categories_container" className="card__container">
+    <div id='category_manager'>
+      <p className='card__title'> Zarządzanie kategoriami</p>
+      <div
+        id='categories_container'
+        className='card__container'
+      >
         {data.map((el: any, index: number) => (
           <CategoryLine
             tabIndex={index}
@@ -139,7 +157,10 @@ function CategoriesManager(props: any) {
           ></CategoryLine>
         ))}
       </div>
-      <button className="card__input card__input__button" id="btn_confirm_all">
+      <button
+        className='card__input card__input__button'
+        id='btn_confirm_all'
+      >
         Zatwierdź wszystkie
       </button>
     </div>
@@ -148,18 +169,21 @@ function CategoriesManager(props: any) {
 
 function Reset(props: any) {
   return (
-    <form id="reset" className="card">
-      <p className="card__title"> Reset projektu </p>
-      <label htmlFor="newDatabase"> Nazwa nowej bazy danych</label>
+    <form
+      id='reset'
+      className='card'
+    >
+      <p className='card__title'> Reset projektu </p>
+      <label htmlFor='newDatabase'> Nazwa nowej bazy danych</label>
       <input
-        type="text"
-        name="newDatabase"
-        className="card__input"
-        id="newDatabase"
+        type='text'
+        name='newDatabase'
+        className='card__input'
+        id='newDatabase'
       />
       <button
-        title="Stworzy nową bazę danych"
-        className="card__input card__input__button "
+        title='Stworzy nową bazę danych'
+        className='card__input card__input__button '
       >
         Reset
       </button>
@@ -168,9 +192,15 @@ function Reset(props: any) {
 }
 function DatabaseList(props: any) {
   return (
-    <form id="database_list" className="card">
-      <p className="component_title"> Wybór bazy danych znanych API</p>
-      <select name="databases" id="databases">
+    <form
+      id='database_list'
+      className='card'
+    >
+      <p className='component_title'> Wybór bazy danych znanych API</p>
+      <select
+        name='databases'
+        id='databases'
+      >
         {/* List of available databases */}
       </select>
     </form>
@@ -179,9 +209,16 @@ function DatabaseList(props: any) {
 
 function ThemeList(props: any) {
   return (
-    <form id="theme_list" className="card">
-      <p className="card__title"> Wybór styli przestrzeni roboczej</p>
-      <select name="themes" id="themes" className="card__input">
+    <form
+      id='theme_list'
+      className='card'
+    >
+      <p className='card__title'> Wybór styli przestrzeni roboczej</p>
+      <select
+        name='themes'
+        id='themes'
+        className='card__input'
+      >
         {/* List of available styles */}
       </select>
     </form>
@@ -192,8 +229,11 @@ function AutoTranscriptionList(props: any) {}
 
 function ShortcutList(props: any) {
   return (
-    <div id="shortcutManager" className="card">
-      <p className="card__title"> Skróty klawiszowe </p>
+    <div
+      id='shortcutManager'
+      className='card'
+    >
+      <p className='card__title'> Skróty klawiszowe </p>
     </div>
   );
 }

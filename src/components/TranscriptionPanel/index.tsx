@@ -53,7 +53,7 @@ const Wrapper = () => {
 
   return (
     <>
-      <section id="Panel">
+      <section id='Panel'>
         <MainPanel
           elementsPerPage={workspaceConfig['elementsPerPage']}
           config={configData}
@@ -61,7 +61,7 @@ const Wrapper = () => {
         <SidePanel />
       </section>
       <Pagination
-        key="pagination"
+        key='pagination'
         elementsPerPage={workspaceConfig['elementsPerPage']}
       />
     </>
@@ -73,8 +73,11 @@ export const TranscriptionPanel = () => {
     return () => {};
   });
   return (
-    <QueryClientProvider key="query_provider" client={PanelQueryClient}>
-      <Wrapper key="panel" />
+    <QueryClientProvider
+      key='query_provider'
+      client={PanelQueryClient}
+    >
+      <Wrapper key='panel' />
     </QueryClientProvider>
   );
 };
@@ -195,15 +198,18 @@ function MainPanel(props: IPanelProps) {
   });
 
   return (
-    <div id="lines">
+    <div id='lines'>
       {data2.map((el: any, index: number) => (
         <div
           data-ordering={index}
           data-id={el['bindings_id']}
-          className="line"
+          className='line'
           key={`con_${el['audio_name']}_${index}`}
         >
-          <span key={`sp_${el['audio_name']}`} className="audio_name">
+          <span
+            key={`sp_${el['audio_name']}`}
+            className='audio_name'
+          >
             {el['audio_name']}
           </span>
           <WaveAudio
@@ -293,22 +299,22 @@ function Transcript(props: ITranscriptProps) {
     textareaElement.focus();
   };
   return (
-    <div className="transcript_area">
+    <div className='transcript_area'>
       <textarea
-        title="Transkrpcja"
+        title='Transkrpcja'
         value={text}
         onChange={handleChange}
         onBlur={handleBlur}
         tabIndex={props['index'] + 1}
-        className="transcript"
+        className='transcript'
         spellCheck={props['spellcheck']}
       ></textarea>
-      <div className="special_char_container">
+      <div className='special_char_container'>
         {specialCharacters.map((el) => (
           <button
             tabIndex={-1}
             key={el}
-            className="special_character"
+            className='special_character'
             data-character={el}
             onClick={handleSpecialCharacters}
           >
@@ -367,20 +373,26 @@ function Category(props: ICategoryProps) {
     console.log(ev);
   };
   const categories = data.map((category: any, index: number) => (
-    <option key={`option_${category['id']}_${index}`} value={category['id']}>
+    <option
+      key={`option_${category['id']}_${index}`}
+      value={category['id']}
+    >
       {category['name'].trim()}
     </option>
   ));
   return (
-    <QueryClientProvider key="cat_query_provider" client={CategoryQueryClient}>
+    <QueryClientProvider
+      key='cat_query_provider'
+      client={CategoryQueryClient}
+    >
       <select
-        title="Kategorie głosów"
+        title='Kategorie głosów'
         onChange={handleChange}
         onClick={handleClick}
         onCopy={handleCopy}
         onCopyCapture={handleCopy}
         value={category}
-        className="category"
+        className='category'
       >
         {categories}
       </select>
@@ -443,8 +455,8 @@ function Pagination(props: IPaginationProps) {
   // console.log(pages);
   return (
     <div
-      id="pagination"
-      className="pages"
+      id='pagination'
+      className='pages'
       data-max-offset={steps * elementsPerPage}
     >
       {pages}

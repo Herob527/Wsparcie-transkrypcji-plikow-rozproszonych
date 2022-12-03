@@ -1,5 +1,9 @@
 {
   "tabWidth": 2,
   "useTabs": false,
-  "singleQuote": true
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "endOfLine": "lf",
+  "jsxSingleQuote": true,
+  "singleAttributePerLine": true
 }
