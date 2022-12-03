@@ -24,7 +24,7 @@ import type { IPaginationProps } from './types/IPaginationProps';
 import { SidePanel } from './SidePanel';
 import { WaveAudio } from './WaveAudio';
 
-const API_ADDRESS = 'http://localhost:5002';
+const API_ADDRESS = 'http://127.0.0.1:5002';
 
 const PanelQueryClient = new QueryClient();
 const CategoryQueryClient = new QueryClient();
@@ -110,9 +110,9 @@ function MainPanel(props: IPanelProps) {
         {
           method: 'GET',
           headers: {
-            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Charset': 'utf8',
           },
-          credentials: 'same-origin',
         }
       )
         .then((response) => {
@@ -138,10 +138,11 @@ function MainPanel(props: IPanelProps) {
     },
     [remove]
   );
+  console.log(isError, data);
   if (isError) {
     return <div> Error </div>;
   }
-  if (isLoading && !isError) {
+  if (isLoading) {
     return <div> Lolding data... </div>;
   }
 

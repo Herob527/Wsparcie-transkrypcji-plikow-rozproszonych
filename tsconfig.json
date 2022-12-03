@@ -1,13 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      "ES2015.Promise",
-      "ESNext.Array"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "ES2015.Promise", "ESNext.Array"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -20,13 +14,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "downlevelIteration":true,
-    "jsx": "react-jsx",
+    "downlevelIteration": true,
+    "jsx": "react-jsx"
   },
-  "include": [
-    "src"
-, "type.ts"  ],
-  "exclude": [
-    ".src/sd_App.tsx"
-  ]
+  "include": ["src", "type.ts", ".eslint.js"],
+  "exclude": [".src/sd_App.tsx"]
 }

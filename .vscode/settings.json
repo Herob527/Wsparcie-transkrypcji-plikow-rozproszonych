@@ -1,11 +1,14 @@
 {
-    "sqltools.useNodeRuntime": true,
-    "sqltools.connections": [
-        {
-            "previewLimit": 50,
-            "driver": "SQLite",
-            "name": "file_category",
-            "database": "${workspaceFolder:katalogowanie-dzwiekow-react}/file_category.db"
-        }
-    ]
+  "python.linting.pylintEnabled": false,
+  "python.linting.enabled": true,
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.fixAll": [
+    "source.convertImportFormat",
+    "source.unusedImports"
+  ],
+  "python.analysis.completeFunctionParens": true,
+  "python.analysis.importFormat": "relative",
+  "python.linting.banditEnabled": false,
+  "python.linting.flake8Enabled": false,
+  "python.linting.pylamaEnabled": true
 }

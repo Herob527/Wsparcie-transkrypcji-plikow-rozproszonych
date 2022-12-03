@@ -37,6 +37,7 @@
     "use-isnan": "error",
     "no-irregular-whitespace": "error",
     "no-shadow-restricted-names": "error",
-    "semi-spacing": "error"
+    "semi-spacing": "error",
+    "quote-props": "warn"
   }
 }

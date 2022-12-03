@@ -154,7 +154,6 @@ def get_line():
             c_audio.c.name.label("audio_name"),
             c_audio.c.directory.label("audio_directory"),
             c_audio.c.duration_seconds,
-
             c_texts.c.transcript,
 
         )
