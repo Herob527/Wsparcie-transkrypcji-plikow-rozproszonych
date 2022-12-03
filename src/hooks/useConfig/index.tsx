@@ -1,22 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 import {
   useQueryClient,
   QueryClientProvider,
   useQuery,
   QueryClient,
-} from "react-query";
+} from 'react-query';
 
 //const configClient = new QueryClient();
 
-const API_ADDRESS = "http://localhost:5002";
+const API_ADDRESS = 'http://localhost:5002';
 
-function useConfig(endpoint = "config") {
+function useConfig(endpoint = 'config') {
   const config = useQuery(
-    "configData",
+    'configData',
     async () =>
       await fetch(`${API_ADDRESS}/${endpoint}`, {
-        method: "GET",
+        method: 'GET',
       })
         .then((res) => res.json())
         .then((data) => data)

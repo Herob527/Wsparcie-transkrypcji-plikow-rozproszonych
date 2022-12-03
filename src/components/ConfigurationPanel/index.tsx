@@ -1,12 +1,12 @@
-import "./ConfigurationPanel.sass";
-import { E_API_ADDRESS } from "../../App";
-import React, { useEffect, useState, useRef, MouseEvent } from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import './ConfigurationPanel.sass';
+import { E_API_ADDRESS } from '../../App';
+import React, { useEffect, useState, useRef, MouseEvent } from 'react';
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
 const ConfigQueryClient = new QueryClient();
 
 export function ConfigurationPanel(props: any) {
-  document.title = "Konfiguracja";
+  document.title = 'Konfiguracja';
   return (
     <QueryClientProvider client={ConfigQueryClient} key="query_config_panel">
       <div id="ConfigurationPanel">
@@ -33,7 +33,7 @@ function ElementsPerPage(props: any) {
 
 function CategoriesManager(props: any) {
   const { isLoading, error, data } = useQuery(
-    "categories_query",
+    'categories_query',
     async () => {
       const res = await fetch(`${E_API_ADDRESS}/categories`);
       return await res.json();
@@ -49,18 +49,18 @@ function CategoriesManager(props: any) {
     return <p> Loading... </p>;
   }
   function CategoryLine(c_props: any) {
-    const [text, setText] = useState(c_props["categoryName"]);
+    const [text, setText] = useState(c_props['categoryName']);
 
     const handleDelete = async (event: MouseEvent<HTMLButtonElement>) => {
       const IdToDelete = Number(
-        event.currentTarget.parentElement?.getAttribute("data-category-id")
+        event.currentTarget.parentElement?.getAttribute('data-category-id')
       );
       await fetch(`${E_API_ADDRESS}/categories`, {
         headers: {
-          "Content-Type": "application/json",
-          Charset: "utf8",
+          'Content-Type': 'application/json',
+          Charset: 'utf8',
         },
-        method: "DELETE",
+        method: 'DELETE',
         body: JSON.stringify(IdToDelete),
       })
         .then((_) =>
@@ -73,22 +73,22 @@ function CategoriesManager(props: any) {
     const handleUpdate = async (event: MouseEvent<HTMLButtonElement>) => {
       const clickedElement = event.currentTarget;
       const idToUpdate = Number(
-        event.currentTarget.parentElement?.getAttribute("data-category-id")
+        event.currentTarget.parentElement?.getAttribute('data-category-id')
       );
-      const newValue = event.currentTarget.getAttribute("data-value");
+      const newValue = event.currentTarget.getAttribute('data-value');
       const response = await fetch(`${E_API_ADDRESS}/categories`, {
         headers: {
-          "Content-Type": "application/json",
-          Charset: "utf8",
+          'Content-Type': 'application/json',
+          Charset: 'utf8',
         },
-        method: "PATCH",
+        method: 'PATCH',
         body: JSON.stringify({ category_id: idToUpdate, new_value: newValue }),
       })
         .then((res) => res.json())
         .then((data) => data)
         .catch((err) => err);
       console.log(response);
-      let result = response["Success"] ? "success" : "error";
+      let result = response['Success'] ? 'success' : 'error';
 
       clickedElement.classList.add(result);
       setTimeout(() => clickedElement.classList.remove(result), 2000);
@@ -98,10 +98,10 @@ function CategoriesManager(props: any) {
     };
 
     return (
-      <div data-category-id={c_props["categoryId"]} className="card__row">
+      <div data-category-id={c_props['categoryId']} className="card__row">
         <input
-          key={"input" + c_props["tabIndex"] + 1 + c_props["categoryId"]}
-          tabIndex={c_props["tabIndex"] + 1}
+          key={'input' + c_props['tabIndex'] + 1 + c_props['categoryId']}
+          tabIndex={c_props['tabIndex'] + 1}
           type="text"
           className="category_name card__input"
           value={text}
@@ -113,8 +113,7 @@ function CategoriesManager(props: any) {
           title="Zmiłuj się"
           onClick={handleDelete}
         >
-          {" "}
-          Usuń{" "}
+          Usuń
         </button>
         <button
           className="confirm_new_name card__input card__input__button"
@@ -122,8 +121,7 @@ function CategoriesManager(props: any) {
           title="Zatwierdź nową nazwę"
           data-value={text}
         >
-          {" "}
-          Zatwierdź{" "}
+          Zatwierdź
         </button>
       </div>
     );
@@ -135,15 +133,14 @@ function CategoriesManager(props: any) {
         {data.map((el: any, index: number) => (
           <CategoryLine
             tabIndex={index}
-            categoryName={el["name"]}
-            categoryId={el["id"]}
-            key={el["id"] + index + el["name"]}
+            categoryName={el['name']}
+            categoryId={el['id']}
+            key={el['id'] + index + el['name']}
           ></CategoryLine>
         ))}
       </div>
       <button className="card__input card__input__button" id="btn_confirm_all">
-        {" "}
-        Zatwierdź wszystkie{" "}
+        Zatwierdź wszystkie
       </button>
     </div>
   );
@@ -164,8 +161,7 @@ function Reset(props: any) {
         title="Stworzy nową bazę danych"
         className="card__input card__input__button "
       >
-        {" "}
-        Reset{" "}
+        Reset
       </button>
     </form>
   );

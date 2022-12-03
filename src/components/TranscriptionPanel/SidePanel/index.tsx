@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { useQuery } from "react-query";
-import { useSharedFilterCategory } from "../../../hooks/useFilterByCategory";
-import { useSharedOffsetState } from "../index";
-import "./style.sass";
+import { useEffect } from 'react';
+import { useQuery } from 'react-query';
+import { useSharedFilterCategory } from '../../../hooks/useFilterByCategory';
+import { useSharedOffsetState } from '../index';
+import './style.sass';
 
-const API_ADDRESS = "http://localhost:5002";
+const API_ADDRESS = 'http://localhost:5002';
 
 export const SidePanel = () => {
   return (
@@ -38,7 +38,7 @@ function FilterByCategory() {
   const { filterCategory, setFilterCategory } = useSharedFilterCategory();
   const { setOffset } = useSharedOffsetState();
   const { isLoading, error, data, refetch, remove } = useQuery(
-    "get_category",
+    'get_category',
     async () => {
       const res = await fetch(`${API_ADDRESS}/categories`);
       return await res.json();
@@ -62,8 +62,8 @@ function FilterByCategory() {
       </select>
     );
   const categories = data.map((category: any, index: number) => (
-    <option key={`option_${category["id"]}_${index}`} value={category["id"]}>
-      {category["name"].trim()}
+    <option key={`option_${category['id']}_${index}`} value={category['id']}>
+      {category['name'].trim()}
     </option>
   ));
   const handleChange = async (ev: any) => {
@@ -88,7 +88,7 @@ function FilterByCategory() {
         value={filterCategory}
         className="category card__input"
       >
-        <option value={-1} key={"option_all"}>
+        <option value={-1} key={'option_all'}>
           Wszystkie
         </option>
         {categories}

@@ -1,29 +1,29 @@
-import "./style.sass";
+import './style.sass';
 
-import React, { useEffect } from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import React, { useEffect } from 'react';
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
 // @ts-ignore
-import keyboardjs from "keyboardjs";
+import keyboardjs from 'keyboardjs';
 
 // Hooks
-import useConfig from "../../hooks/useConfig";
-import { useSharedFilterCategory } from "../../hooks/useFilterByCategory";
+import useConfig from '../../hooks/useConfig';
+import { useSharedFilterCategory } from '../../hooks/useFilterByCategory';
 
-import { useBetween, free } from "use-between";
-import { useStateIfMounted } from "use-state-if-mounted";
-import useIsMounted from "ismounted";
+import { useBetween, free } from 'use-between';
+import { useStateIfMounted } from 'use-state-if-mounted';
+import useIsMounted from 'ismounted';
 // Types
-import type { configAPIData } from "../../../type";
-import type { IPanelProps } from "./types/IPanelProps";
-import type { ITranscriptProps } from "./types/ITranscriptProps";
-import type { ICategoryProps } from "./types/ICategoryProps";
-import type { IPaginationProps } from "./types/IPaginationProps";
+import type { configAPIData } from '../../../type';
+import type { IPanelProps } from './types/IPanelProps';
+import type { ITranscriptProps } from './types/ITranscriptProps';
+import type { ICategoryProps } from './types/ICategoryProps';
+import type { IPaginationProps } from './types/IPaginationProps';
 
-import { SidePanel } from "./SidePanel";
-import { WaveAudio } from "./WaveAudio";
+import { SidePanel } from './SidePanel';
+import { WaveAudio } from './WaveAudio';
 
-const API_ADDRESS = "http://localhost:5002";
+const API_ADDRESS = 'http://localhost:5002';
 
 const PanelQueryClient = new QueryClient();
 const CategoryQueryClient = new QueryClient();
@@ -49,20 +49,20 @@ const Wrapper = () => {
   }
 
   const configData = config.data as configAPIData.RootObject;
-  const workspaceConfig = configData["workspaceConfig"];
+  const workspaceConfig = configData['workspaceConfig'];
 
   return (
     <>
       <section id="Panel">
         <MainPanel
-          elementsPerPage={workspaceConfig["elementsPerPage"]}
+          elementsPerPage={workspaceConfig['elementsPerPage']}
           config={configData}
         />
         <SidePanel />
       </section>
       <Pagination
         key="pagination"
-        elementsPerPage={workspaceConfig["elementsPerPage"]}
+        elementsPerPage={workspaceConfig['elementsPerPage']}
       />
     </>
   );
@@ -82,11 +82,11 @@ export const TranscriptionPanel = () => {
 const handlePageChange = (currentPage: number) => {
   console.log(currentPage);
   document
-    .querySelector(".paginationElement.active")
-    ?.classList.remove("active");
+    .querySelector('.paginationElement.active')
+    ?.classList.remove('active');
   document
     .querySelector(`.paginationElement:nth-child(${currentPage + 1})`)
-    ?.classList.add("active");
+    ?.classList.add('active');
 };
 interface ILineFromAPI {
   audio_directory: string;
@@ -106,17 +106,17 @@ function MainPanel(props: IPanelProps) {
     [offset, filterCategory],
     async () => {
       return await fetch(
-        `${API_ADDRESS}/get_lines?limit=${props["elementsPerPage"]}&offset=${offset}&category_id=${filterCategory}`,
+        `${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}&category_id=${filterCategory}`,
         {
-          method: "GET",
+          method: 'GET',
           headers: {
-            Accept: "application/json",
+            Accept: 'application/json',
           },
         }
       )
         .then((res) => res.json())
         .then((data) => {
-          handlePageChange(offset / props["elementsPerPage"]);
+          handlePageChange(offset / props['elementsPerPage']);
           return data;
         })
         .catch((error) => error);
@@ -141,28 +141,28 @@ function MainPanel(props: IPanelProps) {
     return <div> {error} </div>;
   }
   console.log(`MainPanel - Offset: ${offset}`);
-  keyboardjs.bind("ctrl+.", (event: any) => {
+  keyboardjs.bind('ctrl+.', (event: any) => {
     event.preventDefault();
     if (!isMounted.current) return;
-    const newPageOffset = offset + props["elementsPerPage"];
+    const newPageOffset = offset + props['elementsPerPage'];
     if (newPageOffset >= maxOffset) {
       return;
     }
-    const newPage = newPageOffset / props["elementsPerPage"];
+    const newPage = newPageOffset / props['elementsPerPage'];
 
     handlePageChange(newPage);
     setOffset(newPageOffset);
 
     return false;
   });
-  keyboardjs.bind("ctrl+2", (event: any) => {
+  keyboardjs.bind('ctrl+2', (event: any) => {
     event.preventDefault();
     let currentFocusedElementOrderId =
-      document.activeElement?.parentElement?.getAttribute("data-ordering");
+      document.activeElement?.parentElement?.getAttribute('data-ordering');
     if (currentFocusedElementOrderId === null) {
       currentFocusedElementOrderId =
         document.activeElement?.parentElement?.parentElement?.getAttribute(
-          "data-ordering"
+          'data-ordering'
         );
     }
     if (currentFocusedElementOrderId === null) {
@@ -174,14 +174,14 @@ function MainPanel(props: IPanelProps) {
     selectElement?.focus();
     return false;
   });
-  keyboardjs.bind("ctrl+3", (event: any) => {
+  keyboardjs.bind('ctrl+3', (event: any) => {
     event.preventDefault();
     let currentFocusedElementOrderId =
-      document.activeElement?.parentElement?.getAttribute("data-ordering");
+      document.activeElement?.parentElement?.getAttribute('data-ordering');
     if (currentFocusedElementOrderId === null) {
       currentFocusedElementOrderId =
         document.activeElement?.parentElement?.parentElement?.getAttribute(
-          "data-ordering"
+          'data-ordering'
         );
     }
     if (currentFocusedElementOrderId === null) {
@@ -199,30 +199,29 @@ function MainPanel(props: IPanelProps) {
       {data2.map((el: any, index: number) => (
         <div
           data-ordering={index}
-          data-id={el["bindings_id"]}
+          data-id={el['bindings_id']}
           className="line"
-          key={`con_${el["audio_name"]}_${index}`}
+          key={`con_${el['audio_name']}_${index}`}
         >
-          <span key={`sp_${el["audio_name"]}`} className="audio_name">
-            {" "}
-            {el["audio_name"]}
+          <span key={`sp_${el['audio_name']}`} className="audio_name">
+            {el['audio_name']}
           </span>
           <WaveAudio
-            key={`wa_${el["audio_name"]}_${index}`}
-            index={el["bindings_id"]}
-            audio_name={el["audio_name"]}
-            audio_dir={el["audio_directory"]}
+            key={`wa_${el['audio_name']}_${index}`}
+            index={el['bindings_id']}
+            audio_name={el['audio_name']}
+            audio_dir={el['audio_directory']}
           />
           <Transcript
-            key={`tr_${el["audio_name"]}_${index}`}
-            transcript={el["transcript"]}
+            key={`tr_${el['audio_name']}_${index}`}
+            transcript={el['transcript']}
             index={index}
-            spellcheck={props["config"]["workspaceConfig"]["spellcheck"]}
+            spellcheck={props['config']['workspaceConfig']['spellcheck']}
           />
           <Category
-            key={`cat_${el["audio_name"]}_${index}`}
-            currentCategory={el["category_name"]}
-            id={el["category_id"]}
+            key={`cat_${el['audio_name']}_${index}`}
+            currentCategory={el['category_name']}
+            id={el['category_id']}
           />
         </div>
       ))}
@@ -231,17 +230,17 @@ function MainPanel(props: IPanelProps) {
 }
 
 function Transcript(props: ITranscriptProps) {
-  const [text, setText] = useStateIfMounted(props["transcript"]);
+  const [text, setText] = useStateIfMounted(props['transcript']);
   const isMounted = useIsMounted();
   useEffect(() => {
     if (!isMounted.current) return;
     const textareaElement = document.querySelector(
-      `textarea[tabindex='${props["index"] + 1}']`
+      `textarea[tabindex='${props['index'] + 1}']`
     ) as HTMLTextAreaElement;
     const isValid = validateEntry(textareaElement);
-    if (!isValid) textareaElement.classList.add("error");
+    if (!isValid) textareaElement.classList.add('error');
   });
-  const endingChars = [".", "?", "!"];
+  const endingChars = ['.', '?', '!'];
   const validateEntry = (el: HTMLTextAreaElement) => {
     const valueLength = el.value.length;
     for (const char of endingChars) {
@@ -255,9 +254,9 @@ function Transcript(props: ITranscriptProps) {
   const handleChange = async (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
     const isValid = validateEntry(ev.currentTarget);
     if (!isValid) {
-      ev.currentTarget.classList.add("error");
+      ev.currentTarget.classList.add('error');
     } else {
-      ev.currentTarget.classList.remove("error");
+      ev.currentTarget.classList.remove('error');
     }
     setText(ev.currentTarget.value);
     return false;
@@ -266,12 +265,12 @@ function Transcript(props: ITranscriptProps) {
     setText(ev.target.value);
 
     const bindingId =
-      ev.currentTarget.parentElement?.parentElement?.getAttribute("data-id");
+      ev.currentTarget.parentElement?.parentElement?.getAttribute('data-id');
     console.log(bindingId);
     const res = await fetch(`${API_ADDRESS}/texts`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         text: text,
@@ -284,12 +283,12 @@ function Transcript(props: ITranscriptProps) {
     console.log(res);
     return false;
   };
-  const specialCharacters = ["ř"];
+  const specialCharacters = ['ř'];
   const handleSpecialCharacters = (ev: React.MouseEvent<HTMLButtonElement>) => {
-    const character = ev.currentTarget.getAttribute("data-character");
+    const character = ev.currentTarget.getAttribute('data-character');
     setText(text + character);
     const textareaElement = document.querySelector(
-      `.transcript[tabindex="${props["index"] + 1}"]`
+      `.transcript[tabindex="${props['index'] + 1}"]`
     ) as HTMLTextAreaElement;
     textareaElement.focus();
   };
@@ -300,9 +299,9 @@ function Transcript(props: ITranscriptProps) {
         value={text}
         onChange={handleChange}
         onBlur={handleBlur}
-        tabIndex={props["index"] + 1}
+        tabIndex={props['index'] + 1}
         className="transcript"
-        spellCheck={props["spellcheck"]}
+        spellCheck={props['spellcheck']}
       ></textarea>
       <div className="special_char_container">
         {specialCharacters.map((el) => (
@@ -325,7 +324,7 @@ function Category(props: ICategoryProps) {
   const { id } = props;
   const [category, setCategory] = useStateIfMounted(id);
   const { isLoading, error, data, refetch, remove } = useQuery(
-    "get_category",
+    'get_category',
     async () => {
       const res = await fetch(`${API_ADDRESS}/categories`);
       return await res.json();
@@ -368,8 +367,8 @@ function Category(props: ICategoryProps) {
     console.log(ev);
   };
   const categories = data.map((category: any, index: number) => (
-    <option key={`option_${category["id"]}_${index}`} value={category["id"]}>
-      {category["name"].trim()}
+    <option key={`option_${category['id']}_${index}`} value={category['id']}>
+      {category['name'].trim()}
     </option>
   ));
   return (
@@ -398,14 +397,14 @@ function Pagination(props: IPaginationProps) {
     return await fetch(
       `${API_ADDRESS}/get_size?category_id=${filterCategory}`,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
-          Accept: "application/json",
+          Accept: 'application/json',
         },
       }
     )
       .then((response) => response.json())
-      .then((data) => data["count_1"])
+      .then((data) => data['count_1'])
       .catch((error) => error);
   });
   useEffect(
@@ -421,7 +420,7 @@ function Pagination(props: IPaginationProps) {
   }
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-    const newOffset = Number(event.currentTarget.getAttribute("data-offset"));
+    const newOffset = Number(event.currentTarget.getAttribute('data-offset'));
     setOffset(newOffset);
     return false;
   };
@@ -431,7 +430,7 @@ function Pagination(props: IPaginationProps) {
     .fill(0)
     .map((el: number, index: number) => (
       <div
-        className={`paginationElement ${index === currentPage ? "active" : ""}`}
+        className={`paginationElement ${index === currentPage ? 'active' : ''}`}
         onClick={handleClick}
         data-page={index}
         data-offset={index * elementsPerPage}

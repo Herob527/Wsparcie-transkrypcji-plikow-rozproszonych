@@ -1,7 +1,7 @@
-import formatterData from "../../../src/transcription_example_data.json";
+import formatterData from '../../../src/transcription_example_data.json';
 
 function useTranscriptFormatter() {
-  const transcription_options = formatterData["data"];
+  const transcription_options = formatterData['data'];
   const transcription_options_map = new Map();
   for (let val in transcription_options) {
     // @ts-ignore
@@ -12,7 +12,7 @@ function useTranscriptFormatter() {
     format: (value: string) => {
       let newVal = value;
       for (let [key, val] of transcription_options_map.entries()) {
-        newVal = newVal.replaceAll(`{${key}}`, val["example_value"]);
+        newVal = newVal.replaceAll(`{${key}}`, val['example_value']);
       }
       console.log(newVal);
       return newVal;

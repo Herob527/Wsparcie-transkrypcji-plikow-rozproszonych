@@ -1,31 +1,31 @@
-import { useRef, useState } from "react";
-import "./FinalisationPanel.sass";
+import { useRef, useState } from 'react';
+import './FinalisationPanel.sass';
 
-import useTranscriptFormatter from "../../hooks/useTranscriptFormatter";
-import useConfig from "../../hooks/useConfig";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { useBetween } from "use-between";
-const API_ADDRESS = "http://localhost:5002";
+import useTranscriptFormatter from '../../hooks/useTranscriptFormatter';
+import useConfig from '../../hooks/useConfig';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { useBetween } from 'use-between';
+const API_ADDRESS = 'http://localhost:5002';
 
 const ConfigClient = new QueryClient();
 
-type FinalisationStates = "None" | "Executing" | "Finished" | "Error";
+type FinalisationStates = 'None' | 'Executing' | 'Finished' | 'Error';
 
 const useFinaliseRes = () => {
   const [finaliseState, setFinaliseState] = useState(
-    "None" as FinalisationStates
+    'None' as FinalisationStates
   );
   const errorColors = {
-    None: "default",
-    Executing: "executing",
-    Finished: "finished",
-    Error: "error",
+    None: 'default',
+    Executing: 'executing',
+    Finished: 'finished',
+    Error: 'error',
   };
   const messages = {
-    None: "Jestem gotowy!",
-    Executing: "Robię!",
-    Finished: "I po sprawie...",
-    Error: "Błąd, tylko jaki?",
+    None: 'Jestem gotowy!',
+    Executing: 'Robię!',
+    Finished: 'I po sprawie...',
+    Error: 'Błąd, tylko jaki?',
   };
   return {
     messages,
@@ -49,23 +49,23 @@ function Wrapper() {
   if (isLoading) {
     return <div className="card"> Loading</div>;
   }
-  const finaliseData = data["finalisationRecent"];
+  const finaliseData = data['finalisationRecent'];
   const handleSubmit = async (ev: React.MouseEvent<HTMLFormElement>) => {
     ev.preventDefault();
-    setFinaliseState("Executing");
+    setFinaliseState('Executing');
     const formData = new FormData(ev.currentTarget);
     const res = await fetch(`${API_ADDRESS}/finalise`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(Object.fromEntries(formData)),
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     })
       .then((response) => response.json())
       .then((data) => {
-        setFinaliseState("Finished");
+        setFinaliseState('Finished');
         return data;
       })
       .catch((err) => {
-        setFinaliseState("Error");
+        setFinaliseState('Error');
         return err;
       });
     console.log(res);
@@ -78,12 +78,12 @@ function Wrapper() {
     >
       <OutputFormat />
       <AudioLengthRanges
-        minLength={finaliseData["audioLengthFilter"]["minLength"]}
-        maxLength={finaliseData["audioLengthFilter"]["maxLength"]}
-        invalidsDir={finaliseData["audioLengthFilter"]["invalidsDir"]}
+        minLength={finaliseData['audioLengthFilter']['minLength']}
+        maxLength={finaliseData['audioLengthFilter']['maxLength']}
+        invalidsDir={finaliseData['audioLengthFilter']['invalidsDir']}
       />
       <ExportTypeConfig />
-      <LineFormat lineFormat={finaliseData["lineFormat"]["format"]} />
+      <LineFormat lineFormat={finaliseData['lineFormat']['format']} />
       <Consequences />
       <Decisions />
     </form>
@@ -93,8 +93,8 @@ function Wrapper() {
 function OutputFormat(props: any) {
   const [channels, setChannels] = useState(1);
   const [sampleRate, setSampleRate] = useState(22050);
-  const [audioFilter, setAudioFilter] = useState("");
-  const [outputType, setOutputType] = useState("wav");
+  const [audioFilter, setAudioFilter] = useState('');
+  const [outputType, setOutputType] = useState('wav');
 
   const handleInput_channels = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     setChannels(Number.parseInt(ev.currentTarget.value));
@@ -206,20 +206,16 @@ function ExportTypeConfig(props: any) {
       <select name="export_method" className="card__input">
         <option value="enderal-finalise"> Enderal </option>
         <option value="to_one_folder">
-          {" "}
-          Każda kategoria do jednego folderu{" "}
+          Każda kategoria do jednego folderu
         </option>
-        <option value="distinctive">
-          {" "}
-          Każda kategoria do osobnego folderu{" "}
-        </option>
+        <option value="distinctive">Każda kategoria do osobnego folderu</option>
       </select>
     </div>
   );
 }
 
 function LineFormat(props: any) {
-  const [lineFormat, setLineFormat] = useState(props["lineFormat"]);
+  const [lineFormat, setLineFormat] = useState(props['lineFormat']);
   const handleInput = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const newValue = ev.currentTarget.value;
     setLineFormat(newValue);
@@ -262,10 +258,9 @@ function Decisions(props: any) {
       />
       <button
         className={`card__input card__input__button ${colors[finaliseState]}`}
-        disabled={finaliseState === "Executing"}
+        disabled={finaliseState === 'Executing'}
       >
-        {" "}
-        Finalizuj{" "}
+        Finalizuj
       </button>
       <p> {messages[finaliseState]}</p>
     </div>

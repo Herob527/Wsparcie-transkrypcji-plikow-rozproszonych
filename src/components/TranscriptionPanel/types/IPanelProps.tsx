@@ -1,4 +1,4 @@
-import { configAPIData } from "../../../../type";
+import { configAPIData } from '../../../../type';
 
 export interface IPanelProps {
   elementsPerPage: number;
