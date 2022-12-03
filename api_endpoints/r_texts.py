@@ -3,6 +3,8 @@ from flask_restful import Resource, reqparse
 from typing import List
 from sqlalchemy import engine, select
 from flask import jsonify, request
+
+
 class r_texts(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -14,12 +16,12 @@ class r_texts(Resource):
         )
         args = parser.parse_args()
         query = (
-                select(c_texts.c)
-                .select_from(c_bindings.join(c_texts))
-                .limit(args["limit"])
-                .offset(args["offset"])
-                .order_by(c_categories.c.name)
-            )
+            select(c_texts.c)
+            .select_from(c_bindings.join(c_texts))
+            .limit(args["limit"])
+            .offset(args["offset"])
+            .order_by(c_categories.c.name)
+        )
         res: List[engine.Row] = query.execute().mappings().all()
         return [dict(row) for row in res]
 
@@ -35,7 +37,5 @@ class r_texts(Resource):
             query.execute()
         except Exception as e:
             print(e.args)
-            return jsonify(
-                {"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"}
-            )
+            return jsonify({"Error": f"Błąd w czasie aktualizacji. Treść: {e.args}"})
         return jsonify({"Success": "Tekst zaktualizowany pomyślnie"})
