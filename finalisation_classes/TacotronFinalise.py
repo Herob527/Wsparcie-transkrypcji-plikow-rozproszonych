@@ -1,11 +1,13 @@
-from finalisation_classes.BaseFinalise import BaseFinalise
-from pathlib import Path
-from shutil import rmtree
-from tables_definition import *
-from shutil import copy
 import asyncio
-from ffmpeg import FFmpeg
 from operator import itemgetter
+from os import getcwd
+from pathlib import Path
+from shutil import copy, rmtree
+
+from ffmpeg import FFmpeg
+
+from finalisation_classes.BaseFinalise import BaseFinalise
+from tables_definition import *
 
 
 class TacotronFinalise(BaseFinalise):
@@ -40,13 +42,12 @@ class TacotronFinalise(BaseFinalise):
             category_name = entry["category_name"].strip()
             audio_length = entry["audio_length"]
             output_file_path = Path(self.output, category_name, "wavs")
-
             is_invalid_format = (
                 audio_length > max_length
                 or audio_length < min_length
                 or audio_channels != 1
             )
-            source_path = f"{directory}/{name}"
+            source_path = Path(directory, name)
             if should_filter and is_invalid_format:
                 path_for_invalid_length = Path(
                     self.output, category_name, "invalid_length"
@@ -54,7 +55,8 @@ class TacotronFinalise(BaseFinalise):
                 path_for_invalid_length.mkdir(exist_ok=True)
                 copy(source_path, f"{path_for_invalid_length}")
                 continue
-            copy(source_path, f"{output_file_path}")
+            copy(f'{source_path}'.replace('\\', '/'),
+                 f"{output_file_path}".replace('\\', '/'))
 
     def provide_transcription(self):
         output_type, min_length, max_length, should_format, line_format_input, should_filter = itemgetter(
@@ -74,7 +76,7 @@ class TacotronFinalise(BaseFinalise):
                 transcription_path = Path(category_path, "invalid_list.txt")
             with open(transcription_path, "a", encoding="utf-8") as output:
                 formatted_line = line_format_input.format_map(entry)
-                line:str = formatted_line.strip()
+                line: str = formatted_line.strip()
                 if not line.endswith((".", "?", "!")):
                     line += "."
                 output.write(f"{formatted_line}\n")
@@ -110,16 +112,16 @@ class TacotronFinalise(BaseFinalise):
                     .output(output_name, **output_params)
                 )
 
-                @current_file.on("stderr")
+                @ current_file.on("stderr")
                 def on_stderr(line):
                     # print('stderr:', line)
                     pass
 
-                @current_file.on("error")
+                @ current_file.on("error")
                 def on_error(code):
                     print("Error:", code, f" on file: {audio}")
 
-                @current_file.on("completed")
+                @ current_file.on("completed")
                 def on_completed():
                     audio.unlink()
                     print(f"Completed formating file: {audio}")

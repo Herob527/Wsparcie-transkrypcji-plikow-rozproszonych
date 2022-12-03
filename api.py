@@ -1,35 +1,27 @@
-from finalisation_classes import (
-    TacotronFinalise,
-    MultiSpeakerFinalise,
-    get_methods,
-    EnderalFinalise,
-)
-from tables_definition import *
 import contextlib
-from flask import Flask, jsonify, request
-from flask_restful import Api
-from pathlib import Path
-from flask_cors import CORS
-import sqlalchemy
-from sqlalchemy import (
-    create_engine,
-    MetaData,
-    select,
-    func,
-)
-from pydub import AudioSegment, exceptions
-import time
 import json
-from typing import List
 import logging
+import time
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from typing import List
 
-from api_endpoints.r_status import r_status
-from api_endpoints.r_config import r_config
-from api_endpoints.r_bindings import r_bindings
-from api_endpoints.r_texts import r_texts
-from api_endpoints.r_categories import r_categories
+import sqlalchemy
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from flask_restful import Api
+from pydub import AudioSegment, exceptions
+from sqlalchemy import MetaData, create_engine, func, select
+
 from api_endpoints.r_audios import r_audios
+from api_endpoints.r_bindings import r_bindings
+from api_endpoints.r_categories import r_categories
+from api_endpoints.r_config import r_config
+from api_endpoints.r_status import r_status
+from api_endpoints.r_texts import r_texts
+from finalisation_classes import (EnderalFinalise, MultiSpeakerFinalise,
+                                  TacotronFinalise, get_methods)
+from tables_definition import *
 
 log_dir = Path("logs")
 log_dir.mkdir(exist_ok=True)
