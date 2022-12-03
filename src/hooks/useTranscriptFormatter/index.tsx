@@ -1,17 +1,17 @@
 import formatterData from '../../../src/transcription_example_data.json';
 
 function useTranscriptFormatter() {
-  const transcription_options = formatterData['data'];
-  const transcription_options_map = new Map();
-  for (let val in transcription_options) {
+  const transcriptionOptions = formatterData['data'];
+  const transcriptionOptionsMap = new Map();
+  for (const val in transcriptionOptions) {
     // @ts-ignore
-    transcription_options_map.set(val, transcription_options[val]);
+    transcriptionOptionsMap.set(val, transcriptionOptions[val]);
   }
 
   return {
     format: (value: string) => {
       let newVal = value;
-      for (let [key, val] of transcription_options_map.entries()) {
+      for (const [key, val] of transcriptionOptionsMap.entries()) {
         newVal = newVal.replaceAll(`{${key}}`, val['example_value']);
       }
       console.log(newVal);

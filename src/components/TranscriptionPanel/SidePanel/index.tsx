@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { useSharedFilterCategory } from '../../../hooks/useFilterByCategory';
@@ -6,8 +7,7 @@ import './style.sass';
 
 const API_ADDRESS = 'http://localhost:5002';
 
-export const SidePanel = () => {
-  return (
+export const SidePanel = () => (
     <section
       id='side_panel'
       className='card__container'
@@ -16,7 +16,6 @@ export const SidePanel = () => {
       <FilterByCategory />
     </section>
   );
-};
 
 function AddCategory() {
   const handleSubmit = (ev: React.FormEvent) => {
@@ -56,11 +55,9 @@ function FilterByCategory() {
       return await res.json();
     }
   );
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       remove();
-    };
-  }, [remove]);
+    }, [remove]);
   if (isLoading)
     return (
       <select disabled={true}>

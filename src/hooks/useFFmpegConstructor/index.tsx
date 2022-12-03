@@ -1,22 +1,12 @@
-import { useState, useEffect } from 'react';
 
-import {
-  useQueryClient,
-  QueryClientProvider,
-  useQuery,
-  QueryClient,
-} from 'react-query';
+
+
 
 function useFFmpegConstructor() {
   return {
-    createCommand: (
-      ac: number = 1,
-      ar: number = 22050,
-      af: string = '',
-      output_type: string = 'wav'
-    ) => {
+    createCommand: (ac = 1, ar = 22050, af = '', outputType = 'wav') => {
       const valueIsInvalid =
-        output_type === '' ||
+        outputType === '' ||
         ac <= 0 ||
         ar <= 0 ||
         Number.isNaN(ac) ||
@@ -26,7 +16,7 @@ function useFFmpegConstructor() {
       }
       return `ffmpeg.exe -i "plikel.mp3" -ac ${ac} -ar ${ar} ${
         af ? '-af ' + af : ''
-      } plikel.${output_type}`;
+      } plikel.${outputType}`;
     },
   };
 }

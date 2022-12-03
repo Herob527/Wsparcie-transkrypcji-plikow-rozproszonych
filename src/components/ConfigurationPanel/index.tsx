@@ -1,6 +1,6 @@
 import './ConfigurationPanel.sass';
 import { E_API_ADDRESS } from '../../App';
-import React, { useEffect, useState, useRef, MouseEvent } from 'react';
+import React, { MouseEvent, useState } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
 const ConfigQueryClient = new QueryClient();
@@ -60,8 +60,8 @@ function CategoriesManager(props: any) {
   if (isLoading) {
     return <p> Loading... </p>;
   }
-  function CategoryLine(c_props: any) {
-    const [text, setText] = useState(c_props['categoryName']);
+  function CategoryLine(cProps: any) {
+    const [text, setText] = useState(cProps['categoryName']);
 
     const handleDelete = async (event: MouseEvent<HTMLButtonElement>) => {
       const IdToDelete = Number(
@@ -94,13 +94,13 @@ function CategoriesManager(props: any) {
           Charset: 'utf8',
         },
         method: 'PATCH',
-        body: JSON.stringify({ category_id: idToUpdate, new_value: newValue }),
+        body: JSON.stringify({ "category_id": idToUpdate, "new_value": newValue }),
       })
         .then((res) => res.json())
         .then((data) => data)
         .catch((err) => err);
       console.log(response);
-      let result = response['Success'] ? 'success' : 'error';
+      const result = response['Success'] ? 'success' : 'error';
 
       clickedElement.classList.add(result);
       setTimeout(() => clickedElement.classList.remove(result), 2000);
@@ -111,12 +111,12 @@ function CategoriesManager(props: any) {
 
     return (
       <div
-        data-category-id={c_props['categoryId']}
+        data-category-id={cProps['categoryId']}
         className='card__row'
       >
         <input
-          key={'input' + c_props['tabIndex'] + 1 + c_props['categoryId']}
-          tabIndex={c_props['tabIndex'] + 1}
+          key={'input' + cProps['tabIndex'] + 1 + cProps['categoryId']}
+          tabIndex={cProps['tabIndex'] + 1}
           type='text'
           className='category_name card__input'
           value={text}
@@ -225,7 +225,7 @@ function ThemeList(props: any) {
   );
 }
 
-function AutoTranscriptionList(props: any) {}
+// function AutoTranscriptionList(props: any) {}
 
 function ShortcutList(props: any) {
   return (

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useRef } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import keyboardjs from 'keyboardjs';
@@ -60,7 +61,7 @@ export function WaveAudio(props: IWaveAudioProps) {
           'data-ordering'
         );
     }
-    let outerAudioContainerId =
+    const outerAudioContainerId =
       audioContainerRef.current.parentElement?.getAttribute('data-ordering');
     return (
       outerAudioContainerId === currentFocusedElementOrderId &&

@@ -1,10 +1,6 @@
-import { useState, useEffect } from 'react';
 
 import {
-  useQueryClient,
-  QueryClientProvider,
   useQuery,
-  QueryClient,
 } from 'react-query';
 
 //const configClient = new QueryClient();
