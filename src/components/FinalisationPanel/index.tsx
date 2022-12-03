@@ -1,3 +1,4 @@
+import React from 'react';
 import { useRef, useState } from 'react';
 import './FinalisationPanel.sass';
 
@@ -36,8 +37,7 @@ const useFinaliseRes = () => {
 };
 const useSharedFinaliseRes = () => useBetween(useFinaliseRes);
 
-export const FinalisationPanel = (props: any) => {
-  return (
+export const FinalisationPanel = (props: any) => (
     <QueryClientProvider
       key='config_query_provider'
       client={ConfigClient}
@@ -45,7 +45,6 @@ export const FinalisationPanel = (props: any) => {
       <Wrapper />
     </QueryClientProvider>
   );
-};
 function Wrapper() {
   const { setFinaliseState } = useSharedFinaliseRes();
   const { isLoading, data } = useConfig();
@@ -63,9 +62,9 @@ function Wrapper() {
       headers: { 'Content-Type': 'application/json' },
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then((resData) => {
         setFinaliseState('Finished');
-        return data;
+        return resData;
       })
       .catch((err) => {
         setFinaliseState('Error');
@@ -99,20 +98,20 @@ function OutputFormat(props: any) {
   const [audioFilter, setAudioFilter] = useState('');
   const [outputType, setOutputType] = useState('wav');
 
-  const handleInput_channels = (ev: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleInputChannels = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     setChannels(Number.parseInt(ev.currentTarget.value));
   };
-  const handleInput_sampleRate = (
+  const handleInputSampleRate = (
     ev: React.KeyboardEvent<HTMLInputElement>
   ) => {
     setSampleRate(Number.parseInt(ev.currentTarget.value));
   };
-  const handleInput_audioFilter = (
+  const handleInputAudioFilter = (
     ev: React.KeyboardEvent<HTMLInputElement>
   ) => {
     setAudioFilter(ev.currentTarget.value);
   };
-  const handleInput_outputType = (
+  const handleInputOutputType = (
     ev: React.KeyboardEvent<HTMLInputElement>
   ) => {
     setOutputType(ev.currentTarget.value);
@@ -127,7 +126,7 @@ function OutputFormat(props: any) {
       <input
         type='number'
         className='card__input'
-        onInput={handleInput_channels}
+        onInput={handleInputChannels}
         name='output_channels'
         id='output_channels'
         min='1'
@@ -139,7 +138,7 @@ function OutputFormat(props: any) {
       <input
         type='number'
         className='card__input'
-        onInput={handleInput_sampleRate}
+        onInput={handleInputSampleRate}
         name='output_sample_rate'
         id='output_sample_rate'
         min='1'
@@ -151,7 +150,7 @@ function OutputFormat(props: any) {
       <input
         type='text'
         className='card__input'
-        onInput={handleInput_audioFilter}
+        onInput={handleInputAudioFilter}
         name='output_audio_filter'
         id='output_audio_filter'
         title='Wyjściowy filtr audio'
@@ -162,7 +161,7 @@ function OutputFormat(props: any) {
       <input
         type='text'
         className='card__input'
-        onInput={handleInput_outputType}
+        onInput={handleInputOutputType}
         name='output_type'
         id='output_type'
         title='Rozszerzenie wyjściowego audio. Domyślnie wav'

@@ -3,14 +3,13 @@ import './style.sass';
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
-// @ts-ignore
 import keyboardjs from 'keyboardjs';
 
 // Hooks
 import useConfig from '../../hooks/useConfig';
 import { useSharedFilterCategory } from '../../hooks/useFilterByCategory';
 
-import { useBetween, free } from 'use-between';
+import { free, useBetween } from 'use-between';
 import { useStateIfMounted } from 'use-state-if-mounted';
 import useIsMounted from 'ismounted';
 // Types
@@ -49,6 +48,7 @@ const Wrapper = () => {
   }
 
   const configData = config.data as configAPIData.RootObject;
+  // eslint-disable-next-line prefer-destructuring
   const workspaceConfig = configData['workspaceConfig'];
 
   return (
@@ -68,11 +68,7 @@ const Wrapper = () => {
   );
 };
 
-export const TranscriptionPanel = () => {
-  useEffect(() => {
-    return () => {};
-  });
-  return (
+export const TranscriptionPanel = () => (
     <QueryClientProvider
       key='query_provider'
       client={PanelQueryClient}
@@ -80,7 +76,6 @@ export const TranscriptionPanel = () => {
       <Wrapper key='panel' />
     </QueryClientProvider>
   );
-};
 
 const handlePageChange = (currentPage: number) => {
   console.log(currentPage);
@@ -105,10 +100,9 @@ function MainPanel(props: IPanelProps) {
   const { maxOffset, offset, setOffset } = useSharedOffsetState();
   const { filterCategory } = useSharedFilterCategory();
   const isMounted = useIsMounted();
-  let { data, isLoading, error, remove } = useQuery(
+  const { data, isLoading, error, remove } = useQuery(
     [offset, filterCategory],
-    async () => {
-      return await fetch(
+    async () => await fetch(
         `${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}&category_id=${filterCategory}`,
         {
           method: 'GET',
@@ -117,13 +111,12 @@ function MainPanel(props: IPanelProps) {
           },
         }
       )
-        .then((res) => res.json())
-        .then((data) => {
+        .then((response) => response.json())
+        .then((resData) => {
           handlePageChange(offset / props['elementsPerPage']);
-          return data;
+          return resData;
         })
-        .catch((error) => error);
-    },
+        .catch((resError) => resError),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -131,12 +124,10 @@ function MainPanel(props: IPanelProps) {
       cacheTime: 0,
     }
   );
-  let data2: dataFromAPI = data;
-  useEffect(() => {
-    return () => {
+  const data2: dataFromAPI = data;
+  useEffect(() => () => {
       remove();
-    };
-  }, [remove]);
+    }, [remove]);
   if (isLoading) {
     return <div> Lolding data... </div>;
   }
@@ -279,13 +270,13 @@ function Transcript(props: ITranscriptProps) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        text: text,
-        bindings_id: Number(bindingId),
+        "text": text,
+        "bindings_id": Number(bindingId),
       }),
     })
-      .then((res) => res.json())
-      .then((data) => data)
-      .catch((err) => err);
+      .then((response) => response.json())
+      .then((resData) => resData)
+      .catch((resErr) => resErr);
     console.log(res);
     return false;
   };
@@ -372,12 +363,12 @@ function Category(props: ICategoryProps) {
     ev.preventDefault();
     console.log(ev);
   };
-  const categories = data.map((category: any, index: number) => (
+  const categories = data.map((categoryEntry: any, index: number) => (
     <option
-      key={`option_${category['id']}_${index}`}
-      value={category['id']}
+      key={`option_${categoryEntry['id']}_${index}`}
+      value={categoryEntry['id']}
     >
-      {category['name'].trim()}
+      {categoryEntry['name'].trim()}
     </option>
   ));
   return (
@@ -405,8 +396,7 @@ function Pagination(props: IPaginationProps) {
   const { filterCategory } = useSharedFilterCategory();
   const { elementsPerPage } = props;
   const currentPage = 0 / elementsPerPage;
-  const { data, isLoading, remove } = useQuery([filterCategory], async () => {
-    return await fetch(
+  const { data, isLoading, remove } = useQuery([filterCategory], async () => await fetch(
       `${API_ADDRESS}/get_size?category_id=${filterCategory}`,
       {
         method: 'GET',
@@ -416,9 +406,8 @@ function Pagination(props: IPaginationProps) {
       }
     )
       .then((response) => response.json())
-      .then((data) => data['count_1'])
-      .catch((error) => error);
-  });
+      .then((resData) => resData['count_1'])
+      .catch((error) => error));
   useEffect(
     () => () => {
       remove();
@@ -436,7 +425,7 @@ function Pagination(props: IPaginationProps) {
     setOffset(newOffset);
     return false;
   };
-  let steps = Math.ceil(data / elementsPerPage);
+  const steps = Math.ceil(data / elementsPerPage);
 
   const pages = Array(steps)
     .fill(0)

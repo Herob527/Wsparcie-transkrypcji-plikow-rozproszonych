@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useRef } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import keyboardjs from 'keyboardjs';
@@ -60,7 +61,7 @@ export function WaveAudio(props: IWaveAudioProps) {
           'data-ordering'
         );
     }
-    let outerAudioContainerId =
+    const outerAudioContainerId =
       audioContainerRef.current.parentElement?.getAttribute('data-ordering');
     return (
       outerAudioContainerId === currentFocusedElementOrderId &&
@@ -132,8 +133,8 @@ export function WaveAudio(props: IWaveAudioProps) {
       // Memory leak fix
       //@ts-ignore
       waveAudioRef.current.backend = null;
-      //@ts-ignore
-      delete waveAudioRef.current.backend;
+
+      Reflect.deleteProperty(waveAudioRef.current, 'backend')
       //@ts-ignore
       waveAudioRef.current = null;
     };
