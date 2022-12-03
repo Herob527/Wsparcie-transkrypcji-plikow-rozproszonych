@@ -1,5 +1,5 @@
 export interface ITranscriptProps {
-    "transcript": string;
-    "index": number;
-    'spellcheck': boolean;
+  transcript: string;
+  index: number;
+  spellcheck: boolean;
 }

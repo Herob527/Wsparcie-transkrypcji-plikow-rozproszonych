@@ -1,49 +1,49 @@
 {
-    "data": {
+  "data": {
     "audio_id": {
-        "description": "ID pliku audio",
-        "type": "integer",
-        "example_value": 1
+      "description": "ID pliku audio",
+      "type": "integer",
+      "example_value": 1
     },
     "audio_length": {
-        "description": "Długość pliku audio w sekundach",
-        "type": "float",
-        "example_value": 2.534
+      "description": "Długość pliku audio w sekundach",
+      "type": "float",
+      "example_value": 2.534
     },
     "audio_name": {
-        "description": "Nazwa pliku audio (po formatowaniu, jeżeli zaaplikowane)",
-        "type": "string",
-        "example_value": "ala_ma_kota.wav"
+      "description": "Nazwa pliku audio (po formatowaniu, jeżeli zaaplikowane)",
+      "type": "string",
+      "example_value": "ala_ma_kota.wav"
     },
     "audio_channels": {
-        "description": "Ilość kanałów (po formatowaniu, jeżeli zaaplikowane)",
-        "type": "integer",
-        "example_value": 2
+      "description": "Ilość kanałów (po formatowaniu, jeżeli zaaplikowane)",
+      "type": "integer",
+      "example_value": 2
     },
-    "audio_frame_rate" : {
-        "description": "Częstotliwość próbkowania (po formatowaniu, jeżeli zaplikowane)",
-        "type": "integer",
-        "example_value": 22050
+    "audio_frame_rate": {
+      "description": "Częstotliwość próbkowania (po formatowaniu, jeżeli zaplikowane)",
+      "type": "integer",
+      "example_value": 22050
     },
     "category_name": {
-        "description": "Nazwa kategorii",
-        "type": "string",
-        "example_value": "Herob"
+      "description": "Nazwa kategorii",
+      "type": "string",
+      "example_value": "Herob"
     },
     "category_id": {
-        "description": "ID kategorii",
-        "type": "integer",
-        "example_value": 2
+      "description": "ID kategorii",
+      "type": "integer",
+      "example_value": 2
     },
     "text_id": {
-        "description": "ID tekstu",
-        "type": "integer",
-        "example_value": 2
+      "description": "ID tekstu",
+      "type": "integer",
+      "example_value": 2
     },
     "text_transcript": {
-        "description": "Transkrypt",
-        "type": "string",
-        "example_value": "To jest transkrypt tejże liniki."
+      "description": "Transkrypt",
+      "type": "string",
+      "example_value": "To jest transkrypt tejże liniki."
     }
-}
+  }
 }

@@ -18,7 +18,6 @@
     "react-dom": "^17.0.2",
     "react-hotkeys-hook": "^3.4.7",
     "react-query": "^3.34.16",
-    "react-scripts": "5.0.0",
     "sass": "^1.55.0",
     "typescript": "^4.6.2",
     "use-between": "^1.3.4",
@@ -32,7 +31,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start_api": "python api.py",
-    "start_sass": "sass src --watch"
+    "start_sass": "sass src --watch",
+    "prettify": "prettier ./src --write"
   },
   "eslintConfig": {
     "extends": [
@@ -55,6 +55,8 @@
   "devDependencies": {
     "@types/keyboardjs": "^2.5.0",
     "@types/mousetrap": "^1.6.9",
-    "@types/wavesurfer.js": "^6.0.3"
+    "@types/wavesurfer.js": "^6.0.3",
+    "prettier": "2.8.0",
+    "react-scripts": "5.0.0"
   }
 }

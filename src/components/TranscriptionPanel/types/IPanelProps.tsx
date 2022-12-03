@@ -1,6 +1,6 @@
-import { configAPIData } from '../../../../type';
+import { configAPIData } from "../../../../type";
 
 export interface IPanelProps {
-    "elementsPerPage": number;
-    "config": configAPIData.RootObject;
+  elementsPerPage: number;
+  config: configAPIData.RootObject;
 }

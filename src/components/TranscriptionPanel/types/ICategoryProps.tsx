@@ -1,4 +1,4 @@
 export interface ICategoryProps {
-    "id": any;
-    "currentCategory": string;
+  id: any;
+  currentCategory: string;
 }

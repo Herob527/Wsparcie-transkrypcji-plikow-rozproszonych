@@ -1,3 +1,3 @@
 export interface IPaginationProps {
-    "elementsPerPage": number;
+  elementsPerPage: number;
 }
