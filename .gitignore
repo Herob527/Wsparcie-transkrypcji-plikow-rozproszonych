@@ -59,16 +59,4 @@ recalculate_durations.py
 /finalisation_classes/__pycache__/*.pyc
 public/source
 
-__pycache__/tables_definition.cpython-39.pyc
-api_endpoints/__pycache__/__init__.cpython-39.pyc
-api_endpoints/__pycache__/r_audios.cpython-39.pyc
-api_endpoints/__pycache__/r_bindings.cpython-39.pyc
-api_endpoints/__pycache__/r_categories.cpython-39.pyc
-api_endpoints/__pycache__/r_config.cpython-39.pyc
-api_endpoints/__pycache__/r_status.cpython-39.pyc
-api_endpoints/__pycache__/r_texts.cpython-39.pyc
-finalisation_classes/__pycache__/__init__.cpython-39.pyc
-finalisation_classes/__pycache__/BaseFinalise.cpython-39.pyc
-finalisation_classes/__pycache__/EnderalFinalise.cpython-39.pyc
-finalisation_classes/__pycache__/MultiSpeakerFinalise.cpython-39.pyc
-finalisation_classes/__pycache__/TacotronFinalise.cpython-39.pyc
+*.pyc
