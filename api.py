@@ -74,7 +74,7 @@ def get_size():
     args = request.args
 
     query = select([func.count()]).select_from(c_bindings)
-    if args["category_id"] != -1:
+    if int(args["category_id"]) != -1:
         query = query.where(c_bindings.c.category_id == args["category_id"])
     res = query.execute()
 
