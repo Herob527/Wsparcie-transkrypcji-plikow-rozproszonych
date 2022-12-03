@@ -108,8 +108,8 @@ function MainPanel(props: IPanelProps) {
       await fetch(
         `${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}&category_id=${filterCategory}`,
         {
-          method: 'GET',
-          headers: {
+          'method': 'GET',
+          'headers': {
             'Content-Type': 'application/json',
             'Charset': 'utf8',
           },
@@ -126,9 +126,9 @@ function MainPanel(props: IPanelProps) {
           return resData;
         }),
     {
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchOnMount: false,
+      'refetchOnWindowFocus': false,
+      'refetchOnReconnect': false,
+      'refetchOnMount': false,
     }
   );
   const data2: dataFromAPI = data;
@@ -277,11 +277,11 @@ function Transcript(props: ITranscriptProps) {
       ev.currentTarget.parentElement?.parentElement?.getAttribute('data-id');
     console.log(bindingId);
     const res = await fetch(`${API_ADDRESS}/texts`, {
-      method: 'PATCH',
-      headers: {
+      'method': 'PATCH',
+      'headers': {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      'body': JSON.stringify({
         'text': text,
         'bindings_id': Number(bindingId),
       }),
@@ -338,7 +338,7 @@ function Category(props: ICategoryProps) {
       const res = await fetch(`${API_ADDRESS}/categories`);
       return await res.json();
     },
-    { cacheTime: 0 }
+    { 'cacheTime': 0 }
   );
   useEffect(
     () => () => {
@@ -412,9 +412,9 @@ function Pagination(props: IPaginationProps) {
     [filterCategory],
     async () =>
       await fetch(`${API_ADDRESS}/get_size?category_id=${filterCategory}`, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
+        'method': 'GET',
+        'headers': {
+          'Accept': 'application/json',
         },
       })
         .then((response) => {

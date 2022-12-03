@@ -5,9 +5,9 @@ import keyboardjs from 'keyboardjs';
 import './style.sass';
 
 const icons = {
-  "play": '\ue034',
-  "pause": '\ue037',
-  "stop": '\ue047',
+  'play': '\ue034',
+  'pause': '\ue037',
+  'stop': '\ue047',
 };
 interface IWaveAudioProps {
   index: number;
@@ -102,11 +102,12 @@ export function WaveAudio(props: IWaveAudioProps) {
     audioContainerRef.current = audioElement;
 
     const waveform = new WaveSurfer({
-      "container": audioElement,
-      "waveColor": '#0569ff',
-      "progressColor": '#0353cc',
-      "responsive": true,
+      'container': audioElement,
+      'waveColor': '#0569ff',
+      'progressColor': '#0353cc',
+      'responsive': true,
     }).init();
+
     waveform.on('error', (err) => {
       console.log('Błąd: ', err);
     });
@@ -119,7 +120,9 @@ export function WaveAudio(props: IWaveAudioProps) {
     waveform.on('finished', () => {
       audioPlayElement.current.innerText = icons['pause'];
     });
+
     const pathToFile = `${props['audio_dir']}/${props['audio_name']}`;
+    console.log(pathToFile);
     waveform.load(pathToFile);
 
     waveAudioRef.current = waveform;
@@ -131,7 +134,7 @@ export function WaveAudio(props: IWaveAudioProps) {
       waveAudioRef.current?.destroy();
       waveAudioRef.current?.unAll();
       // Memory leak fix
-      Reflect.deleteProperty(waveAudioRef.current as WaveSurfer, 'backend')
+      Reflect.deleteProperty(waveAudioRef.current as WaveSurfer, 'backend');
       waveAudioRef.current = null;
     };
   });
@@ -139,14 +142,14 @@ export function WaveAudio(props: IWaveAudioProps) {
   return (
     <>
       <div
-        className="waveform"
+        className='waveform'
         id={`waveform_${props['index']}`}
         data-ordering={props['index']}
         key={`wav_cont_${props['index']}`}
       >
-        <div className="waveform__options">
+        <div className='waveform__options'>
           <span
-            className="waveform__option material-symbols-outlined audio_play"
+            className='waveform__option material-symbols-outlined audio_play'
             key={`wav_button_toggle_${props['index']}`}
             onClick={() => playAudioToggle()}
             title={'Uruchom / Zatrzymaj odtwarzanie - Ctrl + 1'}
@@ -154,7 +157,7 @@ export function WaveAudio(props: IWaveAudioProps) {
             {icons['pause']}
           </span>
           <span
-            className="waveform__option material-symbols-outlined audio_stop"
+            className='waveform__option material-symbols-outlined audio_stop'
             key={`wav_button_stop_${props['index']}`}
             onClick={() => stopAudio()}
             title={'Zatrzymaj i wskaźnik na początek - Ctrl + r'}
