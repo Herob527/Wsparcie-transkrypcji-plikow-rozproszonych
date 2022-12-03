@@ -12,6 +12,7 @@ import { useSharedFilterCategory } from '../../hooks/useFilterByCategory';
 import { free, useBetween } from 'use-between';
 import { useStateIfMounted } from 'use-state-if-mounted';
 import useIsMounted from 'ismounted';
+
 // Types
 import type { configAPIData } from '../../../type';
 import type { IPanelProps } from './types/IPanelProps';
@@ -19,6 +20,7 @@ import type { ITranscriptProps } from './types/ITranscriptProps';
 import type { ICategoryProps } from './types/ICategoryProps';
 import type { IPaginationProps } from './types/IPaginationProps';
 
+// Related components
 import { SidePanel } from './SidePanel';
 import { WaveAudio } from './WaveAudio';
 
@@ -69,13 +71,13 @@ const Wrapper = () => {
 };
 
 export const TranscriptionPanel = () => (
-    <QueryClientProvider
-      key='query_provider'
-      client={PanelQueryClient}
-    >
-      <Wrapper key='panel' />
-    </QueryClientProvider>
-  );
+  <QueryClientProvider
+    key='query_provider'
+    client={PanelQueryClient}
+  >
+    <Wrapper key='panel' />
+  </QueryClientProvider>
+);
 
 const handlePageChange = (currentPage: number) => {
   console.log(currentPage);
@@ -100,40 +102,49 @@ function MainPanel(props: IPanelProps) {
   const { maxOffset, offset, setOffset } = useSharedOffsetState();
   const { filterCategory } = useSharedFilterCategory();
   const isMounted = useIsMounted();
-  const { data, isLoading, error, remove } = useQuery(
+  const { data, isLoading, isError, remove } = useQuery(
     [offset, filterCategory],
-    async () => await fetch(
+    async () =>
+      await fetch(
         `${API_ADDRESS}/get_lines?limit=${props['elementsPerPage']}&offset=${offset}&category_id=${filterCategory}`,
         {
           method: 'GET',
           headers: {
             Accept: 'application/json',
           },
+          credentials: 'same-origin',
         }
       )
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.status !== 200) {
+            throw new Error(response.status.toString());
+          }
+          return response.json();
+        })
         .then((resData) => {
           handlePageChange(offset / props['elementsPerPage']);
           return resData;
-        })
-        .catch((resError) => resError),
+        }),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       refetchOnMount: false,
-      cacheTime: 0,
     }
   );
   const data2: dataFromAPI = data;
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       remove();
-    }, [remove]);
-  if (isLoading) {
+    },
+    [remove]
+  );
+  if (isError) {
+    return <div> Error </div>;
+  }
+  if (isLoading && !isError) {
     return <div> Lolding data... </div>;
   }
-  if (error) {
-    return <div> {error} </div>;
-  }
+
   console.log(`MainPanel - Offset: ${offset}`);
   keyboardjs.bind('ctrl+.', (event: any) => {
     event.preventDefault();
@@ -270,8 +281,8 @@ function Transcript(props: ITranscriptProps) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "text": text,
-        "bindings_id": Number(bindingId),
+        'text': text,
+        'bindings_id': Number(bindingId),
       }),
     })
       .then((response) => response.json())
@@ -396,18 +407,23 @@ function Pagination(props: IPaginationProps) {
   const { filterCategory } = useSharedFilterCategory();
   const { elementsPerPage } = props;
   const currentPage = 0 / elementsPerPage;
-  const { data, isLoading, remove } = useQuery([filterCategory], async () => await fetch(
-      `${API_ADDRESS}/get_size?category_id=${filterCategory}`,
-      {
+  const { data, isLoading, remove, isError } = useQuery(
+    [filterCategory],
+    async () =>
+      await fetch(`${API_ADDRESS}/get_size?category_id=${filterCategory}`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
         },
-      }
-    )
-      .then((response) => response.json())
-      .then((resData) => resData['count_1'])
-      .catch((error) => error));
+      })
+        .then((response) => {
+          if (response.status !== 200) {
+            throw new Error(response.status.toString());
+          }
+          return response.json();
+        })
+        .then((resData) => resData['count_1'])
+  );
   useEffect(
     () => () => {
       remove();
@@ -416,7 +432,10 @@ function Pagination(props: IPaginationProps) {
     },
     [remove]
   );
-  if (isLoading) {
+  if (isError) {
+    return <p> Eror </p>;
+  }
+  if (isLoading && !isError) {
     return <p> Loading pages</p>;
   }
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {

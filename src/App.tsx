@@ -15,9 +15,9 @@ type Purpouse = 'transcript' | 'config' | 'finalise';
 
 export default function App() {
   const componentsMap: I_ComponentsMap = {
-    transcript: <TranscriptionPanel />,
-    config: <ConfigurationPanel />,
-    finalise: <FinalisationPanel />,
+    "transcript": <TranscriptionPanel />,
+    "config": <ConfigurationPanel />,
+    "finalise": <FinalisationPanel />,
   };
 
   const purpouses = Object.keys(componentsMap) as Purpouse[];
@@ -42,19 +42,19 @@ export default function App() {
     <>
       <nav>
         <button
-          data-purpouse='config'
+          data-purpouse="config"
           onClick={handleClick}
         >
           Konfiguracja
         </button>
         <button
-          data-purpouse='transcript'
+          data-purpouse="transcript"
           onClick={handleClick}
         >
           Transkrypcja
         </button>
         <button
-          data-purpouse='finalise'
+          data-purpouse="finalise"
           onClick={handleClick}
         >
           Finalizacja

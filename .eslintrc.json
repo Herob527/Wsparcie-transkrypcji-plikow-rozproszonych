@@ -10,7 +10,7 @@
     "prettier"
   ],
   "overrides": [],
-  "parser": "@typescript-eslint/parser",
+  "parser": "typescript",
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
@@ -36,6 +36,7 @@
     "prefer-spread": "error",
     "use-isnan": "error",
     "no-irregular-whitespace": "error",
-    "no-shadow-restricted-names": "error"
+    "no-shadow-restricted-names": "error",
+    "semi-spacing": "error"
   }
 }

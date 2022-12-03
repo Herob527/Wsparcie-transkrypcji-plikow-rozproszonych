@@ -5,5 +5,6 @@
   "trailingComma": "es5",
   "endOfLine": "lf",
   "jsxSingleQuote": true,
-  "singleAttributePerLine": true
+  "singleAttributePerLine": true,
+  "quoteProps": "preserve"
 }

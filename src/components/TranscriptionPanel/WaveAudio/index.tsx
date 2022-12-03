@@ -5,9 +5,9 @@ import keyboardjs from 'keyboardjs';
 import './style.sass';
 
 const icons = {
-  play: '\ue034',
-  pause: '\ue037',
-  stop: '\ue047',
+  "play": '\ue034',
+  "pause": '\ue037',
+  "stop": '\ue047',
 };
 interface IWaveAudioProps {
   index: number;
@@ -16,29 +16,29 @@ interface IWaveAudioProps {
 }
 
 export function WaveAudio(props: IWaveAudioProps) {
-  const waveAudioRef = useRef({} as WaveSurfer);
+  const waveAudioRef = useRef({} as WaveSurfer | null);
   const audioContainerRef = useRef({} as HTMLElement);
   const audioPlayElement = useRef({} as HTMLSpanElement);
 
   const stopAudio = () => {
-    waveAudioRef.current.stop();
+    waveAudioRef.current?.stop();
   };
   const playAudio = () => {
-    waveAudioRef.current.play();
+    waveAudioRef.current?.play();
   };
   const playAudioToggle = () => {
     console.dir(waveAudioRef.current);
-    if (waveAudioRef.current.isPlaying()) {
+    if (waveAudioRef.current?.isPlaying()) {
       console.log('Playing. Pause the audio.');
       waveAudioRef.current.pause();
       return;
     }
     console.log('Not playing. Start the audio');
-    waveAudioRef.current.play();
+    waveAudioRef.current?.play();
     return;
   };
   const pauseAudio = () => {
-    waveAudioRef.current.pause();
+    waveAudioRef.current?.pause();
     return;
   };
 
@@ -82,14 +82,14 @@ export function WaveAudio(props: IWaveAudioProps) {
   keyboardjs.bind('ctrl+r', (event: any) => {
     event.preventDefault();
     if (isCurrentContainer()) {
-      waveAudioRef.current.stop();
+      waveAudioRef.current?.stop();
     }
     return false;
   });
   keyboardjs.bind('ctrl+;', (event: any) => {
     event.preventDefault();
     if (isCurrentContainer()) {
-      waveAudioRef.current.skipBackward(0.5);
+      waveAudioRef.current?.skipBackward(0.5);
     }
   });
   useEffect(() => {
@@ -102,10 +102,10 @@ export function WaveAudio(props: IWaveAudioProps) {
     audioContainerRef.current = audioElement;
 
     const waveform = new WaveSurfer({
-      container: audioElement,
-      waveColor: '#0569ff',
-      progressColor: '#0353cc',
-      responsive: true,
+      "container": audioElement,
+      "waveColor": '#0569ff',
+      "progressColor": '#0353cc',
+      "responsive": true,
     }).init();
     waveform.on('error', (err) => {
       console.log('Błąd: ', err);
@@ -128,14 +128,10 @@ export function WaveAudio(props: IWaveAudioProps) {
     return () => {
       audioContainerRef.current.removeEventListener('click', playAudioToggle);
       audioPlayElement.current.removeEventListener('click', playAudioToggle);
-      waveAudioRef.current.destroy();
-      waveAudioRef.current.unAll();
+      waveAudioRef.current?.destroy();
+      waveAudioRef.current?.unAll();
       // Memory leak fix
-      //@ts-ignore
-      waveAudioRef.current.backend = null;
-
-      Reflect.deleteProperty(waveAudioRef.current, 'backend')
-      //@ts-ignore
+      Reflect.deleteProperty(waveAudioRef.current as WaveSurfer, 'backend')
       waveAudioRef.current = null;
     };
   });
@@ -143,14 +139,14 @@ export function WaveAudio(props: IWaveAudioProps) {
   return (
     <>
       <div
-        className='waveform'
+        className="waveform"
         id={`waveform_${props['index']}`}
         data-ordering={props['index']}
         key={`wav_cont_${props['index']}`}
       >
-        <div className='waveform__options'>
+        <div className="waveform__options">
           <span
-            className='waveform__option material-symbols-outlined audio_play'
+            className="waveform__option material-symbols-outlined audio_play"
             key={`wav_button_toggle_${props['index']}`}
             onClick={() => playAudioToggle()}
             title={'Uruchom / Zatrzymaj odtwarzanie - Ctrl + 1'}
@@ -158,7 +154,7 @@ export function WaveAudio(props: IWaveAudioProps) {
             {icons['pause']}
           </span>
           <span
-            className='waveform__option material-symbols-outlined audio_stop'
+            className="waveform__option material-symbols-outlined audio_stop"
             key={`wav_button_stop_${props['index']}`}
             onClick={() => stopAudio()}
             title={'Zatrzymaj i wskaźnik na początek - Ctrl + r'}

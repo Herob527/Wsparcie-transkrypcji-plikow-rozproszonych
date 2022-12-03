@@ -12,15 +12,15 @@ function useConfig(endpoint = 'config') {
     'configData',
     async () =>
       await fetch(`${API_ADDRESS}/${endpoint}`, {
-        method: 'GET',
+        "method": 'GET',
       })
         .then((res) => res.json())
         .then((data) => data)
         .catch((error) => error),
     {
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      refetchOnWindowFocus: false,
+      "refetchOnMount": false,
+      "refetchOnReconnect": false,
+      "refetchOnWindowFocus": false,
     }
   );
 

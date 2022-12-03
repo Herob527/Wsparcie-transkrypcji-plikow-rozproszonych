@@ -9,8 +9,8 @@ const API_ADDRESS = 'http://localhost:5002';
 
 export const SidePanel = () => (
     <section
-      id='side_panel'
-      className='card__container'
+      id="side_panel"
+      className="card__container"
     >
       <AddCategory />
       <FilterByCategory />
@@ -23,22 +23,22 @@ function AddCategory() {
   };
   return (
     <article
-      id='add_category'
-      className='card'
+      id="add_category"
+      className="card"
     >
-      <h1 className='card__title'> Dodaj nową kategorię </h1>
+      <h1 className="card__title"> Dodaj nową kategorię </h1>
       <form
         onSubmit={handleSubmit}
-        className='side_form card__container'
+        className="side_form card__container"
       >
         <input
-          name='category_name'
-          className='card__input'
-          id='new_category_name'
+          name="category_name"
+          className="card__input"
+          id="new_category_name"
         />
         <input
-          type='submit'
-          className='card__input card__input__button'
+          type="submit"
+          className="card__input card__input__button"
         />
       </form>
     </article>
@@ -91,14 +91,14 @@ function FilterByCategory() {
     return;
   };
   return (
-    <article className='fitler_by_category card'>
-      <h1 className='card__title'> Filtruj po kategorii </h1>
+    <article className="fitler_by_category card">
+      <h1 className="card__title"> Filtruj po kategorii </h1>
       <select
-        title='Kategorie głosów'
+        title="Kategorie głosów"
         onChange={handleChange}
         onClick={handleClick}
         value={filterCategory}
-        className='category card__input'
+        className="category card__input"
       >
         <option
           value={-1}
