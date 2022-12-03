@@ -37,7 +37,6 @@
         "comma-spacing": "error",
         "arrow-spacing": "error",
         "no-shadow":"error",
-        "prefer-const": "error",
-        "prefer-destructuring":"error"
+        "prefer-const": "error"
     }
 }
