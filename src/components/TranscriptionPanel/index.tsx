@@ -48,6 +48,7 @@ const Wrapper = () => {
   }
 
   const configData = config.data as configAPIData.RootObject;
+  // eslint-disable-next-line prefer-destructuring
   const workspaceConfig = configData['workspaceConfig'];
 
   return (
@@ -110,12 +111,12 @@ function MainPanel(props: IPanelProps) {
           },
         }
       )
-        .then((res) => res.json())
-        .then((data) => {
+        .then((response) => response.json())
+        .then((resData) => {
           handlePageChange(offset / props['elementsPerPage']);
-          return data;
+          return resData;
         })
-        .catch((error) => error),
+        .catch((resError) => resError),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -273,9 +274,9 @@ function Transcript(props: ITranscriptProps) {
         "bindings_id": Number(bindingId),
       }),
     })
-      .then((res) => res.json())
-      .then((data) => data)
-      .catch((err) => err);
+      .then((response) => response.json())
+      .then((resData) => resData)
+      .catch((resErr) => resErr);
     console.log(res);
     return false;
   };
@@ -362,12 +363,12 @@ function Category(props: ICategoryProps) {
     ev.preventDefault();
     console.log(ev);
   };
-  const categories = data.map((category: any, index: number) => (
+  const categories = data.map((categoryEntry: any, index: number) => (
     <option
-      key={`option_${category['id']}_${index}`}
-      value={category['id']}
+      key={`option_${categoryEntry['id']}_${index}`}
+      value={categoryEntry['id']}
     >
-      {category['name'].trim()}
+      {categoryEntry['name'].trim()}
     </option>
   ));
   return (
@@ -405,7 +406,7 @@ function Pagination(props: IPaginationProps) {
       }
     )
       .then((response) => response.json())
-      .then((data) => data['count_1'])
+      .then((resData) => resData['count_1'])
       .catch((error) => error));
   useEffect(
     () => () => {

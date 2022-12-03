@@ -35,6 +35,9 @@
         "no-unused-expressions": "error",
         "unused-imports/no-unused-imports": "error",
         "comma-spacing": "error",
-        "arrow-spacing": "error"
+        "arrow-spacing": "error",
+        "no-shadow":"error",
+        "prefer-const": "error",
+        "prefer-destructuring":"error"
     }
 }

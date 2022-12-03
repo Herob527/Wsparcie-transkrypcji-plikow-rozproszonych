@@ -88,7 +88,7 @@ function CategoriesManager(props: any) {
         event.currentTarget.parentElement?.getAttribute('data-category-id')
       );
       const newValue = event.currentTarget.getAttribute('data-value');
-      const response = await fetch(`${E_API_ADDRESS}/categories`, {
+      const res = await fetch(`${E_API_ADDRESS}/categories`, {
         headers: {
           'Content-Type': 'application/json',
           Charset: 'utf8',
@@ -96,11 +96,11 @@ function CategoriesManager(props: any) {
         method: 'PATCH',
         body: JSON.stringify({ "category_id": idToUpdate, "new_value": newValue }),
       })
-        .then((res) => res.json())
-        .then((data) => data)
+        .then((response) => response.json())
+        .then((resData) => resData)
         .catch((err) => err);
-      console.log(response);
-      const result = response['Success'] ? 'success' : 'error';
+      console.log(res);
+      const result = res['Success'] ? 'success' : 'error';
 
       clickedElement.classList.add(result);
       setTimeout(() => clickedElement.classList.remove(result), 2000);
@@ -224,8 +224,6 @@ function ThemeList(props: any) {
     </form>
   );
 }
-
-// function AutoTranscriptionList(props: any) {}
 
 function ShortcutList(props: any) {
   return (

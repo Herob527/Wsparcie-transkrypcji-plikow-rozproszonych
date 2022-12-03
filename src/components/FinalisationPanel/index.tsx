@@ -62,9 +62,9 @@ function Wrapper() {
       headers: { 'Content-Type': 'application/json' },
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then((resData) => {
         setFinaliseState('Finished');
-        return data;
+        return resData;
       })
       .catch((err) => {
         setFinaliseState('Error');
