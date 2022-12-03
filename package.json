@@ -2,6 +2,9 @@
   "name": "katalogowanie-dzwiekow-react",
   "version": "0.1.0",
   "private": false,
+  "engines": {
+    "node": "v16.18.1"
+  },
   "dependencies": {
     "@re_point/wavesurfer": "^5.3.4",
     "hotkeys-js": "^3.10.0",
