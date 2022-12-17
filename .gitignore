@@ -58,5 +58,5 @@ recalculate_durations.py
 *.bat
 /finalisation_classes/__pycache__/*.pyc
 public/source
-
+outdated.log
 *.pyc
