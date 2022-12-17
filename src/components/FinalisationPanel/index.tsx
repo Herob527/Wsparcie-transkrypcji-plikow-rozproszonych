@@ -46,6 +46,7 @@ export const FinalisationPanel = (props: any) => (
   </QueryClientProvider>
 );
 function Wrapper() {
+  document.title = 'Finalizacja';
   const { setFinaliseState } = useSharedFinaliseRes();
   const { isLoading, data } = useConfig();
   if (isLoading) {

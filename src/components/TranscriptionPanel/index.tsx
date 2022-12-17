@@ -99,6 +99,7 @@ interface ILineFromAPI {
 type dataFromAPI = ILineFromAPI[];
 
 function MainPanel(props: IPanelProps) {
+  document.title = 'Transkrypcja';
   const { maxOffset, offset, setOffset } = useSharedOffsetState();
   const { filterCategory } = useSharedFilterCategory();
   const isMounted = useIsMounted();
