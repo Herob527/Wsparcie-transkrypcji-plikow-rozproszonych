@@ -1,10 +1,6 @@
-
-
-
-
 function useFFmpegConstructor() {
   return {
-    "createCommand": (ac = 1, ar = 22050, af = '', outputType = 'wav') => {
+    'createCommand': (ac = 1, ar = 22050, af = '', outputType = 'wav') => {
       const valueIsInvalid =
         outputType === '' ||
         ac <= 0 ||

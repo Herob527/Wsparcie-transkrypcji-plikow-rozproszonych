@@ -9,7 +9,7 @@ function useTranscriptFormatter() {
   }
 
   return {
-    "format": (value: string) => {
+    'format': (value: string) => {
       let newVal = value;
       for (const [key, val] of transcriptionOptionsMap.entries()) {
         newVal = newVal.replaceAll(`{${key}}`, val['example_value']);
