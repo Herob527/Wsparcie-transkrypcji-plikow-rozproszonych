@@ -10,7 +10,6 @@
     #lines
         flex: 8
         padding: 0.2rem
-        
 
 .line
     display: grid
@@ -20,7 +19,7 @@
     align-items: center
     text-align: center
     position: relative
-    
+
     .audio_name
         word-break: break-all
         font: 1.2rem Arial
@@ -41,7 +40,7 @@
             &.error
                 border-color: $error_color
                 border-width: 1px
-        .special_char_container 
+        .special_char_container
             position: absolute
             bottom: 0
             right: 0
@@ -53,9 +52,11 @@
                 font: 1.2rem Arial
                 &:not(:last-of-type)
                     margin-right: 0.5rem
-                
+
     .category
         font: 1.2rem Arial
+        background: $background-color
+        border: 1px solid $secondary_color
     &:not(:last-of-type)
         margin-bottom: 1rem
 
