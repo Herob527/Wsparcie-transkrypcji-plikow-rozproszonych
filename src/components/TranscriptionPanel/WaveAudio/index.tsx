@@ -136,6 +136,7 @@ export function WaveAudio(props: IWaveAudioProps) {
       // Memory leak fix
       Reflect.deleteProperty(waveAudioRef.current as WaveSurfer, 'backend');
       waveAudioRef.current = null;
+      Reflect.deleteProperty(waveAudioRef, 'current');
     };
   });
 
