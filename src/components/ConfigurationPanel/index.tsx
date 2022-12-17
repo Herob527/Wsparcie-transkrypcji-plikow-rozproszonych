@@ -10,13 +10,13 @@ export function ConfigurationPanel(props: any) {
   return (
     <QueryClientProvider
       client={ConfigQueryClient}
-      key="query_config_panel"
+      key='query_config_panel'
     >
-      <div id="ConfigurationPanel">
+      <div id='ConfigurationPanel'>
         <CategoriesManager></CategoriesManager>
         <div
-          id="side-container"
-          className="card__container"
+          id='side-container'
+          className='card__container'
         >
           <Reset />
           <ElementsPerPage />
@@ -31,13 +31,13 @@ export function ConfigurationPanel(props: any) {
 function ElementsPerPage(props: any) {
   return (
     <form
-      id="elementPerPage"
-      className="card"
+      id='elementPerPage'
+      className='card'
     >
-      <p className="card__title"> Ilość elementów na stronę </p>
+      <p className='card__title'> Ilość elementów na stronę </p>
       <input
-        type="number"
-        className="card__input"
+        type='number'
+        className='card__input'
       />
     </form>
   );
@@ -50,7 +50,7 @@ function CategoriesManager(props: any) {
       const res = await fetch(`${E_API_ADDRESS}/categories`);
       return await res.json();
     },
-    { "refetchOnWindowFocus": false }
+    { 'refetchOnWindowFocus': false }
   );
 
   if (error) {
@@ -68,12 +68,12 @@ function CategoriesManager(props: any) {
         event.currentTarget.parentElement?.getAttribute('data-category-id')
       );
       await fetch(`${E_API_ADDRESS}/categories`, {
-        "headers": {
+        'headers': {
           'Content-Type': 'application/json',
-          "Charset": 'utf8',
+          'Charset': 'utf8',
         },
-        "method": 'DELETE',
-        "body": JSON.stringify(IdToDelete),
+        'method': 'DELETE',
+        'body': JSON.stringify(IdToDelete),
       })
         .then((_) =>
           document
@@ -89,12 +89,15 @@ function CategoriesManager(props: any) {
       );
       const newValue = event.currentTarget.getAttribute('data-value');
       const res = await fetch(`${E_API_ADDRESS}/categories`, {
-        "headers": {
+        'headers': {
           'Content-Type': 'application/json',
-          "Charset": 'utf8',
+          'Charset': 'utf8',
         },
-        "method": 'PATCH',
-        "body": JSON.stringify({ "category_id": idToUpdate, "new_value": newValue }),
+        'method': 'PATCH',
+        'body': JSON.stringify({
+          'category_id': idToUpdate,
+          'new_value': newValue,
+        }),
       })
         .then((response) => response.json())
         .then((resData) => resData)
@@ -112,28 +115,28 @@ function CategoriesManager(props: any) {
     return (
       <div
         data-category-id={cProps['categoryId']}
-        className="card__row"
+        className='card__row'
       >
         <input
           key={`input${cProps['tabIndex']}${1}${cProps['categoryId']}`}
           tabIndex={cProps['tabIndex'] + 1}
-          type="text"
-          className="category_name card__input"
+          type='text'
+          className='category_name card__input'
           value={text}
           title={text}
           onChange={handleInputChange}
         ></input>
         <button
-          className="remove_category card__input card__input__button"
-          title="Zmiłuj się"
+          className='remove_category card__input card__input__button'
+          title='Zmiłuj się'
           onClick={handleDelete}
         >
           Usuń
         </button>
         <button
-          className="confirm_new_name card__input card__input__button"
+          className='confirm_new_name card__input card__input__button'
           onClick={handleUpdate}
-          title="Zatwierdź nową nazwę"
+          title='Zatwierdź nową nazwę'
           data-value={text}
         >
           Zatwierdź
@@ -142,11 +145,11 @@ function CategoriesManager(props: any) {
     );
   }
   return (
-    <div id="category_manager">
-      <p className="card__title"> Zarządzanie kategoriami</p>
+    <div id='category_manager'>
+      <p className='card__title'> Zarządzanie kategoriami</p>
       <div
-        id="categories_container"
-        className="card__container"
+        id='categories_container'
+        className='card__container'
       >
         {data.map((el: any, index: number) => (
           <CategoryLine
@@ -158,8 +161,8 @@ function CategoriesManager(props: any) {
         ))}
       </div>
       <button
-        className="card__input card__input__button"
-        id="btn_confirm_all"
+        className='card__input card__input__button'
+        id='btn_confirm_all'
       >
         Zatwierdź wszystkie
       </button>
@@ -170,20 +173,20 @@ function CategoriesManager(props: any) {
 function Reset(props: any) {
   return (
     <form
-      id="reset"
-      className="card"
+      id='reset'
+      className='card'
     >
-      <p className="card__title"> Reset projektu </p>
-      <label htmlFor="newDatabase"> Nazwa nowej bazy danych</label>
+      <p className='card__title'> Reset projektu </p>
+      <label htmlFor='newDatabase'> Nazwa nowej bazy danych</label>
       <input
-        type="text"
-        name="newDatabase"
-        className="card__input"
-        id="newDatabase"
+        type='text'
+        name='newDatabase'
+        className='card__input'
+        id='newDatabase'
       />
       <button
-        title="Stworzy nową bazę danych"
-        className="card__input card__input__button "
+        title='Stworzy nową bazę danych'
+        className='card__input card__input__button '
       >
         Reset
       </button>
@@ -193,13 +196,13 @@ function Reset(props: any) {
 function DatabaseList(props: any) {
   return (
     <form
-      id="database_list"
-      className="card"
+      id='database_list'
+      className='card'
     >
-      <p className="component_title"> Wybór bazy danych znanych API</p>
+      <p className='component_title'> Wybór bazy danych znanych API</p>
       <select
-        name="databases"
-        id="databases"
+        name='databases'
+        id='databases'
       >
         {/* List of available databases */}
       </select>
@@ -210,14 +213,14 @@ function DatabaseList(props: any) {
 function ThemeList(props: any) {
   return (
     <form
-      id="theme_list"
-      className="card"
+      id='theme_list'
+      className='card'
     >
-      <p className="card__title"> Wybór styli przestrzeni roboczej</p>
+      <p className='card__title'> Wybór styli przestrzeni roboczej</p>
       <select
-        name="themes"
-        id="themes"
-        className="card__input"
+        name='themes'
+        id='themes'
+        className='card__input'
       >
         {/* List of available styles */}
       </select>
@@ -228,10 +231,10 @@ function ThemeList(props: any) {
 function ShortcutList(props: any) {
   return (
     <div
-      id="shortcutManager"
-      className="card"
+      id='shortcutManager'
+      className='card'
     >
-      <p className="card__title"> Skróty klawiszowe </p>
+      <p className='card__title'> Skróty klawiszowe </p>
     </div>
   );
 }

@@ -17,20 +17,20 @@ const useFinaliseRes = () => {
     'None' as FinalisationStates
   );
   const errorColors = {
-    "None": 'default',
-    "Executing": 'executing',
-    "Finished": 'finished',
-    "Error": 'error',
+    'None': 'default',
+    'Executing': 'executing',
+    'Finished': 'finished',
+    'Error': 'error',
   };
   const messages = {
-    "None": 'Jestem gotowy!',
-    "Executing": 'Robię!',
-    "Finished": 'I po sprawie...',
-    "Error": 'Błąd, tylko jaki?',
+    'None': 'Jestem gotowy!',
+    'Executing': 'Robię!',
+    'Finished': 'I po sprawie...',
+    'Error': 'Błąd, tylko jaki?',
   };
   return {
     messages,
-    "colors": errorColors,
+    'colors': errorColors,
     finaliseState,
     setFinaliseState,
   };
@@ -38,18 +38,18 @@ const useFinaliseRes = () => {
 const useSharedFinaliseRes = () => useBetween(useFinaliseRes);
 
 export const FinalisationPanel = (props: any) => (
-    <QueryClientProvider
-      key="config_query_provider"
-      client={ConfigClient}
-    >
-      <Wrapper />
-    </QueryClientProvider>
-  );
+  <QueryClientProvider
+    key='config_query_provider'
+    client={ConfigClient}
+  >
+    <Wrapper />
+  </QueryClientProvider>
+);
 function Wrapper() {
   const { setFinaliseState } = useSharedFinaliseRes();
   const { isLoading, data } = useConfig();
   if (isLoading) {
-    return <div className="card"> Loading</div>;
+    return <div className='card'> Loading</div>;
   }
   const finaliseData = data['finalisationRecent'];
   const handleSubmit = async (ev: React.MouseEvent<HTMLFormElement>) => {
@@ -57,9 +57,9 @@ function Wrapper() {
     setFinaliseState('Executing');
     const formData = new FormData(ev.currentTarget);
     const res = await fetch(`${API_ADDRESS}/finalise`, {
-      "method": 'POST',
-      "body": JSON.stringify(Object.fromEntries(formData)),
-      "headers": { 'Content-Type': 'application/json' },
+      'method': 'POST',
+      'body': JSON.stringify(Object.fromEntries(formData)),
+      'headers': { 'Content-Type': 'application/json' },
     })
       .then((response) => response.json())
       .then((resData) => {
@@ -74,8 +74,8 @@ function Wrapper() {
   };
   return (
     <form
-      id="FinalisationPanel"
-      className="card__container"
+      id='FinalisationPanel'
+      className='card__container'
       onSubmit={handleSubmit}
     >
       <OutputFormat />
@@ -101,9 +101,7 @@ function OutputFormat(props: any) {
   const handleInputChannels = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     setChannels(Number.parseInt(ev.currentTarget.value));
   };
-  const handleInputSampleRate = (
-    ev: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleInputSampleRate = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     setSampleRate(Number.parseInt(ev.currentTarget.value));
   };
   const handleInputAudioFilter = (
@@ -111,60 +109,58 @@ function OutputFormat(props: any) {
   ) => {
     setAudioFilter(ev.currentTarget.value);
   };
-  const handleInputOutputType = (
-    ev: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleInputOutputType = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     setOutputType(ev.currentTarget.value);
   };
   return (
     <div
-      id="simpleFfmpegConstructor"
-      className="card"
+      id='simpleFfmpegConstructor'
+      className='card'
     >
-      <p className="card__title"> Parametry formatowania FFmpeg </p>
-      <label htmlFor="output_channels"> Ilość kanałów (-ac)</label>
+      <p className='card__title'> Parametry formatowania FFmpeg </p>
+      <label htmlFor='output_channels'> Ilość kanałów (-ac)</label>
       <input
-        type="number"
-        className="card__input"
+        type='number'
+        className='card__input'
         onInput={handleInputChannels}
-        name="output_channels"
-        id="output_channels"
-        min="1"
-        title="Wyjściowa ilośc kanałów"
+        name='output_channels'
+        id='output_channels'
+        min='1'
+        title='Wyjściowa ilośc kanałów'
         value={channels}
       />
 
-      <label htmlFor="output_sample_rate"> Częstotliwość dźwięku (-ar)</label>
+      <label htmlFor='output_sample_rate'> Częstotliwość dźwięku (-ar)</label>
       <input
-        type="number"
-        className="card__input"
+        type='number'
+        className='card__input'
         onInput={handleInputSampleRate}
-        name="output_sample_rate"
-        id="output_sample_rate"
-        min="1"
-        title="Wyjściowa częstotliwość próbkowania"
+        name='output_sample_rate'
+        id='output_sample_rate'
+        min='1'
+        title='Wyjściowa częstotliwość próbkowania'
         value={sampleRate}
       />
 
-      <label htmlFor="output_audio_filter"> Dodatkowe filtry audio (-af)</label>
+      <label htmlFor='output_audio_filter'> Dodatkowe filtry audio (-af)</label>
       <input
-        type="text"
-        className="card__input"
+        type='text'
+        className='card__input'
         onInput={handleInputAudioFilter}
-        name="output_audio_filter"
-        id="output_audio_filter"
-        title="Wyjściowy filtr audio"
+        name='output_audio_filter'
+        id='output_audio_filter'
+        title='Wyjściowy filtr audio'
         value={audioFilter}
       />
 
-      <label htmlFor="output_type"> Docelowy typ (rozszerzenie)</label>
+      <label htmlFor='output_type'> Docelowy typ (rozszerzenie)</label>
       <input
-        type="text"
-        className="card__input"
+        type='text'
+        className='card__input'
         onInput={handleInputOutputType}
-        name="output_type"
-        id="output_type"
-        title="Rozszerzenie wyjściowego audio. Domyślnie wav"
+        name='output_type'
+        id='output_type'
+        title='Rozszerzenie wyjściowego audio. Domyślnie wav'
         value={outputType}
       />
     </div>
@@ -177,31 +173,31 @@ function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
 
   return (
     <div
-      id="audioLengthRanges"
-      className="card"
+      id='audioLengthRanges'
+      className='card'
     >
-      <p className="card__title"> Filtr długości audio </p>
-      <label htmlFor="min_length"> Minimalna długość pliku audio [s] </label>
+      <p className='card__title'> Filtr długości audio </p>
+      <label htmlFor='min_length'> Minimalna długość pliku audio [s] </label>
       <input
-        type="number"
+        type='number'
         ref={refMinLength}
-        id="min_length"
+        id='min_length'
         defaultValue={minLength}
-        name="min_length"
-        min="0"
-        className="card__input"
-        title="Minimalna długość audio"
+        name='min_length'
+        min='0'
+        className='card__input'
+        title='Minimalna długość audio'
       />
-      <label htmlFor="max_length"> Maksymalna długość pliku audio [s] </label>
+      <label htmlFor='max_length'> Maksymalna długość pliku audio [s] </label>
       <input
-        type="number"
+        type='number'
         ref={refMaxLength}
-        id="max_length"
+        id='max_length'
         defaultValue={maxLength}
-        name="max_length"
-        min="0"
-        className="card__input"
-        title="Maksymalna długość audio"
+        name='max_length'
+        min='0'
+        className='card__input'
+        title='Maksymalna długość audio'
       />
     </div>
   );
@@ -210,19 +206,19 @@ function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
 function ExportTypeConfig(props: any) {
   return (
     <div
-      id="exportTypeConfig"
-      className="card"
+      id='exportTypeConfig'
+      className='card'
     >
-      <p className="card__title"> Typ eksportu </p>
+      <p className='card__title'> Typ eksportu </p>
       <select
-        name="export_method"
-        className="card__input"
+        name='export_method'
+        className='card__input'
       >
-        <option value="enderal-finalise"> Enderal </option>
-        <option value="to_one_folder">
+        <option value='enderal-finalise'> Enderal </option>
+        <option value='to_one_folder'>
           Każda kategoria do jednego folderu
         </option>
-        <option value="distinctive">Każda kategoria do osobnego folderu</option>
+        <option value='distinctive'>Każda kategoria do osobnego folderu</option>
       </select>
     </div>
   );
@@ -236,17 +232,17 @@ function LineFormat(props: any) {
   };
   return (
     <div
-      id="lineFormat"
-      className="card"
+      id='lineFormat'
+      className='card'
     >
-      <p className="card__title"> Format linijki </p>
-      <label htmlFor="line_format_input"> Format linijki w transkrypcji </label>
+      <p className='card__title'> Format linijki </p>
+      <label htmlFor='line_format_input'> Format linijki w transkrypcji </label>
       <textarea
-        id="line_format_input"
-        className="card__input card__input__textarea"
+        id='line_format_input'
+        className='card__input card__input__textarea'
         onInput={handleInput}
         value={lineFormat}
-        name="line_format_input"
+        name='line_format_input'
       />
       <ExampleLine text={lineFormat} />
     </div>
@@ -258,23 +254,23 @@ function Decisions(props: any) {
   const { messages, colors, finaliseState } = useSharedFinaliseRes();
   return (
     <div
-      id="decision"
-      className="card"
+      id='decision'
+      className='card'
     >
-      <p className="card__title"> Zatwierdzenie finalizacji </p>
-      <label htmlFor="should_filter"> Filtruj długość </label>
+      <p className='card__title'> Zatwierdzenie finalizacji </p>
+      <label htmlFor='should_filter'> Filtruj długość </label>
       <input
-        type="checkbox"
-        name="should_filter"
-        id="should_filter"
-        title="Uwzględnij filtr długości audio"
+        type='checkbox'
+        name='should_filter'
+        id='should_filter'
+        title='Uwzględnij filtr długości audio'
       />
-      <label htmlFor="should_format"> Formatuj pliki audio </label>
+      <label htmlFor='should_format'> Formatuj pliki audio </label>
       <input
-        type="checkbox"
-        name="should_format"
-        id="should_format"
-        title="Dodatkowo formatuje pliki audio"
+        type='checkbox'
+        name='should_format'
+        id='should_format'
+        title='Dodatkowo formatuje pliki audio'
       />
       <button
         className={`card__input card__input__button ${colors[finaliseState]}`}
@@ -292,10 +288,10 @@ function ExampleLine({ text }: { text: string }) {
   formatter.format(text as string);
   return (
     <>
-      <label htmlFor="lineExample"> Przykład linijki </label>
+      <label htmlFor='lineExample'> Przykład linijki </label>
       <textarea
-        id="lineExample"
-        className="card__input card__input__textarea"
+        id='lineExample'
+        className='card__input card__input__textarea'
         readOnly
         value={formatter.format(text)}
       />
@@ -305,8 +301,8 @@ function ExampleLine({ text }: { text: string }) {
 
 function Consequences(props: any) {
   return (
-    <div className="card">
-      <p className="card__title"> Konsekwencje wyborów </p>
+    <div className='card'>
+      <p className='card__title'> Konsekwencje wyborów </p>
     </div>
   );
 }
