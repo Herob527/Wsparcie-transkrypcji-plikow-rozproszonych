@@ -304,7 +304,7 @@ function Transcript(props: ITranscriptProps) {
   return (
     <div className='transcript_area'>
       <textarea
-        title='Transkrpcja'
+        title='Transkrypcja'
         value={text}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -359,9 +359,19 @@ function Category(props: ICategoryProps) {
       </select>
     );
 
-  const handleChange = async (ev: any) => {
-    console.log(ev.target.value);
+  const handleChange = async (ev: React.ChangeEvent<HTMLSelectElement>) => {
     const categoryId = ev.target.value;
+    const res = await fetch(`${API_ADDRESS}/set_category`, {
+      'headers': {
+        'Content-Type': 'application/json',
+      },
+      'method': 'PATCH',
+      'body': JSON.stringify({
+        'bindings_id': id,
+        'category_id': categoryId,
+      }),
+    });
+
     setCategory(categoryId);
 
     return;
