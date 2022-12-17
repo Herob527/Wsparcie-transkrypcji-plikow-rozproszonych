@@ -8,20 +8,22 @@ import json
 import asyncio
 from ffmpeg import FFmpeg
 from sqlalchemy.engine import Engine
+
+
 class MultiSpeakerFinalise(BaseFinalise):
     """
     This class implements finalisation of the project optimised to train multispeaker models like Flowtron or Uberduck Pipeline Tacotron
     """
 
-    def __init__(self, configuration: dict, sql_engine :Engine):
+    def __init__(self, configuration: dict, sql_engine: Engine):
         BaseFinalise.__init__(self, configuration, sql_engine)
         self.output = Path("./multispeaker_output")
         if self.output.exists():
             rmtree(self.output)
         self.output.mkdir()
-        
-        self.name = 'all_to_one'
-        self.ux_name = 'Każda kategoria do jednego folderu'
+
+        self.name = "all_to_one"
+        self.ux_name = "Każda kategoria do jednego folderu"
         self.model_info = (
             select(
                 c_categories.c.id,
@@ -47,10 +49,10 @@ class MultiSpeakerFinalise(BaseFinalise):
         invalid_wavs_path = Path(self.output, "invalid_wavs")
         wavs_path.mkdir()
         invalid_wavs_path.mkdir()
-        
+
         for i in self.general_data:
             current_folder = wavs_path
-            directory = i['directory']
+            directory = i["directory"]
             audio_length = i["duration_seconds"]
             audio_channels = i["channels"]
             is_invalid_format = (
@@ -58,7 +60,7 @@ class MultiSpeakerFinalise(BaseFinalise):
                 or audio_length < self.configuration["min_length"]
                 or audio_channels != 1
             )
-            if is_invalid_format and self.configuration['should_filter']:
+            if is_invalid_format and self.configuration["should_filter"]:
                 current_folder = invalid_wavs_path
             output_name = f"{i['category_id']}_{i['name']}"
             source_path = Path(directory, i["name"])
@@ -155,4 +157,3 @@ class MultiSpeakerFinalise(BaseFinalise):
         for audio in temp_folder.iterdir():
             copy(audio, wavs_path)
         rmtree(temp_folder)
-

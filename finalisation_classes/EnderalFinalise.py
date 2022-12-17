@@ -1,13 +1,9 @@
-from pprint import pprint
 from finalisation_classes.BaseFinalise import BaseFinalise
 from dataclasses import dataclass
-from pathlib import Path
 from tables_definition import *
-from sqlalchemy import select, func
-from typing import List
 from sqlalchemy.sql import text
 from sqlalchemy.engine import Engine
-from collections import Counter
+
 
 @dataclass
 class EnderalFinalise(BaseFinalise):
@@ -58,7 +54,7 @@ class EnderalFinalise(BaseFinalise):
                     """
                 )
             )
-            self.general_data = sorted([*self.general_query], key=lambda d: d['c_name'])
+            self.general_data = sorted([*self.general_query], key=lambda d: d["c_name"])
             self.characters_card_data = [*self.characters_card_query]
 
     def filter(self):
@@ -68,21 +64,23 @@ class EnderalFinalise(BaseFinalise):
         pass
 
     def provide_transcription(self):
-        with open("texts.txt", "w", encoding="utf-8") as f_texts_output, open("karty_postaci.csv", "w", encoding="utf-8") as f_chars_output:
+        with open("texts.txt", "w", encoding="utf-8") as f_texts_output, open(
+            "karty_postaci.csv", "w", encoding="utf-8"
+        ) as f_chars_output:
             current_category = ""
-            f_chars_output.write('Nazwa_postaci;Ilość_tekstów\n')
+            f_chars_output.write("Nazwa_postaci;Ilość_tekstów\n")
             for i in self.general_data:
                 file_name, category_name, transcript = i
-                
+
                 if current_category != category_name:
-                    f_texts_output.write(f'\n{category_name}\n')
+                    f_texts_output.write(f"\n{category_name}\n")
                     f_texts_output.write("-" * 20)
                     f_texts_output.write("\n")
                     current_category = category_name
-                f_texts_output.write(f'{file_name}|{transcript}\n')
+                f_texts_output.write(f"{file_name}|{transcript}\n")
             for j in self.characters_card_data:
                 category_name, count = j
-                f_chars_output.write(f'{category_name};{count}\n')
+                f_chars_output.write(f"{category_name};{count}\n")
 
     def format(self):
         pass

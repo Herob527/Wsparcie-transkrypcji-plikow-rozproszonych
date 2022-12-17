@@ -1,6 +1,5 @@
 import asyncio
 from operator import itemgetter
-from os import getcwd
 from pathlib import Path
 from shutil import copy, rmtree
 
@@ -18,10 +17,12 @@ class TacotronFinalise(BaseFinalise):
     def __init__(self, configuration: dict, sql_engine):
         BaseFinalise.__init__(self, configuration, sql_engine)
         self.output = Path("./tacotron_output")
-        self.name = 'distinctive'
-        self.ux_name = 'Każda kategoria do jednego folderu'
-        if self.configuration['line_format_input'] == '':
-            self.configuration['line_format_input'] = 'wavs/{audio_name}|{text_transcript}'
+        self.name = "distinctive"
+        self.ux_name = "Każda kategoria do jednego folderu"
+        if self.configuration["line_format_input"] == "":
+            self.configuration[
+                "line_format_input"
+            ] = "wavs/{audio_name}|{text_transcript}"
         if self.output.exists():
             rmtree(self.output)
 
@@ -29,7 +30,8 @@ class TacotronFinalise(BaseFinalise):
         category_query = self.general_query.group_by(c_categories.c.name)
         category_data = category_query.execute().mappings().all()
         min_length, max_length, should_filter = itemgetter(
-            'min_length', 'max_length', 'should_filter')(self.configuration)
+            "min_length", "max_length", "should_filter"
+        )(self.configuration)
         for category in category_data:
             category_path = Path(self.output, category["category_name"])
             wavs_path = Path(category_path, "wavs")
@@ -55,12 +57,29 @@ class TacotronFinalise(BaseFinalise):
                 path_for_invalid_length.mkdir(exist_ok=True)
                 copy(source_path, f"{path_for_invalid_length}")
                 continue
-            copy(f'{source_path}'.replace('\\', '/'),
-                 f"{output_file_path}".replace('\\', '/'))
+            copy(
+                f"{source_path}".replace("\\", "/"),
+                f"{output_file_path}".replace("\\", "/"),
+            )
 
     def provide_transcription(self):
-        output_type, min_length, max_length, should_format, line_format_input, should_filter = itemgetter(
-            'output_type', 'min_length', 'max_length', 'should_format', 'line_format_input', 'should_filter')(self.configuration)
+        (
+            output_type,
+            min_length,
+            max_length,
+            should_format,
+            line_format_input,
+            should_filter,
+        ) = itemgetter(
+            "output_type",
+            "min_length",
+            "max_length",
+            "should_format",
+            "line_format_input",
+            "should_filter",
+        )(
+            self.configuration
+        )
         for entry in self.general_data:
             audio_length = entry["audio_length"]
             audio_channels = entry["audio_channels"]
@@ -84,14 +103,22 @@ class TacotronFinalise(BaseFinalise):
     def format(self):
         category_query = self.general_query.group_by(c_categories.c.name)
         category_data = category_query.execute().mappings().all()
-        output_type, output_audio_filter, output_sample_rate, output_channels = itemgetter(
-            'output_type', 'output_audio_filter', 'output_sample_rate', 'output_channels')(self.configuration)
-        output_params = {
-            "ac": output_channels,
-            "ar": output_sample_rate
-        }
-        if output_audio_filter != '':
-            output_params['af'] = output_audio_filter
+        (
+            output_type,
+            output_audio_filter,
+            output_sample_rate,
+            output_channels,
+        ) = itemgetter(
+            "output_type",
+            "output_audio_filter",
+            "output_sample_rate",
+            "output_channels",
+        )(
+            self.configuration
+        )
+        output_params = {"ac": output_channels, "ar": output_sample_rate}
+        if output_audio_filter != "":
+            output_params["af"] = output_audio_filter
 
         for category in category_data:
             wavs_path = Path(self.output, category["category_name"], "wavs")
@@ -112,16 +139,16 @@ class TacotronFinalise(BaseFinalise):
                     .output(output_name, **output_params)
                 )
 
-                @ current_file.on("stderr")
+                @current_file.on("stderr")
                 def on_stderr(line):
                     # print('stderr:', line)
                     pass
 
-                @ current_file.on("error")
+                @current_file.on("error")
                 def on_error(code):
                     print("Error:", code, f" on file: {audio}")
 
-                @ current_file.on("completed")
+                @current_file.on("completed")
                 def on_completed():
                     audio.unlink()
                     print(f"Completed formating file: {audio}")
