@@ -19,8 +19,12 @@ from api_endpoints.r_categories import r_categories
 from api_endpoints.r_config import r_config
 from api_endpoints.r_status import r_status
 from api_endpoints.r_texts import r_texts
-from finalisation_classes import (EnderalFinalise, MultiSpeakerFinalise,
-                                  TacotronFinalise, get_methods)
+from finalisation_classes import (
+    EnderalFinalise,
+    MultiSpeakerFinalise,
+    TacotronFinalise,
+    get_methods,
+)
 from tables_definition import *
 
 log_dir = Path("logs")
@@ -111,8 +115,7 @@ def insert_data_to_database(index, path, additional_data, audio, file_name):
             }
         ).execute()
     except sqlalchemy.exc.IntegrityError:
-        logging.error(
-            f"Failed to enter audio {file_name} with id {index}. It exists.")
+        logging.error(f"Failed to enter audio {file_name} with id {index}. It exists.")
     try:
         c_bindings.insert(
             {
@@ -147,7 +150,6 @@ def get_line():
             c_audio.c.directory.label("audio_directory"),
             c_audio.c.duration_seconds,
             c_texts.c.transcript,
-
         )
         .join(c_audio)
         .join(c_categories)
@@ -156,9 +158,8 @@ def get_line():
         .limit(args["limit"])
         .offset(args["offset"])
     )
-    if int(args['category_id']) != -1:
-        general_query = general_query.where(
-            c_categories.c.id == args["category_id"])
+    if int(args["category_id"]) != -1:
+        general_query = general_query.where(c_categories.c.id == args["category_id"])
 
     general_data: List[dict] = (
         general_query.order_by(c_audio.c.name).execute().mappings().all()
@@ -173,11 +174,11 @@ def setup_database():
         """
             Category used for files with unassigned category. Default category.
         """
-        "unknown": {"id": 0, "name": "Nieznany", "initial_category": "Nieznany"},
+        "unknown": {"id": 0, "name": "Nieznany"},
         """
             Category set by user, who identify a file as... trash, insufficient for later usage or something. It's up to them
         """
-        "trash": {"id": 1, "name": "Odpad", "initial_category": "Odpad"},
+        "trash": {"id": 1, "name": "Odpad"},
     }
     print("Usuwanie istniejących tabel")
     if c_categories.exists():
@@ -197,9 +198,7 @@ def setup_database():
     print("Wstawianie danych")
     start_time = time.time()
     for val in initial_categories.values():
-        c_categories.insert().values(
-            id=val["id"], name=val["name"], initial_category=val["initial_category"]
-        ).execute()
+        c_categories.insert().values(id=val["id"], name=val["name"]).execute()
 
     with _engine.connect():
         dirs = [i for i in source_path.iterdir() if i.is_dir()]
@@ -219,9 +218,7 @@ def setup_database():
 
         for index, directory in enumerate(dirs, start=2):
             with contextlib.suppress(sqlalchemy.exc.IntegrityError):
-                c_categories.insert().values(
-                    name=directory.name, initial_category=directory.name
-                ).execute()
+                c_categories.insert().values(name=directory.name).execute()
 
             path_to_text = Path(directory, f"{directory.name}.txt")
             if path_to_text.exists():
@@ -254,8 +251,7 @@ def setup_database():
 
         with ThreadPoolExecutor() as executor:
             for index, i in enumerate(data):
-                x = executor.submit(insert_data, index,
-                                    i["path"], i["additional_data"])
+                x = executor.submit(insert_data, index, i["path"], i["additional_data"])
                 x.result()
 
     total_time = time.time() - start_time
