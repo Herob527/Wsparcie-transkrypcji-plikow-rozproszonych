@@ -254,7 +254,7 @@ function Transcript(props: ITranscriptProps) {
   const validateEntry = (el: HTMLTextAreaElement) => {
     const valueLength = el.value.length;
     for (const char of endingChars) {
-      if (el.value.lastIndexOf(char) === valueLength - 1) {
+      if (el.value.trim().lastIndexOf(char) === valueLength - 1) {
         return true;
       }
     }
