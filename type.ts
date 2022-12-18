@@ -4,6 +4,7 @@ export namespace configAPIData {
         elementsPerPage: number;
         theme: string;
         spellcheck: boolean
+        specialCharacters: Array<string>
     }
 
     export interface DatabaseConnectionConfig {
