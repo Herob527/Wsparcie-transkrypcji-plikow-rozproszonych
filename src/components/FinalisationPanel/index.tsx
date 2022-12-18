@@ -124,7 +124,6 @@ function OutputFormat(props: any) {
         className='card__label'
         htmlFor='output_channels'
       >
-        {' '}
         Ilość kanałów (-ac)
       </label>
       <input
@@ -142,7 +141,6 @@ function OutputFormat(props: any) {
         className='card__label'
         htmlFor='output_sample_rate'
       >
-        {' '}
         Częstotliwość dźwięku (-ar)
       </label>
       <input
@@ -160,7 +158,6 @@ function OutputFormat(props: any) {
         htmlFor='output_audio_filter'
         className='card__label'
       >
-        {' '}
         Dodatkowe filtry audio (-af)
       </label>
       <input
@@ -177,7 +174,6 @@ function OutputFormat(props: any) {
         htmlFor='output_type'
         className='card__label'
       >
-        {' '}
         Docelowy typ (rozszerzenie)
       </label>
       <input
@@ -207,8 +203,7 @@ function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
         htmlFor='min_length'
         className='card__label'
       >
-        {' '}
-        Minimalna długość pliku audio [s]{' '}
+        Minimalna długość pliku audio [s]
       </label>
       <input
         type='number'
@@ -224,8 +219,7 @@ function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
         htmlFor='max_length'
         className='card__label'
       >
-        {' '}
-        Maksymalna długość pliku audio [s]{' '}
+        Maksymalna długość pliku audio [s]
       </label>
       <input
         type='number'
@@ -278,8 +272,7 @@ function LineFormat(props: any) {
         htmlFor='line_format_input'
         className='card__label'
       >
-        {' '}
-        Format linijki w transkrypcji{' '}
+        Format linijki w transkrypcji
       </label>
       <textarea
         id='line_format_input'
@@ -306,8 +299,7 @@ function Decisions(props: any) {
         htmlFor='should_filter'
         className='card__label'
       >
-        {' '}
-        Filtruj długość{' '}
+        Filtruj długość
       </label>
       <input
         type='checkbox'
@@ -319,8 +311,7 @@ function Decisions(props: any) {
         htmlFor='should_format'
         className='card__label'
       >
-        {' '}
-        Formatuj pliki audio{' '}
+        Formatuj pliki audio
       </label>
       <input
         type='checkbox'
@@ -348,8 +339,7 @@ function ExampleLine({ text }: { text: string }) {
         htmlFor='lineExample'
         className='card__label'
       >
-        {' '}
-        Przykład linijki{' '}
+        Przykład linijki
       </label>
       <textarea
         id='lineExample'
