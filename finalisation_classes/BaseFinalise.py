@@ -43,7 +43,7 @@ class BaseFinalise:
             .join(c_texts)
             .where(c_categories.c.name != "Nieznane")
             .where(c_categories.c.name != "Odpad")
-            .where(c_texts.c.transcript == "")
+            .where(c_texts.c.transcript != "")
         )
 
         self.general_data: List[RowMapping] = (

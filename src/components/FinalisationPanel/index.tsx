@@ -6,6 +6,7 @@ import useTranscriptFormatter from '../../hooks/useTranscriptFormatter';
 import useConfig from '../../hooks/useConfig';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { useBetween } from 'use-between';
+
 const API_ADDRESS = 'http://localhost:5002';
 
 const ConfigClient = new QueryClient();
@@ -119,7 +120,13 @@ function OutputFormat(props: any) {
       className='card'
     >
       <p className='card__title'> Parametry formatowania FFmpeg </p>
-      <label htmlFor='output_channels'> Ilość kanałów (-ac)</label>
+      <label
+        className='card__label'
+        htmlFor='output_channels'
+      >
+        {' '}
+        Ilość kanałów (-ac)
+      </label>
       <input
         type='number'
         className='card__input'
@@ -131,7 +138,13 @@ function OutputFormat(props: any) {
         value={channels}
       />
 
-      <label htmlFor='output_sample_rate'> Częstotliwość dźwięku (-ar)</label>
+      <label
+        className='card__label'
+        htmlFor='output_sample_rate'
+      >
+        {' '}
+        Częstotliwość dźwięku (-ar)
+      </label>
       <input
         type='number'
         className='card__input'
@@ -143,7 +156,13 @@ function OutputFormat(props: any) {
         value={sampleRate}
       />
 
-      <label htmlFor='output_audio_filter'> Dodatkowe filtry audio (-af)</label>
+      <label
+        htmlFor='output_audio_filter'
+        className='card__label'
+      >
+        {' '}
+        Dodatkowe filtry audio (-af)
+      </label>
       <input
         type='text'
         className='card__input'
@@ -154,7 +173,13 @@ function OutputFormat(props: any) {
         value={audioFilter}
       />
 
-      <label htmlFor='output_type'> Docelowy typ (rozszerzenie)</label>
+      <label
+        htmlFor='output_type'
+        className='card__label'
+      >
+        {' '}
+        Docelowy typ (rozszerzenie)
+      </label>
       <input
         type='text'
         className='card__input'
@@ -178,7 +203,13 @@ function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
       className='card'
     >
       <p className='card__title'> Filtr długości audio </p>
-      <label htmlFor='min_length'> Minimalna długość pliku audio [s] </label>
+      <label
+        htmlFor='min_length'
+        className='card__label'
+      >
+        {' '}
+        Minimalna długość pliku audio [s]{' '}
+      </label>
       <input
         type='number'
         ref={refMinLength}
@@ -189,7 +220,13 @@ function AudioLengthRanges({ minLength, maxLength, invalidsDir }: any) {
         className='card__input'
         title='Minimalna długość audio'
       />
-      <label htmlFor='max_length'> Maksymalna długość pliku audio [s] </label>
+      <label
+        htmlFor='max_length'
+        className='card__label'
+      >
+        {' '}
+        Maksymalna długość pliku audio [s]{' '}
+      </label>
       <input
         type='number'
         ref={refMaxLength}
@@ -237,7 +274,13 @@ function LineFormat(props: any) {
       className='card'
     >
       <p className='card__title'> Format linijki </p>
-      <label htmlFor='line_format_input'> Format linijki w transkrypcji </label>
+      <label
+        htmlFor='line_format_input'
+        className='card__label'
+      >
+        {' '}
+        Format linijki w transkrypcji{' '}
+      </label>
       <textarea
         id='line_format_input'
         className='card__input card__input__textarea'
@@ -259,14 +302,26 @@ function Decisions(props: any) {
       className='card'
     >
       <p className='card__title'> Zatwierdzenie finalizacji </p>
-      <label htmlFor='should_filter'> Filtruj długość </label>
+      <label
+        htmlFor='should_filter'
+        className='card__label'
+      >
+        {' '}
+        Filtruj długość{' '}
+      </label>
       <input
         type='checkbox'
         name='should_filter'
         id='should_filter'
         title='Uwzględnij filtr długości audio'
       />
-      <label htmlFor='should_format'> Formatuj pliki audio </label>
+      <label
+        htmlFor='should_format'
+        className='card__label'
+      >
+        {' '}
+        Formatuj pliki audio{' '}
+      </label>
       <input
         type='checkbox'
         name='should_format'
@@ -279,7 +334,7 @@ function Decisions(props: any) {
       >
         Finalizuj
       </button>
-      <p> {messages[finaliseState]}</p>
+      <p className='card__label'> {messages[finaliseState]}</p>
     </div>
   );
 }
@@ -289,7 +344,13 @@ function ExampleLine({ text }: { text: string }) {
   formatter.format(text as string);
   return (
     <>
-      <label htmlFor='lineExample'> Przykład linijki </label>
+      <label
+        htmlFor='lineExample'
+        className='card__label'
+      >
+        {' '}
+        Przykład linijki{' '}
+      </label>
       <textarea
         id='lineExample'
         className='card__input card__input__textarea'

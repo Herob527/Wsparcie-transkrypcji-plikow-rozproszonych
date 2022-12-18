@@ -103,9 +103,10 @@ export function WaveAudio(props: IWaveAudioProps) {
 
     const waveform = new WaveSurfer({
       'container': audioElement,
-      'waveColor': '#0569ff',
-      'progressColor': '#0353cc',
+      'waveColor': '#444',
+      'progressColor': '#111',
       'responsive': true,
+      'backgroundColor': '#555',
     }).init();
 
     waveform.on('error', (err) => {

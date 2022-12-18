@@ -3,8 +3,8 @@
 .btn_regular
     transition: background-color .1s, transition .5s
     transition-timing-function: ease-out
-    background-color: $primary_color
-    color: $background-color
+    background-color: $background-color
+    color: $foreground-font-color
     border-radius: 0.15rem
     font-size: 1rem
     padding: 0.2rem
@@ -19,6 +19,7 @@
     padding: $gap_size * 8
     grid-gap: $gap_size * 8
     justify-content: center
+    background-color: $background-color
 
 .card__container__large
     display: flex
@@ -46,19 +47,24 @@
     text-align: center
     margin: 0
     padding: 1rem
+    color: $font-color
+    background: $background-color
         
 .card__input
     font: 1rem Verdana
-    background: $primary_color
-    color: $font-color
-    border: 2px solid $secondary_color
+    background: $background-color
+    color: $foreground-font-color
+    border: 2px solid $primary_color
     padding: $gap_size
+    color: $font-color
     &:focus
         border: 2px solid $secondary_color
-        background: $secondary_color
+        background: $primary_color
         outline: none
+        color: $foreground-font-color 
     &:hover
         background: $secondary_color
+        color: $foreground-font-color
 
 .card__input__button
     font: 1rem Verdana
@@ -78,3 +84,5 @@
     flex-flow: row nowrap
     grid-gap: 0.2rem
 
+.card__label
+    color: $font-color
