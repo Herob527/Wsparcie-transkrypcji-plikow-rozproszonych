@@ -13,7 +13,9 @@ function useConfig(endpoint = 'config') {
       })
         .then((res) => res.json())
         .then((data) => data)
-        .catch((error) => error),
+        .catch((error) => {
+          throw new Error(error);
+        }),
     {
       'refetchOnMount': false,
       'refetchOnReconnect': false,
