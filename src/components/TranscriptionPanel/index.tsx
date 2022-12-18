@@ -1,5 +1,5 @@
 import './style.sass';
-
+import '../../styles/errorStyles.sass';
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 
@@ -44,7 +44,15 @@ export const useSharedOffsetState = () => useBetween(useOffsetData);
 
 const Wrapper = () => {
   const config = useConfig();
-
+  if (config.isError) {
+    console.log(config);
+    return (
+      <div className='error_panel'>
+        <p className='error_title'> Błąd </p>
+        <p className='error_msg'> {config.error?.toString()} </p>
+      </div>
+    );
+  }
   if (config.isLoading) {
     return <p> Lolding config.</p>;
   }
@@ -103,7 +111,7 @@ function MainPanel(props: IPanelProps) {
   const { maxOffset, offset, setOffset } = useSharedOffsetState();
   const { filterCategory } = useSharedFilterCategory();
   const isMounted = useIsMounted();
-  const { data, isLoading, isError, remove } = useQuery(
+  const { data, isLoading, isError, error, remove } = useQuery(
     [offset, filterCategory],
     async () =>
       await fetch(
@@ -141,7 +149,7 @@ function MainPanel(props: IPanelProps) {
   );
   console.log(isError, data);
   if (isError) {
-    return <div> Error </div>;
+    return <div> Error: {error}</div>;
   }
   if (isLoading) {
     return <div> Lolding data... </div>;
@@ -227,6 +235,9 @@ function MainPanel(props: IPanelProps) {
             transcript={el['transcript']}
             index={index}
             spellcheck={props['config']['workspaceConfig']['spellcheck']}
+            specialCharacter={
+              props['config']['workspaceConfig']['specialCharacters']
+            }
           />
           <Category
             key={`cat_${el['audio_name']}_${index}`}
@@ -293,7 +304,7 @@ function Transcript(props: ITranscriptProps) {
     console.log(res);
     return false;
   };
-  const specialCharacters = ['ř'];
+  const specialCharacters = props['specialCharacter'];
   const handleSpecialCharacters = (ev: React.MouseEvent<HTMLButtonElement>) => {
     const character = ev.currentTarget.getAttribute('data-character');
     setText(text + character);
@@ -407,6 +418,7 @@ function Category(props: ICategoryProps) {
         onCopyCapture={handleCopy}
         value={category}
         className='category'
+        size={2}
       >
         {categories}
       </select>

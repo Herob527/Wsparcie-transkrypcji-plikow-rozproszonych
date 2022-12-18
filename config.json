@@ -2,7 +2,8 @@
   "workspaceConfig": {
     "elementsPerPage": 20,
     "theme": "light",
-    "spellcheck": false
+    "spellcheck": false,
+    "specialCharacters": ["ř"]
   },
   "apiConfig": {
     "sourceFolder": "./source",
