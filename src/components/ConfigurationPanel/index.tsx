@@ -18,7 +18,6 @@ export function ConfigurationPanel(props: any) {
           id='side-container'
           className='card__container'
         >
-          <Reset />
           <ElementsPerPage />
           <ThemeList />
           <ShortcutList />
@@ -215,7 +214,22 @@ function DatabaseList(props: any) {
   );
 }
 
+interface styleName {
+  name: string;
+  uxName: string;
+}
 function ThemeList(props: any) {
+  const availableStyles: Array<styleName> = [
+    { 'name': 'white-blue', 'uxName': 'Biało-niebieski' },
+    { 'name': 'grey-yellow', 'uxName': 'Szaro-żółty' },
+  ];
+  const handleChange = (ev: React.ChangeEvent<HTMLSelectElement>) => {
+    const newTheme = ev.currentTarget.value;
+    window.localStorage.setItem('theme', newTheme);
+    const rootEl = document.getElementById('root') as HTMLDivElement;
+    rootEl.style.cssText = `--theme: ${newTheme}`;
+  };
+
   return (
     <form
       id='theme_list'
@@ -223,11 +237,19 @@ function ThemeList(props: any) {
     >
       <p className='card__title'> Wybór styli przestrzeni roboczej</p>
       <select
+        onChange={handleChange}
         name='themes'
         id='themes'
         className='card__input'
       >
-        {/* List of available styles */}
+        {availableStyles.map((el) => (
+          <option
+            value={el['name']}
+            key={el['name']}
+          >
+            {el['uxName']}
+          </option>
+        ))}
       </select>
     </form>
   );
