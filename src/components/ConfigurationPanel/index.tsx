@@ -177,7 +177,12 @@ function Reset(props: any) {
       className='card'
     >
       <p className='card__title'> Reset projektu </p>
-      <label htmlFor='newDatabase'> Nazwa nowej bazy danych</label>
+      <label
+        htmlFor='newDatabase'
+        className='card__label'
+      >
+        Nazwa nowej bazy danych
+      </label>
       <input
         type='text'
         name='newDatabase'
