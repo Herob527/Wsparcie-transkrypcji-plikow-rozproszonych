@@ -6,5 +6,6 @@
   "endOfLine": "lf",
   "jsxSingleQuote": true,
   "singleAttributePerLine": true,
-  "quoteProps": "preserve"
+  "quoteProps": "preserve",
+  "bracketSpacing": true
 }
